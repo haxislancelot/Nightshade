@@ -1,6 +1,4 @@
 #!/system/bin/sh
-# Some script credits go to @pedro3z0 ktsr dev, thx pedro
-# Modified by raidenkk @ telegram
 
 # Colors
 R='\e[01;31m'		# RED TEXT
@@ -290,7 +288,7 @@ kmsg1 "[ * ] Battery charge level: $percentage% "
 kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "-------------------------------------------------------"
 simple_bar
-kmsg1 "[*] ENABLING $rtks_profile PROFILE... "
+kmsg1 "[*] ENABLING $gtks_profile PROFILE... "
 simple_bar
 
 renice -n -5 $(pgrep system_server)
@@ -713,7 +711,7 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 fi
 
 simple_bar
-kmsg1 "[*] $rtks_profile PROFILE APPLIED WITH SUCCESS. "
+kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS. "
 simple_bar
 
 simple_bar
@@ -748,7 +746,7 @@ kmsg1 "[ * ] Battery charge level: $percentage% "
 kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "------------------------------------------------------"
 simple_bar
-kmsg1 "[*] ENABLING $rtks_profile PROFILE... "
+kmsg1 "[*] ENABLING $gtks_profile PROFILE... "
 simple_bar       	
  	
 renice -n -5 $(pgrep system_server)
@@ -1149,7 +1147,7 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 fi
 
 simple_bar
-kmsg1 "[*] $rtks_profile PROFILE APPLIED WITH SUCCESS "
+kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS "
 simple_bar
 
 simple_bar
@@ -1186,7 +1184,7 @@ kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "-------------------------------------------------------
                                                  "
 simple_bar
-kmsg1 "[*] ENABLING $rtks_profile PROFILE..."
+kmsg1 "[*] ENABLING $gtks_profile PROFILE..."
 simple_bar
 	  
 renice -n -5 $(pgrep system_server)
@@ -1615,7 +1613,7 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 fi
 
 simple_bar
-kmsg1 "[*] $rtks_profile PROFILE APPLIED SUCCESS "
+kmsg1 "[*] $gtks_profile PROFILE APPLIED SUCCESS "
 simple_bar
 
 simple_bar
@@ -1651,7 +1649,7 @@ kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "-------------------------------------------------------
                                                  "
 simple_bar
-kmsg1 "[*] ENABLING $rtks_profile PROFILE... "
+kmsg1 "[*] ENABLING $gtks_profile PROFILE... "
 simple_bar
 
 renice -n -5 $(pgrep system_server)
@@ -2082,7 +2080,7 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 fi
 
 simple_bar
-kmsg1 "[*] $rtks_profile PROFILE APPLIED WITH SUCCESS. "
+kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS. "
 simple_bar
 
 simple_bar
@@ -2118,7 +2116,7 @@ kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "-------------------------------------------------------"
 
 simple_bar
-kmsg1 "[*] ENABLING $rtks_profile PROFILE.... "
+kmsg1 "[*] ENABLING $gtks_profile PROFILE.... "
 simple_bar
 
 renice -n -5 $(pgrep system_server)
@@ -2312,7 +2310,7 @@ kmsg1 "[*] THERMAL SETTINGS APPLIED."
 simple_bar
 
 simple_bar
-kmsg1 "[*] $rtks_profile PROFILE APPLIED "
+kmsg1 "[*] $gtks_profile PROFILE APPLIED "
 simple_bar
 
 simple_bar
@@ -2327,55 +2325,55 @@ simple_bar
 }
 
 boot_run_once=false
-rtks_mode=$(getprop persist.raidentweaks.mode)
-[ -z "$rtks_mode" ] && setprop persist.raidentweaks.mode "3"
+gtks_mode=$(getprop persist.griffithtweaks.mode)
+[ -z "$gtks_mode" ] && setprop persist.griffithtweaks.mode "3"
 
 while true
 do
 	sleep 3
 	if $boot_run_once
 	then
-		[ "$(getprop persist.raidentweaks.mode)" == "$rtks_mode" ] && continue
+		[ "$(getprop persist.griffithtweaks.mode)" == "$gtks_mode" ] && continue
 	else
 		boot_run_once=true
 	fi
 
-	rtks_mode=$(getprop persist.raidentweaks.mode)
+	gtks_mode=$(getprop persist.griffithtweaks.mode)
 
-	if [[ "$rtks_mode" == "1" ]]; then
-		rtks_profilebr=Automático
-	elif [[ "$rtks_mode" == "2" ]]; then
-		rtks_profilebr=Bateria
-	elif [[ "$rtks_mode" == "3" ]]; then
-		rtks_profilebr=Balanceado
-	elif [[ "$rtks_mode" == "4" ]]; then
-		rtks_profilebr=Performance
-	elif [[ "$rtks_mode" == "5" ]]; then
-		rtks_profilebr=Gaming
-	elif [[ "$rtks_mode" == "6" ]]; then
-		rtks_profilebr=Thermal
+	if [[ "$gtks_mode" == "1" ]]; then
+		gtks_profilebr=Automático
+	elif [[ "$gtks_mode" == "2" ]]; then
+		gtks_profilebr=Bateria
+	elif [[ "$gtks_mode" == "3" ]]; then
+		gtks_profilebr=Balanceado
+	elif [[ "$gtks_mode" == "4" ]]; then
+		gtks_profilebr=Performance
+	elif [[ "$gtks_mode" == "5" ]]; then
+		gtks_profilebr=Gaming
+	elif [[ "$gtks_mode" == "6" ]]; then
+		gtks_profilebr=Thermal
 	fi
 	 	
-	if [[ "$rtks_mode" == "1" ]]; then
-		rtks_profile=Automatic
-	elif [[ "$rtks_mode" == "2" ]]; then
-		rtks_profile=Battery
-	elif [[ "$rtks_mode" == "3" ]]; then
-		rtks_profile=Balanced
-	elif [[ "$rtks_mode" == "4" ]]; then
-		rtks_profile=Performance
-	elif [[ "$rtks_mode" == "5" ]]; then
-		rtks_profile=Gaming
-	elif [[ "$rtks_mode" == "6" ]]; then
-		rtks_profile=Thermal
+	if [[ "$gtks_mode" == "1" ]]; then
+		gtks_profile=Automatic
+	elif [[ "$gtks_mode" == "2" ]]; then
+		gtks_profile=Battery
+	elif [[ "$gtks_mode" == "3" ]]; then
+		gtks_profile=Balanced
+	elif [[ "$gtks_mode" == "4" ]]; then
+		gtks_profile=Performance
+	elif [[ "$gtks_mode" == "5" ]]; then
+		gtks_profile=Gaming
+	elif [[ "$gtks_mode" == "6" ]]; then
+		gtks_profile=Thermal
 	fi
 
-	case "$rtks_profile" in
+	case "$gtks_profile" in
   	"Battery") {
 			sleep 5
 			settings put global device_idle_constants inactive_to=60000,sensing_to=0,locating_to=0,location_accuracy=2000,motion_inactive_to=0,idle_after_inactive_to=0,idle_pending_to=60000,max_idle_pending_to=120000,idle_pending_factor=2.0,idle_to=900000,max_idle_to=21600000,idle_factor=2.0,max_temp_app_whitelist_duration=60000,mms_temp_app_whitelist_duration=30000,sms_temp_app_whitelist_duration=20000,light_after_inactive_to=10000,light_pre_idle_to=60000,light_idle_to=180000,light_idle_factor=2.0,light_max_idle_to=900000,light_idle_maintenance_min_budget=30000,light_idle_maintenance_max_budget=60000
 			battery
-			su -lp 2000 -c "cmd notification post -S bigtext -t '✔ GriffithTweaks ✔' 'Tag' 'Battery profile was successfully applied!'" > /dev/null
+			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Battery profile was successfully applied!'" > /dev/null
 			echo "3" >"/proc/sys/vm/drop_caches"
 			exit
 		};;
@@ -2383,7 +2381,7 @@ do
 	  "Balanced") {
 			sleep 5
 	 		balanced
-	 		su -lp 2000 -c "cmd notification post -S bigtext -t '✔ GriffithTweaks ✔' 'Tag' 'Balanced profile was successfully applied!'" > /dev/null
+	 		su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Balanced profile was successfully applied!'" > /dev/null
 	 		echo "3" >"/proc/sys/vm/drop_caches"
 	 		exit
 		};;
@@ -2392,7 +2390,7 @@ do
 			sleep 5
 			settings delete global device_idle_constants
 			performance
-			su -lp 2000 -c "cmd notification post -S bigtext -t '✔ GriffithTweaks ✔' 'Tag' 'Performance  profile was successfully applied!'" > /dev/null
+			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Performance  profile was successfully applied!'" > /dev/null
 			echo "3" >"/proc/sys/vm/drop_caches"
 			exit
 		};;
@@ -2401,7 +2399,7 @@ do
 			sleep 5
 			settings delete global device_idle_constants
 			gaming
-			su -lp 2000 -c "cmd notification post -S bigtext -t '✔ GriffithTweaks ✔' 'Tag' 'Gaming profile was successfully applied!'" > /dev/null
+			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Gaming profile was successfully applied!'" > /dev/null
 			echo "3" >"/proc/sys/vm/drop_caches"
 			exit
 		};;
@@ -2409,7 +2407,7 @@ do
 	  "Thermal") {
 			sleep 5
 			thermal
-			su -lp 2000 -c "cmd notification post -S bigtext -t '✔ GriffithTweaks ✔' 'Tag' 'Thermal profile was successfully applied!'" > /dev/null
+			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Thermal profile was successfully applied!'" > /dev/null
 			echo "3" >"/proc/sys/vm/drop_caches"
 			exit
 	   };;
