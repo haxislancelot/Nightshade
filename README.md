@@ -1,5 +1,7 @@
 # GriffithTweaks
 
+![GriffithTweaks Logo](https://github.com/haxislancelot/GriffithTweaks/raw/main/nihil.png)
+
 Welcome to GriffithTweaks, an application designed to optimize your device's performance with five customizable modes: gaming, balanced, thermal, battery, and performance.
 
 ## About
