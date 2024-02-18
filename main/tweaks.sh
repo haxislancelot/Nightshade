@@ -1,4 +1,5 @@
 #!/system/bin/sh
+# Credit to @raidenkk on Telegram, because without him this script would not be possible.
 
 # Colors
 R='\e[01;31m'		# RED TEXT
