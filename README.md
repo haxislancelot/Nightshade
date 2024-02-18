@@ -20,10 +20,9 @@ GriffithTweaks allows users to tailor their device settings according to their s
 
 To install GriffithTweaks, simply download the latest release from the [releases page](https://github.com/haxislancelot/GriffithTweaks/releases).
 
-## Usage
+## How to Use
 
-1. Choose the mode that best fits your current activity or need.
-2. Enjoy optimized device performance tailored to your preferences.
+Learn how to use Griffith Kernel Tweaker by following the instructions provided [here](https://telegra.ph/How-to-use-Grittith-Kernel-Tweaker-02-18).
 
 ## Support
 
@@ -32,4 +31,4 @@ For questions, feedback, or assistance, feel free to join our Telegram community
 
 ## License
 
-This project is licensed under the [MIT License](link-to-license).
+This project is licensed under the [GNU General Public License 3.0](https://www.gnu.org/licenses/gpl-3.0.en.html).
