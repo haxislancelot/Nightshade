@@ -18,7 +18,7 @@ GriffithTweaks allows users to tailor their device settings according to their s
 
 ## Installation
 
-To install GriffithTweaks, simply download the latest release from the [releases page]([link-to-releases](https://github.com/haxislancelot/GriffithTweaks/releases)).
+To install GriffithTweaks, simply download the latest release from the [releases page](https://github.com/haxislancelot/GriffithTweaks/releases).
 
 ## Usage
 
