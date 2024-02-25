@@ -1676,6 +1676,11 @@ init=$(date +%s)
 gaming() {
 init=$(date +%s)
 
+# Kill background apps
+while IFS= read -r pkg_nm; do
+    [[ "$pkg_nm" != "com.tweaker.griffith" ]] && am force-stop "$pkg_nm"
+done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[*] CLEANED BACKGROUND APPS. "
+
 # Variable to ram usage
 total_mem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
 free_mem=$(cat /proc/meminfo | grep MemFree | awk '{print $2}')
@@ -1683,11 +1688,6 @@ buffers=$(cat /proc/meminfo | grep Buffers | awk '{print $2}')
 cached=$(cat /proc/meminfo | grep "^Cached" | awk '{print $2}')
 used_mem=$((total_mem - free_mem - buffers - cached))
 used_percentage=$((used_mem * 100 / total_mem))
-
-# Kill background apps
-while IFS= read -r pkg_nm; do
-    [[ "$pkg_nm" != "com.tweaker.griffith" ]] && am force-stop "$pkg_nm"
-done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[*] CLEANED BACKGROUND APPS. "
 
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
