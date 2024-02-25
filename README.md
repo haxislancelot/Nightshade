@@ -29,7 +29,7 @@
 
 # 🌐 Support 
 
- - [![Telegram](https://img.shields.io/badge/Join%20Us%20on-Telegram-blue)](https://t.me/nihilprojects) - Join the group for bug reports and assistance.
+ - [𝗝𝗼𝗶𝗻 𝗨𝘀 𝗼𝗻 𝗧𝗲𝗹𝗲𝗴𝗿𝗮𝗺](https://t.me/nihilprojects) - Join the group for bug reports and assistance.
 
 # ⚠ Disclaimer
 
@@ -49,11 +49,11 @@
 
 # 🚀 Installation guide 
 
-* Download [here](https://github.com/haxislancelot/GriffithTweaks/releases).
+* Download [𝗵𝗲𝗿𝗲](https://github.com/haxislancelot/GriffithTweaks/releases).
 
 * Save logs for bug resolution.
 
-* Refer to this [guide](https://telegra.ph/How-to-use-Grittith-Kernel-Tweaker-02-18) if you encounter difficulties.
+* Refer to this [𝗴𝘂𝗶𝗱𝗲](https://telegra.ph/How-to-use-Grittith-Kernel-Tweaker-02-18) if you encounter difficulties.
 
 # 🙌 Credits and special thanks:
 
