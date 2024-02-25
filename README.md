@@ -61,7 +61,7 @@
 
 * Save logs for bug resolution.
 
-* See this .[guide.].(https://telegra.ph/How-to-use-Grittith-Kernel-Tweaker-02-18) if you have difficulties
+* See this .[guide.](https://telegra.ph/How-to-use-Grittith-Kernel-Tweaker-02-18). if you have difficulties
 
 # Credits and special thanks:
 
