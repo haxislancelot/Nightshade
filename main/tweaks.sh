@@ -2321,6 +2321,13 @@ simple_bar
 kmsg1 "[*] FSYNC AND DYN TWEAKED."
 simple_bar
 
+chmod 666 /sys/class/power_supply/battery/voltage_max
+write "/sys/class/power_supply/battery/voltage_max" "4000000"
+
+simple_bar
+kmsg1 "[*] DECREASED BATTERY VOLTAGE."
+simple_bar
+
 write "/proc/sys/fs/dir-notify-enable" "0"
 write "/proc/sys/fs/lease-break-time" "15"
 write "/proc/sys/fs/aio-max-nr" "131072"
