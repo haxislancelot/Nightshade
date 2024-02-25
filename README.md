@@ -26,7 +26,7 @@
 
 **Encountering bugs with the module? Where can I report them?**
 
-  - Please report any bugs on our [Telegram group](https://t.me/nihilprojects). The group link can be found in the first lines.
+  - Please report any bugs on our [Telegram group](https://t.me/nihilprojects).
 
 **Does GriffithTweaks work seamlessly on all kernels?**
 
@@ -50,15 +50,13 @@
 
  - Requires **Magisk 20.4 (20400)** and up, or compatible with KSU and APATCH.
 
- - Ensure you have the latest **BusyBox** for optimal functionality.
+ - If you are using KSU or APATCH be sure to allow Griffith root before starting.
 
  - Compatible with Android **5** and up.
 
 # Installation guide 
 
-* Download the module [here](https://github.com/haxislancelot/GriffithTweaks/releases).
-
-* In your preferred manager (Magisk, KSU, or APATCH), install the module by selecting the appropriate file and following the on-screen instructions.
+* Download [here](https://github.com/haxislancelot/GriffithTweaks/releases).
 
 * Save logs for bug resolution.
 
