@@ -49,9 +49,9 @@
 
 # Requirements 
 
- - Requires **Magisk 20.4 (20400)** and up, or compatible with KSU and APATCH.
+ - Requires **Magisk 20.4 (20400)** and up, KSU or APATCH.
 
- - If you are using KSU or APATCH be sure to allow Griffith root before starting.
+ - Remember to allow root for Griffith!
 
  - Compatible with Android **5** and up.
 
@@ -61,7 +61,7 @@
 
 * Save logs for bug resolution.
 
-* Upon completion, click restart to finish the installation.
+* See this .[guide.].(https://telegra.ph/How-to-use-Grittith-Kernel-Tweaker-02-18) if you have difficulties
 
 # Credits and special thanks:
 
