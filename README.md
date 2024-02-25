@@ -56,8 +56,6 @@ GriffithTweaks is a versatile kernel manager designed to enhance your device's p
 
 * Download [here](https://github.com/haxislancelot/GriffithTweaks/releases).
 
-* Save logs for bug resolution.
-
 * Refer to this [guide](https://telegra.ph/How-to-use-Grittith-Kernel-Tweaker-02-18) if you encounter difficulties.
 
 ## Credits and special thanks:
