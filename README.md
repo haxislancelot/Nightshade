@@ -1,4 +1,4 @@
-# GriffithTweaks
+# GriffithTweaks🔥
 
 ![GriffithTweaks Logo](https://github.com/haxislancelot/GriffithTweaks/raw/main/nihil.png)
 
