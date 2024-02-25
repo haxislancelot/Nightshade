@@ -278,6 +278,9 @@ cached=$(cat /proc/meminfo | grep "^Cached" | awk '{print $2}')
 used_mem=$((total_mem - free_mem - buffers - cached))
 used_percentage=$((used_mem * 100 / total_mem))
 
+# Variable to battery temperature
+temperature=$(($(cat /sys/class/power_supply/battery/temp) / 10)) 
+
 # Battery Profile
 battery() {
 	init=$(date +%s)
@@ -295,6 +298,7 @@ kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] GPU model: $GPU_MODEL "
 kmsg1 "[ * ] Device: $dm  "
 kmsg1 "[ * ] Battery charge level: $percentage% "
+kmsg1 "[ * ] Battery temperature: $temperature°C "
 kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "[ * ] RAM usage: $used_percentage% "
 kmsg1 "-------------------------------------------------------"
@@ -764,6 +768,7 @@ kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] GPU model: $GPU_MODEL "
 kmsg1 "[ * ] Device: $dm  "
 kmsg1 "[ * ] Battery charge level: $percentage% "
+kmsg1 "[ * ] Battery temperature: $temperature°C "
 kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "[ * ] RAM usage: $used_percentage% "
 kmsg1 "------------------------------------------------------"
@@ -1212,6 +1217,7 @@ kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] GPU model: $GPU_MODEL "
 kmsg1 "[ * ] Device: $dm  "
 kmsg1 "[ * ] Battery charge level: $percentage% "
+kmsg1 "[ * ] Battery temperature: $temperature°C "
 kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "[ * ] RAM usage: $used_percentage% "
 kmsg1 "-------------------------------------------------------"
@@ -1700,6 +1706,7 @@ kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] GPU model: $GPU_MODEL "
 kmsg1 "[ * ] Device: $dm  "
 kmsg1 "[ * ] Battery charge level: $percentage% "
+kmsg1 "[ * ] Battery temperature: $temperature°C "
 kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "[ * ] RAM usage: $used_percentage% "
 kmsg1 "-------------------------------------------------------"
@@ -2175,6 +2182,7 @@ kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] GPU model: $GPU_MODEL "
 kmsg1 "[ * ] Device: $dm  "
 kmsg1 "[ * ] Battery charge level: $percentage% "
+kmsg1 "[ * ] Battery temperature: $temperature°C "
 kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "[ * ] RAM usage: $used_percentage% "
 kmsg1 "-------------------------------------------------------"
