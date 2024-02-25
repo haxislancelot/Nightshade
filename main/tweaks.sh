@@ -2,10 +2,6 @@
 # Modified by @donottelmyname, on Telegram.
 # Credit to @raidenkk on Telegram, because without him this script would not be possible.
 
-# Colors
-R='\e[01;31m'		# RED TEXT
-N='\e[0m'			# How to use (example): echo "${G}example${N}"
-
 # Logs
 RLOG=/sdcard/.GTKS/griffithTweaks.log
 
@@ -2107,7 +2103,6 @@ simple_bar
 thermal() {
 	init=$(date +%s)
 	
-echo "${R}Warning! This mode is still experimental and may be bug.${N}"
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
 kmsg1 "[ * ] Griffith's version: $griffv "
