@@ -270,12 +270,16 @@ totalram=$(free -m | awk '/Mem:/{print $2}')
 # Variable to battery actual capacity
 percentage=$(cat /sys/class/power_supply/battery/capacity)
 
+# Variable to Griffith's version
+griffv=$(echo "v1.0-beta2")
+
 # Battery Profile
 battery() {
 	init=$(date +%s)
 
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
+kmsg1 "[ * ] Griffith's version: $griffv "
 kmsg1 "[ * ] Kernel: $(uname -a) "
 kmsg1 "[ * ] SOC: $mf, $soc "
 kmsg1 "[ * ] SDK: $sdk "
@@ -734,6 +738,7 @@ balanced() {
      	
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
+kmsg1 "[ * ] Griffith's version: $griffv "
 kmsg1 "[ * ] Kernel: $(uname -a) "
 kmsg1 "[ * ] SOC: $mf, $soc "
 kmsg1 "[ * ] SDK: $sdk "
@@ -1171,6 +1176,7 @@ performance() {
      	
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
+kmsg1 "[ * ] Griffith's version: $griffv "
 kmsg1 "[ * ] Kernel: $(uname -a) "
 kmsg1 "[ * ] SOC: $mf, $soc "
 kmsg1 "[ * ] SDK: $sdk "
@@ -1636,6 +1642,7 @@ gaming() {
      	
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
+kmsg1 "[ * ] Griffith's version: $griffv "
 kmsg1 "[ * ] Kernel: $(uname -a) "
 kmsg1 "[ * ] SOC: $mf, $soc "
 kmsg1 "[ * ] SDK: $sdk "
@@ -2103,6 +2110,7 @@ echo "${R}Warning! This mode is still experimental and may be bug.${N}"
 sleep 3
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
+kmsg1 "[ * ] Griffith's version: $griffv "
 kmsg1 "[ * ] Kernel: $(uname -a) "
 kmsg1 "[ * ] SOC: $mf, $soc "
 kmsg1 "[ * ] SDK: $sdk "
