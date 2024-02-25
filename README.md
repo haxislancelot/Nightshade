@@ -16,9 +16,9 @@
 
   - Yes, GriffithTweaks is compatible with Magisk, KSU, and APATCH for a wider range of customization options.
 
-**Does GriffithTweaks work on all devices/processor types?**
+**Does GriffithTweaks work better on Snapdragon processors?**
 
-  - Yes, GriffithTweaks is designed to be universal, though compatibility may vary on certain devices.
+  - GriffithTweaks is optimized for Snapdragon processors, providing enhanced performance on such devices.
 
 **Is there a risk of device looping after installation?**
 
