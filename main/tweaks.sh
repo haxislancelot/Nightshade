@@ -2402,7 +2402,9 @@ do
 			gaming
 			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Gaming profile was successfully applied!'" > /dev/null
 			echo "3" >"/proc/sys/vm/drop_caches"
-                        am kill-all
+                        while IFS= read -r pkg_nm; do
+                            [[ "$pkg_nm" != "com.tweaker.griffith" ]] && am force-stop "$pkg_nm"
+                        done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")"
 			exit
 		};;
 	  
