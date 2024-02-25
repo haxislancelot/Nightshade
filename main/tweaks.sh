@@ -1,4 +1,5 @@
 #!/system/bin/sh
+# Modified by @donottelmyname, on Telegram.
 # Credit to @raidenkk on Telegram, because without him this script would not be possible.
 
 # Colors
@@ -2406,6 +2407,7 @@ do
 			gaming
 			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Gaming profile was successfully applied!'" > /dev/null
 			echo "3" >"/proc/sys/vm/drop_caches"
+                        am kill-all
 			exit
 		};;
 	  
