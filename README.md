@@ -2,15 +2,22 @@
 
 ![GriffithTweaks Logo](https://github.com/haxislancelot/GriffithTweaks/raw/main/nihil.png)
 
-**GriffithTweaks** empowers your device with a versatile kernel manager, offering tailored profiles for a personalized user experience.
+[![Open Source Love](https://img.shields.io/badge/Open%20Source-Love-blue)](https://github.com/haxislancelot/GriffithTweaks)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-Yes-green)](https://GitHub.com/haxislancelot/GriffithTweaks/graphs/commit-activity)
+[![CodeFactor](https://www.codefactor.io/repository/github/haxislancelot/griffithtweaks/badge)](https://www.codefactor.io/repository/github/haxislancelot/griffithtweaks)
+[![CodeQuality](https://img.shields.io/codacy/grade/a723cb464d5a4d25be3152b5d71de82d?color=blue&logo=codacy)](https://app.codacy.com/gh/haxislancelot/GriffithTweaks/dashboard)
+[![GitHub Forks](https://img.shields.io/github/forks/haxislancelot/GriffithTweaks?&logo=github)](https://github.com/haxislancelot/GriffithTweaks/fork)
+[![GitHub Stars](https://img.shields.io/github/stars/haxislancelot/GriffithTweaks?&logo=github)](https://github.com/haxislancelot/GriffithTweaks/stargazers)
 
-# 📸 Screenshots
+GriffithTweaks is a versatile kernel manager designed to enhance your device's performance. It features multiple profiles tailored to different user preferences.
+
+## Screenshots
 
 ![Screenshot 1](https://github.com/haxislancelot/GriffithTweaks/raw/main/screenshots/Screenshot_20240225-022617_Griffith.png)
 ![Screenshot 2](https://github.com/haxislancelot/GriffithTweaks/raw/main/screenshots/Screenshot_20240225-022621_Griffith.png)
 ![Screenshot 3](https://github.com/haxislancelot/GriffithTweaks/raw/main/screenshots/Screenshot_20240225-022627_Pixel%20Launcher.png)
 
-# ❓ FAQ
+## FAQ
 
 **Compatibility:**
   - GriffithTweaks seamlessly integrates with Magisk, KSU, and APATCH, providing diverse customization options.
@@ -27,11 +34,11 @@
 **Kernel Compatibility:**
   - While GriffithTweaks is designed for various kernels, some exceptions may apply.
 
-# 🌐 Support 
+## Support 
 
- - [𝗝𝗼𝗶𝗻 𝗨𝘀 𝗼𝗻 𝗧𝗲𝗹𝗲𝗴𝗿𝗮𝗺](https://t.me/nihilprojects) - Join the group for bug reports and assistance.
+ - [![Telegram](https://img.shields.io/badge/Join%20Us%20on-Telegram-blue)](https://t.me/nihilprojects) - Join the group for bug reports and assistance.
 
-# ⚠ Disclaimer
+## Disclaimer
 
  - Use GriffithTweaks responsibly!
 
@@ -39,7 +46,7 @@
 
  - Ensure the download link in your video description is the official pling link.
 
-# 📋 Requirements 
+## Requirements 
 
  - Requires **Magisk 20.4 (20400)** and up, or compatible with KSU and APATCH.
 
@@ -47,15 +54,15 @@
 
  - Compatible with Android **5** and up.
 
-# 🚀 Installation guide 
+## Installation guide 
 
-* Download [𝗵𝗲𝗿𝗲](https://github.com/haxislancelot/GriffithTweaks/releases).
+* Download [here](https://github.com/haxislancelot/GriffithTweaks/releases).
 
 * Save logs for bug resolution.
 
-* Refer to this [𝗴𝘂𝗶𝗱𝗲](https://telegra.ph/How-to-use-Grittith-Kernel-Tweaker-02-18) if you encounter difficulties.
+* Refer to this [guide](https://telegra.ph/How-to-use-Grittith-Kernel-Tweaker-02-18) if you encounter difficulties.
 
-# 🙌 Credits and special thanks:
+## Credits and special thanks:
 
 * Special thanks to [raidenkkj](https://github.com/raidenkkj) and [lowr4m](https://github.com/lowr4m) for their valuable contributions.
 
