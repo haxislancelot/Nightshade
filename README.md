@@ -35,7 +35,7 @@
 # Support 
 
  - Telegram group
- - [![Telegram](https://img.shields.io/badge/Join%20Us%20on-Telegram-blue)](https://t.me/nihilprojects)!
+[![Telegram](https://img.shields.io/badge/Join%20Us%20on-Telegram-blue)](https://t.me/nihilprojects)!
 
  - Join the group to report bugs or seek assistance for any issues you encounter.
 
