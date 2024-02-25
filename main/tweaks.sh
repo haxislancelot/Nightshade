@@ -2468,6 +2468,7 @@ do
 		};;
 	  
 	  "Thermal") {
+                        settings delete global device_idle_constants
 			thermal
 			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Thermal profile was successfully applied!'" > /dev/null
 			echo "3" > "/proc/sys/vm/drop_caches"
