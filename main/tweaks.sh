@@ -721,6 +721,15 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 	simple_bar
 fi
 
+if [[ "$dm" = "Mi A3" ]]; then
+    chmod 666 /sys/class/power_supply/battery/voltage_max
+    echo '4200000' > /sys/class/power_supply/battery/voltage_max
+
+    simple_bar
+    kmsg1 "[*] TWEAKED BATTERY VOLTAGE."
+    simple_bar
+fi
+
 simple_bar
 kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS. "
 simple_bar
@@ -1157,6 +1166,15 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 	simple_bar
 	kmsg1 "[*] ENABLED GENTLE FAIR SLEEPERS. "
 	simple_bar
+fi
+
+if [[ "$dm" = "Mi A3" ]]; then
+    chmod 666 /sys/class/power_supply/battery/voltage_max
+    echo '4400000' > /sys/class/power_supply/battery/voltage_max
+
+    simple_bar
+    kmsg1 "[*] TWEAKED BATTERY VOLTAGE."
+    simple_bar
 fi
 
 simple_bar
@@ -1625,6 +1643,15 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 	simple_bar
 	kmsg1 "[*] DISABLED GENTLE FAIR SLEEPERS "
 	simple_bar
+fi
+
+if [[ "$dm" = "Mi A3" ]]; then
+    chmod 666 /sys/class/power_supply/battery/voltage_max
+    echo '4400000' > /sys/class/power_supply/battery/voltage_max
+
+    simple_bar
+    kmsg1 "[*] TWEAKED BATTERY VOLTAGE."
+    simple_bar
 fi
 
 simple_bar
@@ -2110,6 +2137,15 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 	simple_bar
 fi
 
+if [[ "$dm" = "Mi A3" ]]; then
+    chmod 666 /sys/class/power_supply/battery/voltage_max
+    echo '4400000' > /sys/class/power_supply/battery/voltage_max
+
+    simple_bar
+    kmsg1 "[*] TWEAKED BATTERY VOLTAGE."
+    simple_bar
+fi
+
 simple_bar
 kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS. "
 simple_bar
@@ -2321,12 +2357,14 @@ simple_bar
 kmsg1 "[*] FSYNC AND DYN TWEAKED."
 simple_bar
 
-chmod 666 /sys/class/power_supply/battery/voltage_max
-write "/sys/class/power_supply/battery/voltage_max" "4000000"
+if [[ "$dm" = "Mi A3" ]]; then
+    chmod 666 /sys/class/power_supply/battery/voltage_max
+    echo '4000000' > /sys/class/power_supply/battery/voltage_max
 
-simple_bar
-kmsg1 "[*] DECREASED BATTERY VOLTAGE."
-simple_bar
+    simple_bar
+    kmsg1 "[*] TWEAKED BATTERY VOLTAGE."
+    simple_bar
+fi
 
 write "/proc/sys/fs/dir-notify-enable" "0"
 write "/proc/sys/fs/lease-break-time" "15"
