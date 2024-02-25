@@ -16,6 +16,10 @@ GriffithTweaks allows users to tailor their device settings according to their s
 - **Battery Mode:** Extend your device's battery life with power-saving configurations.
 - **Performance Mode:** Unlock the full potential of your device for demanding tasks.
 
+## Compatibility
+
+GriffithTweaks is optimized for devices with Snapdragon processors.
+
 ## Installation
 
 To install GriffithTweaks, simply download the latest release from the [releases page](https://github.com/haxislancelot/GriffithTweaks/releases).
