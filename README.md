@@ -24,7 +24,7 @@
 
   - No, there is no chance of that happening.
 
-**Encountering bugs with the module? Where can I report them?**
+**Encountering bugs with the app? Where can I report them?**
 
   - Please report any bugs on our [Telegram group](https://t.me/nihilprojects).
 
