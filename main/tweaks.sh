@@ -283,8 +283,7 @@ temperature=$(($(cat /sys/class/power_supply/battery/temp) / 10))
 
 # Battery Profile
 battery() {
-	init=$(date +%s)
-
+init=$(date +%s)
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
 kmsg1 "[ * ] Griffith's version: $griffv "
@@ -753,8 +752,7 @@ init=$(date +%s)
 
 # Balanced Profile
 balanced() {
-	init=$(date +%s)
-     	
+init=$(date +%s)     	
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
 kmsg1 "[ * ] Griffith's version: $griffv "
@@ -1202,8 +1200,7 @@ init=$(date +%s)
 
 # Performance Profile
 performance() {
-	init=$(date +%s)
-     	
+init=$(date +%s)     	
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
 kmsg1 "[ * ] Griffith's version: $griffv "
@@ -1677,7 +1674,6 @@ init=$(date +%s)
 
 # Gaming Profile
 gaming() {
-	
 init=$(date +%s)
 
 # Variable to ram usage
@@ -2114,7 +2110,7 @@ fi
 
 if [[ "$dm" = "Mi A3" ]]; then
     chmod 666 /sys/class/power_supply/battery/voltage_max
-    write "/sys/class/power_supply/battery/voltage_max" "4500000"
+    write "/sys/class/power_supply/battery/voltage_max" "4400000"
 fi
 
 simple_bar
@@ -2167,8 +2163,7 @@ simple_bar
 
 # Thermal Profile
 thermal() {
-	init=$(date +%s)
-	
+init=$(date +%s)
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
 kmsg1 "[ * ] Griffith's version: $griffv "
