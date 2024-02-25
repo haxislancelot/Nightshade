@@ -707,6 +707,13 @@ elif [[ -e "/sys/kernel/mm/uksm/run" ]]; then
 	simple_bar
 fi
 
+if [[ "$dm" = "Mi A3" ]]; then
+    chmod 666 /sys/class/power_supply/battery/voltage_max
+    write "/sys/class/power_supply/battery/voltage_max" "4200000"
+    simple_bar
+    kmsg1 "[*] DECRESEAD BATTERY VOLTAGE. "
+fi
+
 if [[ -e "/sys/class/lcd/panel/power_reduce" ]]; then
 	write "/sys/class/lcd/panel/power_reduce" "1"
 	simple_bar
@@ -719,15 +726,6 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 	simple_bar
 	kmsg1 "[*] DISABLED GENTLE FAIR SLEEPERS. "
 	simple_bar
-fi
-
-if [[ "$dm" = "Mi A3" ]]; then
-    chmod 666 /sys/class/power_supply/battery/voltage_max
-    echo '4200000' > /sys/class/power_supply/battery/voltage_max
-
-    simple_bar
-    kmsg1 "[*] TWEAKED BATTERY VOLTAGE."
-    simple_bar
 fi
 
 simple_bar
@@ -1147,6 +1145,13 @@ elif [[ -e "/sys/kernel/mm/uksm/run" ]]; then
 	simple_bar
 fi
 
+if [[ "$dm" = "Mi A3" ]]; then
+    chmod 666 /sys/class/power_supply/battery/voltage_max
+    write "/sys/class/power_supply/battery/voltage_max" "4400000"
+    simple_bar
+    kmsg1 "[*] DECRESEAD BATTERY VOLTAGE. "
+fi
+
 if [[ -e "/sys/module/pm2/parameters/idle_sleep_mode" ]]; then
 	write "/sys/module/pm2/parameters/idle_sleep_mode" "Y"
 	simple_bar
@@ -1166,15 +1171,6 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 	simple_bar
 	kmsg1 "[*] ENABLED GENTLE FAIR SLEEPERS. "
 	simple_bar
-fi
-
-if [[ "$dm" = "Mi A3" ]]; then
-    chmod 666 /sys/class/power_supply/battery/voltage_max
-    echo '4400000' > /sys/class/power_supply/battery/voltage_max
-
-    simple_bar
-    kmsg1 "[*] TWEAKED BATTERY VOLTAGE."
-    simple_bar
 fi
 
 simple_bar
@@ -1616,6 +1612,13 @@ elif [[ -e "/sys/kernel/mm/uksm/run" ]]; then
 	simple_bar
 fi
 
+if [[ "$dm" = "Mi A3" ]]; then
+    chmod 666 /sys/class/power_supply/battery/voltage_max
+    write "/sys/class/power_supply/battery/voltage_max" "4200000"
+    simple_bar
+    kmsg1 "[*] DECRESEAD BATTERY VOLTAGE. "
+fi
+
 # Disable arch power
 if [[ -e "/sys/kernel/sched/arch_power" ]]; then
 	write "/sys/kernel/sched/arch_power" "0"
@@ -1643,15 +1646,6 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 	simple_bar
 	kmsg1 "[*] DISABLED GENTLE FAIR SLEEPERS "
 	simple_bar
-fi
-
-if [[ "$dm" = "Mi A3" ]]; then
-    chmod 666 /sys/class/power_supply/battery/voltage_max
-    echo '4400000' > /sys/class/power_supply/battery/voltage_max
-
-    simple_bar
-    kmsg1 "[*] TWEAKED BATTERY VOLTAGE."
-    simple_bar
 fi
 
 simple_bar
@@ -2108,6 +2102,13 @@ elif [[ -e "/sys/kernel/mm/uksm/run" ]]; then
 	simple_bar
 fi
 
+if [[ "$dm" = "Mi A3" ]]; then
+    chmod 666 /sys/class/power_supply/battery/voltage_max
+    write "/sys/class/power_supply/battery/voltage_max" "4400000"
+    simple_bar
+    kmsg1 "[*] DECRESEAD BATTERY VOLTAGE. "
+fi
+
 # Disable arch power
 if [[ -e "/sys/kernel/sched/arch_power" ]]; then
 	write "/sys/kernel/sched/arch_power" "0"
@@ -2135,15 +2136,6 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 	simple_bar
 	kmsg1 "[*] DISABLED GENTLE FAIR SLEEPERS. "
 	simple_bar
-fi
-
-if [[ "$dm" = "Mi A3" ]]; then
-    chmod 666 /sys/class/power_supply/battery/voltage_max
-    echo '4400000' > /sys/class/power_supply/battery/voltage_max
-
-    simple_bar
-    kmsg1 "[*] TWEAKED BATTERY VOLTAGE."
-    simple_bar
 fi
 
 simple_bar
@@ -2359,11 +2351,9 @@ simple_bar
 
 if [[ "$dm" = "Mi A3" ]]; then
     chmod 666 /sys/class/power_supply/battery/voltage_max
-    echo '4000000' > /sys/class/power_supply/battery/voltage_max
-
+    write "/sys/class/power_supply/battery/voltage_max" "4000000"
     simple_bar
-    kmsg1 "[*] TWEAKED BATTERY VOLTAGE."
-    simple_bar
+    kmsg1 "[*] DECRESEAD BATTERY VOLTAGE. "
 fi
 
 write "/proc/sys/fs/dir-notify-enable" "0"
