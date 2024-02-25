@@ -1,5 +1,8 @@
 #!/bin/bash
 # This is experimental and may be buggy.
+# This will display a panel with your battery information, at least that relevant to the main script.
+# Do not use this in your script or project without asking for my permission.
+# https://t.me/donottellmyname
 
 # Colors
 G='\e[01;32m'      # GREEN TEXT
