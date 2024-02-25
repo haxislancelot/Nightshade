@@ -28,6 +28,10 @@ To install GriffithTweaks, simply download the latest release from the [releases
 
 Learn how to use Griffith Kernel Tweaker by following the instructions provided [here](https://telegra.ph/How-to-use-Grittith-Kernel-Tweaker-02-18).
 
+## Screenshots
+
+![GriffithTweaks Screenshot](https://raw.githubusercontent.com/haxislancelot/GriffithTweaks/main/Screenshot_20240225-021843_Griffith.png)
+
 ## Support
 
 For questions, feedback, or assistance, feel free to join our Telegram community:
