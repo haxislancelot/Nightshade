@@ -34,7 +34,7 @@ GriffithTweaks is a versatile kernel manager designed to enhance your device's p
 
 ## Support 
 
- - [![Telegram](https://img.shields.io/badge/Join%20Us%20on-Telegram-blue)](https://t.me/nihilprojects) - Join the group for bug reports and assistance.
+ - [![Telegram](https://img.shields.io/badge/Join%20Us%20on-Telegram-blue)](https://t.me/nihilprojects) for bug reports and assistance.
 
 ## Disclaimer
 
