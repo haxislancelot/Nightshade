@@ -2391,7 +2391,7 @@ do
 			sleep 5
 			settings delete global device_idle_constants
 			performance
-			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Performance  profile was successfully applied!'" > /dev/null
+			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Performance profile was successfully applied!'" > /dev/null
 			echo "3" >"/proc/sys/vm/drop_caches"
 			exit
 		};;
