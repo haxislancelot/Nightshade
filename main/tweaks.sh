@@ -2107,7 +2107,6 @@ thermal() {
 	init=$(date +%s)
 	
 echo "${R}Warning! This mode is still experimental and may be bug.${N}"
-sleep 3
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
 kmsg1 "[ * ] Griffith's version: $griffv "
@@ -2379,7 +2378,6 @@ do
 
 	case "$gtks_profile" in
   	"Battery") {
-			sleep 5
 			settings put global device_idle_constants inactive_to=60000,sensing_to=0,locating_to=0,location_accuracy=2000,motion_inactive_to=0,idle_after_inactive_to=0,idle_pending_to=60000,max_idle_pending_to=120000,idle_pending_factor=2.0,idle_to=900000,max_idle_to=21600000,idle_factor=2.0,max_temp_app_whitelist_duration=60000,mms_temp_app_whitelist_duration=30000,sms_temp_app_whitelist_duration=20000,light_after_inactive_to=10000,light_pre_idle_to=60000,light_idle_to=180000,light_idle_factor=2.0,light_max_idle_to=900000,light_idle_maintenance_min_budget=30000,light_idle_maintenance_max_budget=60000
 			battery
 			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Battery profile was successfully applied!'" > /dev/null
@@ -2388,7 +2386,7 @@ do
 		};;
 
 	  "Balanced") {
-			sleep 5
+			settings delete global device_idle_constants
 	 		balanced
 	 		su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Balanced profile was successfully applied!'" > /dev/null
 	 		echo "3" >"/proc/sys/vm/drop_caches"
@@ -2396,7 +2394,6 @@ do
 		};;
 
 	  "Performance") {
-			sleep 5
 			settings delete global device_idle_constants
 			performance
 			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Performance profile was successfully applied!'" > /dev/null
@@ -2405,7 +2402,6 @@ do
 		};;
 
 	  "Gaming") {
-			sleep 5
 			settings delete global device_idle_constants
 			gaming
 			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Gaming profile was successfully applied!'" > /dev/null
@@ -2414,7 +2410,6 @@ do
 		};;
 	  
 	  "Thermal") {
-			sleep 5
 			thermal
 			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Thermal profile was successfully applied!'" > /dev/null
 			echo "3" >"/proc/sys/vm/drop_caches"
