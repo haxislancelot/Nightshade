@@ -268,7 +268,7 @@ totalram=$(free -m | awk '/Mem:/{print $2}')
 percentage=$(cat /sys/class/power_supply/battery/capacity)
 
 # Variable to Griffith's version
-griffv=$(echo "v1.0-beta2")
+griffv=$(echo "v1.0-beta3")
 
 # Variable to ram usage
 total_mem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
