@@ -4,8 +4,6 @@
 
 [![Open Source Love](https://img.shields.io/badge/Open%20Source-Love-blue)](https://github.com/haxislancelot/GriffithTweaks)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-Yes-green)](https://GitHub.com/haxislancelot/GriffithTweaks/graphs/commit-activity)
-[![CodeFactor](https://www.codefactor.io/repository/github/haxislancelot/griffithtweaks/badge)](https://www.codefactor.io/repository/github/haxislancelot/griffithtweaks)
-[![CodeQuality](https://img.shields.io/codacy/grade/a723cb464d5a4d25be3152b5d71de82d?color=blue&logo=codacy)](https://app.codacy.com/gh/haxislancelot/GriffithTweaks/dashboard)
 [![GitHub Forks](https://img.shields.io/github/forks/haxislancelot/GriffithTweaks?&logo=github)](https://github.com/haxislancelot/GriffithTweaks/fork)
 [![GitHub Stars](https://img.shields.io/github/stars/haxislancelot/GriffithTweaks?&logo=github)](https://github.com/haxislancelot/GriffithTweaks/stargazers)
 
