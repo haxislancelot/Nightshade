@@ -30,7 +30,8 @@ Learn how to use Griffith Kernel Tweaker by following the instructions provided 
 
 ## Screenshots
 
-![GriffithTweaks Screenshot](https://raw.githubusercontent.com/haxislancelot/GriffithTweaks/main/Screenshot_20240225-021843_Griffith.png)
+![GriffithTweaks Screenshot 1](https://raw.githubusercontent.com/haxislancelot/GriffithTweaks/main/Screenshot_20240225-021843_Griffith.png)
+![GriffithTweaks Screenshot 2](https://raw.githubusercontent.com/haxislancelot/GriffithTweaks/main/Screenshot_20240225-022301_Chrome.png)
 
 ## Support
 
