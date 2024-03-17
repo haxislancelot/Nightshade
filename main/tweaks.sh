@@ -1,6 +1,7 @@
 #!/system/bin/sh
 # Modified by @donottelmyname, on Telegram.
 # Credit to @raidenkk on Telegram, because without him this script would not be possible.
+# Credit to Rem01Gaming for Mediatek support.
 
 # Logs
 GFLOG=/sdcard/.GTKS/griffithTweaks.log
@@ -281,9 +282,210 @@ used_percentage=$((used_mem * 100 / total_mem))
 # Variable to battery temperature
 temperature=$(($(cat /sys/class/power_supply/battery/temp) / 10)) 
 
+# Variiable to mtk profiles
+write_val() {
+	if [ -f $2 ]; then
+		echo $1 >$2
+	fi
+}
+
+lock_val() {
+	[ ! -f "$2" ] && return
+	umount "$2"
+
+	chown root:root "$2"
+	chmod 0666 "$2"
+	echo "$1" >"$2"
+	chmod 0444 "$2"
+
+	local TIME=$(date +"%s%N")
+	echo "$1" >/dev/mount_mask_$TIME
+	mount --bind /dev/mount_mask_$TIME "$2"
+	rm /dev/mount_mask_$TIME
+}
+
+cpu_cores="$(($(nproc --all) - 1))"
+
+# Mediatek Battery Profile
+mtk_battery() {
+	kmsg1 "----------------------- Info -----------------------"
+    kmsg1 "[ * ] Date of execution: $(date) "
+    kmsg1 "[ * ] Griffith's version: $griffv "
+    kmsg1 "[ * ] Kernel: $(uname -a) "
+    kmsg1 "[ * ] SOC: $mf, $soc "
+    kmsg1 "[ * ] SDK: $sdk "
+    kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
+    kmsg1 "[ * ] CPU aarch: $aarch "
+    kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
+    kmsg1 "[ * ] Android version: $arv "
+    kmsg1 "[ * ] GPU model: $GPU_MODEL "
+    kmsg1 "[ * ] Device: $dm  "
+    kmsg1 "[ * ] Battery charge level: $percentage% "
+    kmsg1 "[ * ] Battery temperature: $temperature°C "
+    kmsg1 "[ * ] Device total RAM: $totalram MB "
+    kmsg1 "[ * ] RAM usage: $used_percentage% "
+    kmsg1 "-------------------------------------------------------"
+    simple_bar
+    kmsg1 "[*] ENABLING $gtks_profile PROFILE for Mediatek... "
+    simple_bar
+	# CPU tweaks
+	cpu="0"
+	while [ $cpu -lt $cpu_cores ]; do
+		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
+		if [ -d "$cpu_dir" ]; then
+			echo "$default_cpu_gov" >"${cpu_dir}/cpufreq/scaling_governor"
+		fi
+		cpu="$((cpu + 1))"
+	done
+	
+	simple_bar
+    kmsg1 "[*] CPU TWEAKED. "
+    simple_bar
+
+	# Idle charging
+	write_val "0 0" /proc/mtk_battery_cmd/current_cmd
+	
+	simple_bar
+    kmsg1 "[*] IDLE CHARGING DISABLED. "
+    simple_bar
+	
+	# Enable back PPM
+	write_val "1" /proc/ppm/enabled
+
+	simple_bar
+    kmsg1 "[*] PPM ENABLED. "
+    simple_bar
+	
+	# MTK Power and CCI mode
+	write_val "0" /proc/cpufreq/cpufreq_cci_mode
+	write_val "0" /proc/cpufreq/cpufreq_power_mode
+
+	simple_bar
+    kmsg1 "[*] CPU POWER AND CCI MODE TWEAKED. "
+    simple_bar
+	
+	# EAS/HMP Switch
+	lock_val "1" /sys/devices/system/cpu/eas/enable
+
+	simple_bar
+    kmsg1 "[*] EAS/HMP TWEAKED. "
+    simple_bar
+	
+	# GPU Frequency
+	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
+		echo "0" >/proc/gpufreq/gpufreq_opp_freq 2>/dev/null
+	else
+		echo "0 0" >/proc/gpufreqv2/fix_custom_freq_volt
+	fi
+
+	# Disable GPU Power limiter
+	if [ -f "/proc/gpufreq/gpufreq_power_limited" ]; then
+		echo "ignore_batt_oc 0" >/proc/gpufreq/gpufreq_power_limited
+		echo "ignore_batt_percent 0" >/proc/gpufreq/gpufreq_power_limited
+		echo "ignore_low_batt 0" >/proc/gpufreq/gpufreq_power_limited
+		echo "ignore_thermal_protect 0" >/proc/gpufreq/gpufreq_power_limited
+		echo "ignore_pbm_limited 0" >/proc/gpufreq/gpufreq_power_limited
+	fi
+	
+	simple_bar
+    kmsg1 "[*] GPU TWEAKED. "
+    simple_bar
+
+	# Disable Power Budget management for new 5.x kernels
+	write_val "stop 0" /proc/pbm/pbm_stop
+
+	simple_bar
+    kmsg1 "[*] POWER BUDGET MANAGEMENT TWEAKED. "
+    simple_bar
+	
+	# Disable battery current limiter
+	write_val "stop 0" /proc/mtk_batoc_throttling/battery_oc_protect_stop
+
+	simple_bar
+    kmsg1 "[*] BATTERY CURRENT LIMITER DISABLED. "
+    simple_bar
+	
+	# DRAM Frequency
+	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
+		echo "-1" >/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp
+	else
+		echo "-1" >/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp
+	fi
+
+	simple_bar
+    kmsg1 "[*] DRAM FREQUENCY TWEAKED. "
+    simple_bar
+	
+	# Drop mem cache
+	echo "1" >/proc/sys/vm/drop_caches
+
+	simple_bar
+    kmsg1 "[*] DROPPED MEM CACHE. "
+    simple_bar
+	
+	# Mediatek's APU freq
+	write_val "-1" /sys/module/mmdvfs_pmqos/parameters/force_step
+
+	simple_bar
+    kmsg1 "[*] MEDIATEK's APU FREQ TWEAKED. "
+    simple_bar
+	
+	# Touchpanel
+	tp_path="/proc/touchpanel"
+	write_val "0" $tp_path/game_switch_enable
+	write_val "1" $tp_path/oplus_tp_limit_enable
+	write_val "1" $tp_path/oppo_tp_limit_enable
+	write_val "0" $tp_path/oplus_tp_direction
+	write_val "0" $tp_path/oppo_tp_direction
+	
+	simple_bar
+    kmsg1 "[*] TOUCHPANEL TWEAKED. "
+    simple_bar
+	
+	# CPU Power mode to low power
+	write_val "1" /proc/cpufreq/cpufreq_power_mode
+	# Disable PPM (this is fire dumpster)
+	write_val "0" /proc/ppm/enabled
+	
+	simple_bar
+    kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS. "
+    simple_bar
+
+    simple_bar
+    kmsg1 "[*] END OF EXECUTION: $(date)"
+    simple_bar
+    exit=$(date +%s)
+
+    exectime=$((exit - init))
+    simple_bar
+    kmsg1 "[*] EXECUTION DONE IN $exectime SECONDS. "
+    simple_bar
+
+    init=$(date +%s)
+	
+	su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Battery profile was successfully applied!'" > /dev/null
+}
+
 # Battery Profile
 battery() {
 init=$(date +%s)
+
+# Checking mtk device
+simple_bar
+kmsg1 "[ * ] Checking device compatibility"
+chipset=$(grep "Hardware" /proc/cpuinfo | uniq | cut -d ':' -f 2 | sed 's/^[ \t]*//')
+if [ -z "$chipset" ]; then
+    chipset=$(getprop "ro.hardware")
+fi
+
+if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
+    kmsg1 "[ * ] Device is Mediatek, executing mtk_battery..."
+    mtk_battery
+    exit
+else
+    kmsg1 "[ * ] Device is not Mediatek, continuing script..."
+fi
+
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
 kmsg1 "[ * ] Griffith's version: $griffv "
@@ -750,9 +952,181 @@ simple_bar
 init=$(date +%s)
 }
 
+# Mediatek Balanced(Normal) Mode
+mtk_normal() {
+	kmsg1 "----------------------- Info -----------------------"
+    kmsg1 "[ * ] Date of execution: $(date) "
+    kmsg1 "[ * ] Griffith's version: $griffv "
+    kmsg1 "[ * ] Kernel: $(uname -a) "
+    kmsg1 "[ * ] SOC: $mf, $soc "
+    kmsg1 "[ * ] SDK: $sdk "
+    kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
+    kmsg1 "[ * ] CPU aarch: $aarch "
+    kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
+    kmsg1 "[ * ] Android version: $arv "
+    kmsg1 "[ * ] GPU model: $GPU_MODEL "
+    kmsg1 "[ * ] Device: $dm  "
+    kmsg1 "[ * ] Battery charge level: $percentage% "
+    kmsg1 "[ * ] Battery temperature: $temperature°C "
+    kmsg1 "[ * ] Device total RAM: $totalram MB "
+    kmsg1 "[ * ] RAM usage: $used_percentage% "
+    kmsg1 "-------------------------------------------------------"
+    simple_bar
+    kmsg1 "[*] ENABLING $gtks_profile PROFILE for Mediatek... "
+    simple_bar
+	# CPU tweaks
+	cpu="0"
+	while [ $cpu -lt $cpu_cores ]; do
+		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
+		if [ -d "$cpu_dir" ]; then
+			echo "$default_cpu_gov" >"${cpu_dir}/cpufreq/scaling_governor"
+		fi
+		cpu="$((cpu + 1))"
+	done
+	
+	simple_bar
+    kmsg1 "[*] CPU TWEAKED. "
+    simple_bar
+
+	# Idle charging
+	write_val "0 0" /proc/mtk_battery_cmd/current_cmd
+	
+	simple_bar
+    kmsg1 "[*] IDLE CHARGING DISABLED. "
+    simple_bar
+	
+	# Enable back PPM
+	write_val "1" /proc/ppm/enabled
+
+	simple_bar
+    kmsg1 "[*] PPM ENABLED. "
+    simple_bar
+	
+	# MTK Power and CCI mode
+	write_val "0" /proc/cpufreq/cpufreq_cci_mode
+	write_val "0" /proc/cpufreq/cpufreq_power_mode
+
+	simple_bar
+    kmsg1 "[*] CPU POWER AND CCI MODE TWEAKED. "
+    simple_bar
+	
+	# EAS/HMP Switch
+	lock_val "1" /sys/devices/system/cpu/eas/enable
+
+	simple_bar
+    kmsg1 "[*] EAS/HMP TWEAKED. "
+    simple_bar
+	
+	# GPU Frequency
+	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
+		echo "0" >/proc/gpufreq/gpufreq_opp_freq 2>/dev/null
+	else
+		echo "0 0" >/proc/gpufreqv2/fix_custom_freq_volt
+	fi
+
+	# Disable GPU Power limiter
+	if [ -f "/proc/gpufreq/gpufreq_power_limited" ]; then
+		echo "ignore_batt_oc 0" >/proc/gpufreq/gpufreq_power_limited
+		echo "ignore_batt_percent 0" >/proc/gpufreq/gpufreq_power_limited
+		echo "ignore_low_batt 0" >/proc/gpufreq/gpufreq_power_limited
+		echo "ignore_thermal_protect 0" >/proc/gpufreq/gpufreq_power_limited
+		echo "ignore_pbm_limited 0" >/proc/gpufreq/gpufreq_power_limited
+	fi
+	
+	simple_bar
+    kmsg1 "[*] GPU TWEAKED. "
+    simple_bar
+
+	# Disable Power Budget management for new 5.x kernels
+	write_val "stop 0" /proc/pbm/pbm_stop
+
+	simple_bar
+    kmsg1 "[*] POWER BUDGET MANAGEMENT TWEAKED. "
+    simple_bar
+	
+	# Disable battery current limiter
+	write_val "stop 0" /proc/mtk_batoc_throttling/battery_oc_protect_stop
+
+	simple_bar
+    kmsg1 "[*] BATTERY CURRENT LIMITER DISABLED. "
+    simple_bar
+	
+	# DRAM Frequency
+	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
+		echo "-1" >/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp
+	else
+		echo "-1" >/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp
+	fi
+
+	simple_bar
+    kmsg1 "[*] DRAM FREQUENCY TWEAKED. "
+    simple_bar
+	
+	# Drop mem cache
+	echo "1" >/proc/sys/vm/drop_caches
+
+	simple_bar
+    kmsg1 "[*] DROPPED MEM CACHE. "
+    simple_bar
+	
+	# Mediatek's APU freq
+	write_val "-1" /sys/module/mmdvfs_pmqos/parameters/force_step
+
+	simple_bar
+    kmsg1 "[*] MEDIATEK's APU FREQ TWEAKED. "
+    simple_bar
+	
+	# Touchpanel
+	tp_path="/proc/touchpanel"
+	write_val "0" $tp_path/game_switch_enable
+	write_val "1" $tp_path/oplus_tp_limit_enable
+	write_val "1" $tp_path/oppo_tp_limit_enable
+	write_val "0" $tp_path/oplus_tp_direction
+	write_val "0" $tp_path/oppo_tp_direction
+	
+	simple_bar
+    kmsg1 "[*] TOUCHPANEL TWEAKED. "
+    simple_bar
+	
+	simple_bar
+    kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS. "
+    simple_bar
+
+    simple_bar
+    kmsg1 "[*] END OF EXECUTION: $(date)"
+    simple_bar
+    exit=$(date +%s)
+
+    exectime=$((exit - init))
+    simple_bar
+    kmsg1 "[*] EXECUTION DONE IN $exectime SECONDS. "
+    simple_bar
+
+    init=$(date +%s)
+	
+	su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Balanced profile was successfully applied!'" > /dev/null
+}
+
 # Balanced Profile
 balanced() {
-init=$(date +%s)     	
+init=$(date +%s)     
+
+# Checking mtk device
+simple_bar
+kmsg1 "[ * ] Checking device compatibility"
+chipset=$(grep "Hardware" /proc/cpuinfo | uniq | cut -d ':' -f 2 | sed 's/^[ \t]*//')
+if [ -z "$chipset" ]; then
+    chipset=$(getprop "ro.hardware")
+fi
+
+if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
+    kmsg1 "[ * ] Device is Mediatek, executing mtk_normal..."
+    mtk_normal
+    exit
+else
+    kmsg1 "[ * ] Device is not Mediatek, continuing script..."
+fi
+
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
 kmsg1 "[ * ] Griffith's version: $griffv "
@@ -1198,9 +1572,177 @@ simple_bar
 init=$(date +%s)
 }
 
+# Mediatek Performance Profile
+mtk_perf() {
+	kmsg1 "----------------------- Info -----------------------"
+    kmsg1 "[ * ] Date of execution: $(date) "
+    kmsg1 "[ * ] Griffith's version: $griffv "
+    kmsg1 "[ * ] Kernel: $(uname -a) "
+    kmsg1 "[ * ] SOC: $mf, $soc "
+    kmsg1 "[ * ] SDK: $sdk "
+    kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
+    kmsg1 "[ * ] CPU aarch: $aarch "
+    kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
+    kmsg1 "[ * ] Android version: $arv "
+    kmsg1 "[ * ] GPU model: $GPU_MODEL "
+    kmsg1 "[ * ] Device: $dm  "
+    kmsg1 "[ * ] Battery charge level: $percentage% "
+    kmsg1 "[ * ] Battery temperature: $temperature°C "
+    kmsg1 "[ * ] Device total RAM: $totalram MB "
+    kmsg1 "[ * ] RAM usage: $used_percentage% "
+    kmsg1 "-------------------------------------------------------"
+    simple_bar
+    kmsg1 "[*] ENABLING $gtks_profile PROFILE for Mediatek... "
+    simple_bar
+	# CPU tweaks
+	cpu="0"
+	while [ $cpu -lt $cpu_cores ]; do
+		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
+		if [ -d "$cpu_dir" ]; then
+			echo "performance" >"${cpu_dir}/cpufreq/scaling_governor"
+		fi
+		cpu="$((cpu + 1))"
+	done
+
+	simple_bar
+    kmsg1 "[*] CPU TWEAKED. "
+    simple_bar
+	
+	# MTK Power and CCI mode
+	write_val "1" /proc/cpufreq/cpufreq_cci_mode
+	write_val "3" /proc/cpufreq/cpufreq_power_mode
+
+	simple_bar
+    kmsg1 "[*] MTK POWER AND CCI MODE TWEAKED. "
+    simple_bar
+	
+	# EAS/HMP Switch
+	lock_val "0" /sys/devices/system/cpu/eas/enable
+
+	simple_bar
+    kmsg1 "[*] EAS/HMP TWEAKED. "
+    simple_bar
+	
+	# Idle charging
+	write_val "0 1" /proc/mtk_battery_cmd/current_cmd
+
+	simple_bar
+    kmsg1 "[*] IDLE CHARGING ENABLED. "
+    simple_bar
+	
+	# Disable PPM (this is fire dumpster)
+	write_val "0" /proc/ppm/enabled
+
+	simple_bar
+    kmsg1 "[*] PPM DISABLED. "
+    simple_bar
+	
+	# GPU Frequency
+	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
+		gpu_freq="$(cat /proc/gpufreq/gpufreq_opp_dump | grep -o 'freq = [0-9]*' | sed 's/freq = //' | sort -nr | head -n 1)"
+		echo "$gpu_freq" >/proc/gpufreq/gpufreq_opp_freq
+	else
+		gpu_freq="$(cat /proc/gpufreqv2/gpu_working_opp_table | awk '{print $3}' | sed 's/,//g' | sort -nr | head -n 1)"
+		gpu_volt="$(cat /proc/gpufreqv2/gpu_working_opp_table | awk -v freq="$freq" '$0 ~ freq {gsub(/.*, volt: /, ""); gsub(/,.*/, ""); print}')"
+		echo "${gpu_freq} ${gpu_volt}" >/proc/gpufreqv2/fix_custom_freq_volt
+	fi
+
+	# Disable GPU Power limiter
+	if [ -f "/proc/gpufreq/gpufreq_power_limited" ]; then
+		echo "ignore_batt_oc 1" >/proc/gpufreq/gpufreq_power_limited
+		echo "ignore_batt_percent 1" >/proc/gpufreq/gpufreq_power_limited
+		echo "ignore_low_batt 1" >/proc/gpufreq/gpufreq_power_limited
+		echo "ignore_thermal_protect 1" >/proc/gpufreq/gpufreq_power_limited
+		echo "ignore_pbm_limited 1" >/proc/gpufreq/gpufreq_power_limited
+	fi
+
+	simple_bar
+    kmsg1 "[*] GPU TWEAKED. "
+    simple_bar
+	
+	# Disable battery current limiter
+	write_val "stop 1" /proc/mtk_batoc_throttling/battery_oc_protect_stop
+
+	simple_bar
+    kmsg1 "[*] DISABLED BATTERY CURRENT LIMITER. "
+    simple_bar
+	
+	# DRAM Frequency
+	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
+		echo "0" >/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp
+	else
+		echo "0" >/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp
+	fi
+
+	simple_bar
+    kmsg1 "[*] DRAM FREQUENCY TWEAKED. "
+    simple_bar
+	
+	# Drop mem cache
+	echo "3" >/proc/sys/vm/drop_caches
+
+	simple_bar
+    kmsg1 "[*] DROPPED MEM CACHE. "
+    simple_bar
+	
+	# Mediatek's APU freq
+	write_val "0" /sys/module/mmdvfs_pmqos/parameters/force_step
+
+	simple_bar
+    kmsg1 "[*] MEDIATEK's APU FREQUENCY TWEAKED. "
+    simple_bar
+	
+	# Touchpanel
+	tp_path="/proc/touchpanel"
+	write_val "1" $tp_path/game_switch_enable
+	write_val "0" $tp_path/oplus_tp_limit_enable
+	write_val "0" $tp_path/oppo_tp_limit_enable
+	write_val "1" $tp_path/oplus_tp_direction
+	write_val "1" $tp_path/oppo_tp_direction
+	
+	simple_bar
+    kmsg1 "[*] TOUCHPANEL TWEAKED. "
+    simple_bar
+    
+    simple_bar
+    kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS. "
+    simple_bar
+
+    simple_bar
+    kmsg1 "[*] END OF EXECUTION: $(date)"
+    simple_bar
+    exit=$(date +%s)
+
+    exectime=$((exit - init))
+    simple_bar
+    kmsg1 "[*] EXECUTION DONE IN $exectime SECONDS. "
+    simple_bar
+
+    init=$(date +%s)
+	
+	su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Performance profile was successfully applied!'" > /dev/null
+}
+
 # Performance Profile
 performance() {
-init=$(date +%s)     	
+init=$(date +%s)     
+
+# Checking mtk device
+simple_bar
+kmsg1 "[ * ] Checking device compatibility"
+chipset=$(grep "Hardware" /proc/cpuinfo | uniq | cut -d ':' -f 2 | sed 's/^[ \t]*//')
+if [ -z "$chipset" ]; then
+    chipset=$(getprop "ro.hardware")
+fi
+
+if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
+    kmsg1 "[ * ] Device is Mediatek, executing mtk_perf..."
+    mtk_perf
+    exit
+else
+    kmsg1 "[ * ] Device is not Mediatek, continuing script..."
+fi
+
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
 kmsg1 "[ * ] Griffith's version: $griffv "
@@ -1676,10 +2218,22 @@ init=$(date +%s)
 gaming() {
 init=$(date +%s)
 
-# Kill background apps
-while IFS= read -r pkg_nm; do
-    [[ "$pkg_nm" != "com.tweaker.griffith" ]] && am force-stop "$pkg_nm"
-done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[*] CLEANED BACKGROUND APPS. "
+# Checking mtk device
+simple_bar
+kmsg1 "[ * ] Checking device compatibility"
+chipset=$(grep "Hardware" /proc/cpuinfo | uniq | cut -d ':' -f 2 | sed 's/^[ \t]*//')
+if [ -z "$chipset" ]; then
+    chipset=$(getprop "ro.hardware")
+fi
+
+if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
+    kmsg1 "[ * ] Device is Mediatek, your device does not support this mode!"
+    simple_bar
+    su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' '[ERROR] Your device does not support this mode!'" > /dev/null
+    exit
+else
+    kmsg1 "[ * ] Device is not Mediatek, continuing script..."
+fi
 
 # Variable to ram usage
 total_mem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
@@ -1688,6 +2242,11 @@ buffers=$(cat /proc/meminfo | grep Buffers | awk '{print $2}')
 cached=$(cat /proc/meminfo | grep "^Cached" | awk '{print $2}')
 used_mem=$((total_mem - free_mem - buffers - cached))
 used_percentage=$((used_mem * 100 / total_mem))
+
+# Kill background apps
+while IFS= read -r pkg_nm; do
+    [[ "$pkg_nm" != "com.tweaker.griffith" ]] && am force-stop "$pkg_nm"
+done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[*] CLEANED BACKGROUND APPS. "
 
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
@@ -2164,6 +2723,24 @@ simple_bar
 # Thermal Profile
 thermal() {
 init=$(date +%s)
+
+# Checking mtk device
+simple_bar
+kmsg1 "[ * ] Checking device compatibility"
+chipset=$(grep "Hardware" /proc/cpuinfo | uniq | cut -d ':' -f 2 | sed 's/^[ \t]*//')
+if [ -z "$chipset" ]; then
+    chipset=$(getprop "ro.hardware")
+fi
+
+if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
+    kmsg1 "[ * ] Device is Mediatek, your device does not support this mode!"
+    simple_bar
+    su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' '[ERROR] Your device does not support this mode!'" > /dev/null
+    exit
+else
+    kmsg1 "[ * ] Device is not Mediatek, continuing script..."
+fi
+
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
 kmsg1 "[ * ] Griffith's version: $griffv "
