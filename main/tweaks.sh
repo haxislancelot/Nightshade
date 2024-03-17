@@ -2246,7 +2246,7 @@ used_percentage=$((used_mem * 100 / total_mem))
 # Kill background apps
 while IFS= read -r pkg_nm; do
     [[ "$pkg_nm" != "com.tweaker.griffith" ]] && am force-stop "$pkg_nm"
-done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[*] CLEANED BACKGROUND APPS. "
+done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[ * ] CLEANED BACKGROUND APPS. "
 
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
@@ -2292,7 +2292,6 @@ renice -n 6 $(pgrep android.gms)
 simple_bar
 kmsg1 "[*] RENICED PROCESSES. "
 simple_bar
-
 
 # Disable perfd and mpdecision
 stop perfd > /dev/null
@@ -3030,8 +3029,8 @@ do
 		};;
 
 	  "Balanced") {
-			 settings delete global device_idle_constants
-			 start thermal-engine
+			settings delete global device_idle_constants
+		        start thermal-engine
 	 		balanced
 	 		su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Balanced profile was successfully applied!'" > /dev/null
 	 		echo "3"  > "/proc/sys/vm/drop_caches"
@@ -3057,7 +3056,7 @@ do
 		};;
 	  
 	  "Thermal") {
-	  	  settings delete global device_idle_constants
+	  	        settings delete global device_idle_constants
 			thermal
 			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Thermal profile was successfully applied!'" > /dev/null
 			echo "3" > "/proc/sys/vm/drop_caches"
