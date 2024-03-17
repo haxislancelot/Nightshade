@@ -1,7 +1,21 @@
 #!/system/bin/sh
-# Modified by @donottelmyname, on Telegram.
-# Credit to @raidenkk on Telegram, because without him this script would not be possible.
-# Credit to Rem01Gaming for Mediatek support.
+# Thanks @raidenkk on Telegram and Rem01Gaming on Github for your contributions.
+# This file is part of GriffithTweaks.
+#
+# GriffithTweaks is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GriffithTweaks is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GriffithTweaks.  If not, see <https://www.gnu.org/licenses/>.
+#
+# Copyright (C) 2024 haxislancelot
 
 # Logs
 GFLOG=/sdcard/.GTKS/griffithTweaks.log
@@ -480,6 +494,7 @@ fi
 
 if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
     kmsg1 "[ * ] Device is Mediatek, executing mtk_battery..."
+    settings put global device_idle_constants inactive_to=60000,sensing_to=0,locating_to=0,location_accuracy=2000,motion_inactive_to=0,idle_after_inactive_to=0,idle_pending_to=60000,max_idle_pending_to=120000,idle_pending_factor=2.0,idle_to=900000,max_idle_to=21600000,idle_factor=2.0,max_temp_app_whitelist_duration=60000,mms_temp_app_whitelist_duration=30000,sms_temp_app_whitelist_duration=20000,light_after_inactive_to=10000,light_pre_idle_to=60000,light_idle_to=180000,light_idle_factor=2.0,light_max_idle_to=900000,light_idle_maintenance_min_budget=30000,light_idle_maintenance_max_budget=60000
     mtk_battery
     exit
 else
@@ -1121,6 +1136,7 @@ fi
 
 if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
     kmsg1 "[ * ] Device is Mediatek, executing mtk_normal..."
+    settings delete global device_idle_constants
     mtk_normal
     exit
 else
@@ -1737,6 +1753,7 @@ fi
 
 if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
     kmsg1 "[ * ] Device is Mediatek, executing mtk_perf..."
+    settings delete global device_idle_constants
     mtk_perf
     exit
 else
@@ -1786,7 +1803,6 @@ renice -n 6 $(pgrep android.gms)
 simple_bar
 kmsg1 "[*] RENICED PROCESSES. "
 simple_bar
-
 
 # Enable perfd and stop mp decision
 start perfd > /dev/null
@@ -2246,7 +2262,7 @@ used_percentage=$((used_mem * 100 / total_mem))
 # Kill background apps
 while IFS= read -r pkg_nm; do
     [[ "$pkg_nm" != "com.tweaker.griffith" ]] && am force-stop "$pkg_nm"
-done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[ * ] CLEANED BACKGROUND APPS. "
+done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[*] CLEANED BACKGROUND APPS. "
 
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
@@ -2292,6 +2308,7 @@ renice -n 6 $(pgrep android.gms)
 simple_bar
 kmsg1 "[*] RENICED PROCESSES. "
 simple_bar
+
 
 # Disable perfd and mpdecision
 stop perfd > /dev/null
@@ -3029,12 +3046,12 @@ do
 		};;
 
 	  "Balanced") {
-			settings delete global device_idle_constants
-		        start thermal-engine
-	 		balanced
-	 		su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Balanced profile was successfully applied!'" > /dev/null
-	 		echo "3"  > "/proc/sys/vm/drop_caches"
-	 		exit
+	  	  settings delete global device_idle_constants
+			start thermal-engine 
+			balanced
+	 	   su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Balanced profile was successfully applied!'" > /dev/null	
+	 	   echo "3"  > "/proc/sys/vm/drop_caches"	
+	 	   exit
 		};;
 
 	  "Performance") {
@@ -3056,7 +3073,7 @@ do
 		};;
 	  
 	  "Thermal") {
-	  	        settings delete global device_idle_constants
+	  	  settings delete global device_idle_constants
 			thermal
 			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Thermal profile was successfully applied!'" > /dev/null
 			echo "3" > "/proc/sys/vm/drop_caches"
