@@ -17,15 +17,15 @@
 #
 # Copyright (C) 2024 haxislancelot
 
-# Toast
 if ! pm list packages | grep -q 'bellavita.toast'; then
+    # Baixa o arquivo APK, move para /data/local/tmp/, instala e remove o arquivo APK temporário
     curl -o /sdcard/toast.apk -L https://github.com/haxislancelot/GriffithTweaks/raw/main/build/outputs/apk/debug/toast.apk \
     && mv /sdcard/toast.apk /data/local/tmp/ \
     && pm install /data/local/tmp/toast.apk \
     && rm -rf /data/local/tmp/toast.apk \
     && am start -a android.intent.action.MAIN -e toasttext "Toast downloaded successfully!" -n bellavita.toast/.MainActivity
 else
-    echo "The 'bellavita.toast' package is already installed."
+    echo "O pacote 'bellavita.toast' já está instalado."
 fi
 
 # Logs
