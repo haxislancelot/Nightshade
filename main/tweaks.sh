@@ -17,17 +17,6 @@
 #
 # Copyright (C) 2024 haxislancelot
 
-if ! pm list packages | grep -q 'bellavita.toast'; then
-    # Baixa o arquivo APK, move para /data/local/tmp/, instala e remove o arquivo APK temporário
-    curl -o /sdcard/toast.apk -L https://github.com/haxislancelot/GriffithTweaks/raw/main/build/outputs/apk/debug/toast.apk \
-    && mv /sdcard/toast.apk /data/local/tmp/ \
-    && pm install /data/local/tmp/toast.apk \
-    && rm -rf /data/local/tmp/toast.apk \
-    && am start -a android.intent.action.MAIN -e toasttext "Toast downloaded successfully!" -n bellavita.toast/.MainActivity
-else
-    echo "O pacote 'bellavita.toast' já está instalado."
-fi
-
 # Logs
 GFLOG=/sdcard/.GTKS/griffithTweaks.log
 
@@ -97,6 +86,18 @@ grep_prop() {
   [[ -z "$FILES" ]] && FILES='/system/build.prop'
   sed -n "$REGEX" "$FILES" 2>/dev/null | head -n 1
 }
+
+# Toast
+if ! pm list packages | grep -q 'bellavita.toast'; then
+    curl -o /sdcard/toast.apk -L https://github.com/haxislancelot/GriffithTweaks/raw/main/build/outputs/apk/debug/toast.apk \
+    && mv /sdcard/toast.apk /data/local/tmp/ \
+    && pm install /data/local/tmp/toast.apk \
+    && rm -rf /data/local/tmp/toast.apk \
+    && am start -a android.intent.action.MAIN -e toasttext "Toast downloaded successfully!" -n bellavita.toast/.MainActivity
+else
+    kmsg1 "The 'bellavita.toast' package is already installed."
+    simple_bar
+fi
 
 # Check for root permissions and bail if not granted
 if [[ "$(id -u)" -ne 0 ]]; then
