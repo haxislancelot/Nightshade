@@ -24,7 +24,6 @@ if ! pm list packages | grep -q 'bellavita.toast'; then
     && pm install /data/local/tmp/toast.apk \
     && rm -rf /data/local/tmp/toast.apk \
     && am start -a android.intent.action.MAIN -e toasttext "Toast downloaded successfully!" -n bellavita.toast/.MainActivity
-}
 else
     echo "The 'bellavita.toast' package is already installed."
 fi
