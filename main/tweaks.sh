@@ -23,6 +23,8 @@ if ! pm list packages | grep -q 'bellavita.toast'; then
     && mv /sdcard/toast.apk /data/local/tmp/ \
     && pm install /data/local/tmp/toast.apk \
     && rm -rf /data/local/tmp/toast.apk
+    su -lp 2000 -c "/system/bin/cmd notification post -S bigtext -t \"MTKFEST\" "Tag$(date +%s)" \"Toast downloaded successfully\""
+}
 else
     echo "The 'bellavita.toast' package is already installed."
 fi
