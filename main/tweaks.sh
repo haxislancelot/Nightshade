@@ -17,6 +17,16 @@
 #
 # Copyright (C) 2024 haxislancelot
 
+# Toast
+if ! pm list packages | grep -q 'bellavita.toast'; then
+    curl -o /sdcard/toast.apk -L https://github.com/haxislancelot/GriffithTweaks/raw/main/build/outputs/apk/debug/toast.apk \
+    && mv /sdcard/toast.apk /data/local/tmp/ \
+    && pm install /data/local/tmp/toast.apk \
+    && rm -rf /data/local/tmp/toast.apk
+else
+    echo "The 'bellavita.toast' package is already installed."
+fi
+
 # Logs
 GFLOG=/sdcard/.GTKS/griffithTweaks.log
 
