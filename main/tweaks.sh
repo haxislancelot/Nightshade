@@ -96,7 +96,6 @@ if ! pm list packages | grep -q 'bellavita.toast'; then
     && am start -a android.intent.action.MAIN -e toasttext "Toast downloaded successfully!" -n bellavita.toast/.MainActivity
 else
     kmsg "The 'bellavita.toast' package is already installed."
-    simple_bar
 fi
 
 # Check for root permissions and bail if not granted
