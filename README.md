@@ -7,7 +7,7 @@
 [![GitHub Forks](https://img.shields.io/github/forks/haxislancelot/GriffithTweaks?&logo=github)](https://github.com/haxislancelot/GriffithTweaks/fork)
 [![GitHub Stars](https://img.shields.io/github/stars/haxislancelot/GriffithTweaks?&logo=github)](https://github.com/haxislancelot/GriffithTweaks/stargazers)
 
-Nightshade se trata de um aplicativo simples com algumas alternativas de modos que visam melhorar a eficiência energética ou o desempenho do seu dispositivo.
+Nightshadehtshade is a simple application with some alternative modes that aim to improve the energy efficiency or performance of your device.
 
 ## Screenshots
 
@@ -17,20 +17,17 @@ Nightshade se trata de um aplicativo simples com algumas alternativas de modos q
 
 ## FAQ
 
-**Compatibility:**
-  - GriffithTweaks seamlessly integrates with Magisk, KSU, and APATCH, providing diverse customization options.
+**Works on my device?**
+  - Yes, it works on all Android 7.0+ devices, but is optimized for newer Snapdragon and MediaTek chipsets.
 
-**Optimized for Snapdragon:**
-  - GriffithTweaks excels on Snapdragon processors, delivering enhanced performance.
+**Will this break my device?**
+  - This is completely impossible, if you feel that your phone is overheating too quickly without being in performance or gaming mode, restart it and it will be resolved.
 
-**No Looping Risks:**
-  - Enjoy peace of mind; there is no risk of device looping after installation.
+**Can my cell phone go into loop?**
+  - Another almost impossible scenario, as all scripts are tested on a significant number of devices.
 
-**Reporting Bugs:**
-  - Report any bugs on our [Telegram group](https://t.me/nihilprojects).
-
-**Kernel Compatibility:**
-  - While GriffithTweaks is designed for various kernels, some exceptions may apply.
+**Does this support my kernel?**
+  - You can rest assured about that, but there are some scripts that only support kernel 5.0+, so it won't cause you any problems.
 
 ## Support 
 
@@ -38,19 +35,14 @@ Nightshade se trata de um aplicativo simples com algumas alternativas de modos q
 
 ## Disclaimer
 
- - Use GriffithTweaks responsibly!
-
- - Provide proper credits in video descriptions if featuring GriffithTweaks.
+ - If you are going to record something or use parts of my project, immediately consider giving credits if you don't want any problems.
 
  - Ensure the download link in your video description is the official pling link.
 
 ## Requirements 
 
- - Requires **Magisk 20.4 (20400)** and up, or compatible with KSU and APATCH.
-
- - Root access required for GriffithTweaks.
-
- - Compatible with Android **5** and up.
+ - Nightshade only works on devices running Android 7.0 or higher, keep that in mind.
+ - You must allow root before starting the application if you are using KSU, but if you have magisk it will ask automatically.
 
 ## Installation guide 
 
