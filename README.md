@@ -1,6 +1,6 @@
 # Nightshade 
 
-![Nightshade Logo]([https://github.com/haxislancelot/GriffithTweaks/raw/main/nihil.png](https://raw.githubusercontent.com/haxislancelot/Nightshade/main/nightshade_logo.png))
+![Nightshade Logo](https://github.com/haxislancelot/Nightshade/raw/main/nightshade_logo.png)
 
 [![Open Source Love](https://img.shields.io/badge/Open%20Source-Love-blue)](https://github.com/haxislancelot/GriffithTweaks)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-Yes-green)](https://GitHub.com/haxislancelot/GriffithTweaks/graphs/commit-activity)
