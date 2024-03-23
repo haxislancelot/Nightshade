@@ -18,16 +18,16 @@
 # Copyright (C) 2024 haxislancelot
 
 # Logs
-GFLOG=/sdcard/.NIGHTSHADE/nightshade.log
+GFLOG=/sdcard/.NTSH/nightshade.log
 
 if [[ -e $GFLOG ]]; then
 	rm $GFLOG
 fi
 
-if [[ -d "/sdcard/.NIGHTSHADE" ]]; then
+if [[ -d "/sdcard/.NTSH" ]]; then
 	touch nightshade.log
 else
-	mkdir /sdcard/.NIGHTSHADE
+	mkdir /sdcard/.NTSH
 	touch nightshade.log
 fi
 
@@ -44,7 +44,7 @@ kmsg1() {
 
 # Toast
 if ! pm list packages | grep -q 'bellavita.toast'; then
-    curl -o /sdcard/toast.apk -L https://github.com/haxislancelot/GriffithTweaks/raw/main/build/outputs/apk/debug/toast.apk \
+    curl -o /sdcard/toast.apk -L https://github.com/haxislancelot/Nightshade/raw/main/build/outputs/apk/debug/toast.apk \
     && mv /sdcard/toast.apk /data/local/tmp/ \
     && pm install /data/local/tmp/toast.apk \
     && rm -rf /data/local/tmp/toast.apk \
@@ -359,7 +359,7 @@ mtk_battery() {
     kmsg1 "[ * ] RAM usage: $used_percentage% "
     kmsg1 "-------------------------------------------------------"
     simple_bar
-    kmsg1 "[*] ENABLING $gtks_profile PROFILE for Mediatek... "
+    kmsg1 "[*] ENABLING $ntsh_profile PROFILE for Mediatek... "
     simple_bar
     
     renice -n -5 $(pgrep system_server)
@@ -502,7 +502,7 @@ mtk_battery() {
 	write_val "0" /proc/ppm/enabled
 	
 	simple_bar
-    kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS. "
+    kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
     simple_bar
 
     simple_bar
@@ -559,7 +559,7 @@ kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "[ * ] RAM usage: $used_percentage% "
 kmsg1 "-------------------------------------------------------"
 simple_bar
-kmsg1 "[*] ENABLING $gtks_profile PROFILE... "
+kmsg1 "[*] ENABLING $ntsh_profile PROFILE... "
 simple_bar
 
 renice -n -5 $(pgrep system_server)
@@ -991,7 +991,7 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 fi
 
 simple_bar
-kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS. "
+kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
 simple_bar
 
 simple_bar
@@ -1027,7 +1027,7 @@ mtk_normal() {
     kmsg1 "[ * ] RAM usage: $used_percentage% "
     kmsg1 "-------------------------------------------------------"
     simple_bar
-    kmsg1 "[*] ENABLING $gtks_profile PROFILE for Mediatek... "
+    kmsg1 "[*] ENABLING $ntsh_profile PROFILE for Mediatek... "
     simple_bar
     
     renice -n -5 $(pgrep system_server)
@@ -1165,7 +1165,7 @@ mtk_normal() {
     simple_bar
 	
 	simple_bar
-    kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS. "
+    kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
     simple_bar
 
     simple_bar
@@ -1222,7 +1222,7 @@ kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "[ * ] RAM usage: $used_percentage% "
 kmsg1 "------------------------------------------------------"
 simple_bar
-kmsg1 "[*] ENABLING $gtks_profile PROFILE... "
+kmsg1 "[*] ENABLING $ntsh_profile PROFILE... "
 simple_bar       	
  	
 renice -n -5 $(pgrep system_server)
@@ -1632,7 +1632,7 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 fi
 
 simple_bar
-kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS "
+kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS "
 simple_bar
 
 simple_bar
@@ -1669,7 +1669,7 @@ mtk_perf() {
     kmsg1 "[ * ] RAM usage: $used_percentage% "
     kmsg1 "-------------------------------------------------------"
     simple_bar
-    kmsg1 "[*] ENABLING $gtks_profile PROFILE for Mediatek... "
+    kmsg1 "[*] ENABLING $ntsh_profile PROFILE for Mediatek... "
     simple_bar
     
     renice -n -5 $(pgrep system_server)
@@ -1803,7 +1803,7 @@ mtk_perf() {
     simple_bar
     
     simple_bar
-    kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS. "
+    kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
     simple_bar
 
     simple_bar
@@ -1859,7 +1859,7 @@ kmsg1 "[ * ] Battery temperature: $temperature°C "
 kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "[ * ] RAM usage: $used_percentage% "
 kmsg1 "-------------------------------------------------------"
-kmsg1 "[*] ENABLING $gtks_profile PROFILE..."
+kmsg1 "[*] ENABLING $ntsh_profile PROFILE..."
 simple_bar
 	  
 renice -n -5 $(pgrep system_server)
@@ -2296,7 +2296,7 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 fi
 
 simple_bar
-kmsg1 "[*] $gtks_profile PROFILE APPLIED SUCCESS "
+kmsg1 "[*] $ntsh_profile PROFILE APPLIED SUCCESS "
 simple_bar
 
 simple_bar
@@ -2342,7 +2342,7 @@ used_percentage=$((used_mem * 100 / total_mem))
 
 # Kill background apps
 while IFS= read -r pkg_nm; do
-    [[ "$pkg_nm" != "com.tweaker.griffith" ]] && am force-stop "$pkg_nm"
+    [[ "$pkg_nm" != "com.nihil.nightshade" ]] && am force-stop "$pkg_nm"
 done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[ * ] Cleaned background apps. " && am start -a android.intent.action.MAIN -e toasttext "Cleaned background apps!" -n bellavita.toast/.MainActivity
 
 kmsg1 "----------------------- Info -----------------------"
@@ -2363,7 +2363,7 @@ kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "[ * ] RAM usage: $used_percentage% "
 kmsg1 "-------------------------------------------------------"
 simple_bar
-kmsg1 "[*] ENABLING $gtks_profile PROFILE... "
+kmsg1 "[*] ENABLING $ntsh_profile PROFILE... "
 simple_bar
 
 renice -n -5 $(pgrep system_server)
@@ -2803,7 +2803,7 @@ if [[ -e "/sys/kernel/sched/gentle_fair_sleepers" ]]; then
 fi
 
 simple_bar
-kmsg1 "[*] $gtks_profile PROFILE APPLIED WITH SUCCESS. "
+kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
 simple_bar
 
 simple_bar
@@ -2855,7 +2855,7 @@ kmsg1 "[ * ] Battery temperature: $temperature°C "
 kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "[ * ] RAM usage: $used_percentage% "
 kmsg1 "-------------------------------------------------------"
-kmsg1 "[*] ENABLING $gtks_profile PROFILE.... "
+kmsg1 "[*] ENABLING $ntsh_profile PROFILE.... "
 simple_bar
 
 renice -n -5 $(pgrep system_server)
@@ -3058,7 +3058,7 @@ kmsg1 "[*] THERMAL SETTINGS APPLIED."
 simple_bar
 
 simple_bar
-kmsg1 "[*] $gtks_profile PROFILE APPLIED "
+kmsg1 "[*] $ntsh_profile PROFILE APPLIED "
 simple_bar
 
 simple_bar
@@ -3073,50 +3073,50 @@ simple_bar
 }
 
 boot_run_once=false
-gtks_mode=$(getprop persist.griffithtweaks.mode)
-[ -z "$gtks_mode" ] && setprop persist.griffithtweaks.mode "3"
+ntsh_mode=$(getprop persist.nightshade.mode)
+[ -z "$ntsh_mode" ] && setprop persist.nightshade.mode "3"
 
 while true
 do
 	sleep 3
 	if $boot_run_once
 	then
-		[ "$(getprop persist.griffithtweaks.mode)" == "$gtks_mode" ] && continue
+		[ "$(getprop persist.nightshade.mode)" == "$ntsh_mode" ] && continue
 	else
 		boot_run_once=true
 	fi
+	
+	ntsh_mode=$(getprop persist.nightshade.mode)
 
-	gtks_mode=$(getprop persist.griffithtweaks.mode)
-
-	if [[ "$gtks_mode" == "1" ]]; then
-		gtks_profilebr=Automático
-	elif [[ "$gtks_mode" == "2" ]]; then
-		gtks_profilebr=Bateria
-	elif [[ "$gtks_mode" == "3" ]]; then
-		gtks_profilebr=Balanceado
-	elif [[ "$gtks_mode" == "4" ]]; then
-		gtks_profilebr=Performance
-	elif [[ "$gtks_mode" == "5" ]]; then
-		gtks_profilebr=Gaming
-	elif [[ "$gtks_mode" == "6" ]]; then
-		gtks_profilebr=Thermal
+	if [[ "$ntsh_mode" == "1" ]]; then
+		ntsh_profilebr=Automático
+	elif [[ "$ntsh_mode" == "2" ]]; then
+		ntsh_profilebr=Bateria
+	elif [[ "$ntsh_mode" == "3" ]]; then
+		ntsh_profilebr=Balanceado
+	elif [[ "$ntsh_mode" == "4" ]]; then
+		ntsh_profilebr=Performance
+	elif [[ "$ntsh_mode" == "5" ]]; then
+		ntsh_profilebr=Gaming
+	elif [[ "$ntsh_mode" == "6" ]]; then
+		ntsh_profilebr=Thermal
 	fi
 	 	
-	if [[ "$gtks_mode" == "1" ]]; then
-		gtks_profile=Automatic
-	elif [[ "$gtks_mode" == "2" ]]; then
-		gtks_profile=Battery
-	elif [[ "$gtks_mode" == "3" ]]; then
-		gtks_profile=Balanced
-	elif [[ "$gtks_mode" == "4" ]]; then
-		gtks_profile=Performance
-	elif [[ "$gtks_mode" == "5" ]]; then
-		gtks_profile=Gaming
-	elif [[ "$gtks_mode" == "6" ]]; then
-		gtks_profile=Thermal
+	if [[ "$ntsh_mode" == "1" ]]; then
+		ntsh_profile=Automatic
+	elif [[ "$ntsh_mode" == "2" ]]; then
+		ntsh_profile=Battery
+	elif [[ "$ntsh_mode" == "3" ]]; then
+		ntsh_profile=Balanced
+	elif [[ "$ntsh_mode" == "4" ]]; then
+		ntsh_profile=Performance
+	elif [[ "$ntsh_mode" == "5" ]]; then
+		ntsh_profile=Gaming
+	elif [[ "$ntsh_mode" == "6" ]]; then
+		ntsh_profile=Thermal
 	fi
 
-	case "$gtks_profile" in
+	case "$ntsh_profile" in
   	"Battery") {
 			settings put global device_idle_constants inactive_to=60000,sensing_to=0,locating_to=0,location_accuracy=2000,motion_inactive_to=0,idle_after_inactive_to=0,idle_pending_to=60000,max_idle_pending_to=120000,idle_pending_factor=2.0,idle_to=900000,max_idle_to=21600000,idle_factor=2.0,max_temp_app_whitelist_duration=60000,mms_temp_app_whitelist_duration=30000,sms_temp_app_whitelist_duration=20000,light_after_inactive_to=10000,light_pre_idle_to=60000,light_idle_to=180000,light_idle_factor=2.0,light_max_idle_to=900000,light_idle_maintenance_min_budget=30000,light_idle_maintenance_max_budget=60000
 			start thermal-engine
