@@ -7,7 +7,7 @@
 [![GitHub Forks](https://img.shields.io/github/forks/haxislancelot/GriffithTweaks?&logo=github)](https://github.com/haxislancelot/GriffithTweaks/fork)
 [![GitHub Stars](https://img.shields.io/github/stars/haxislancelot/GriffithTweaks?&logo=github)](https://github.com/haxislancelot/GriffithTweaks/stargazers)
 
-GriffithTweaks is a versatile kernel manager designed to enhance your device's performance. It features multiple profiles tailored to different user preferences.
+Nightshade se trata de um aplicativo simples com algumas alternativas de modos que visam melhorar a eficiência energética ou o desempenho do seu dispositivo.
 
 ## Screenshots
 
