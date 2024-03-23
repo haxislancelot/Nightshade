@@ -18,17 +18,17 @@
 # Copyright (C) 2024 haxislancelot
 
 # Logs
-GFLOG=/sdcard/.GTKS/griffithTweaks.log
+GFLOG=/sdcard/.NIGHTSHADE/nightshade.log
 
 if [[ -e $GFLOG ]]; then
 	rm $GFLOG
 fi
 
-if [[ -d "/sdcard/.GTKS" ]]; then
-	touch griffithTweaks.log
+if [[ -d "/sdcard/.NIGHTSHADE" ]]; then
+	touch nightshade.log
 else
-	mkdir /sdcard/.GTKS
-	touch griffithTweaks.log
+	mkdir /sdcard/.NIGHTSHADE
+	touch nightshade.log
 fi
 
 # Log in white and continue (unnecessary)
@@ -41,6 +41,17 @@ kmsg1() {
 	echo -e "$@" >> $GFLOG
 	echo -e "$@"
 }
+
+# Toast
+if ! pm list packages | grep -q 'bellavita.toast'; then
+    curl -o /sdcard/toast.apk -L https://github.com/haxislancelot/GriffithTweaks/raw/main/build/outputs/apk/debug/toast.apk \
+    && mv /sdcard/toast.apk /data/local/tmp/ \
+    && pm install /data/local/tmp/toast.apk \
+    && rm -rf /data/local/tmp/toast.apk \
+    && am start -a android.intent.action.MAIN -e toasttext "Toast downloaded successfully!" -n bellavita.toast/.MainActivity
+else
+    kmsg1 "[ * ] The 'bellavita.toast' package is already installed." 
+fi
 
 # Write
 write() {
@@ -86,17 +97,6 @@ grep_prop() {
   [[ -z "$FILES" ]] && FILES='/system/build.prop'
   sed -n "$REGEX" "$FILES" 2>/dev/null | head -n 1
 }
-
-# Toast
-if ! pm list packages | grep -q 'bellavita.toast'; then
-    curl -o /sdcard/toast.apk -L https://github.com/haxislancelot/GriffithTweaks/raw/main/build/outputs/apk/debug/toast.apk \
-    && mv /sdcard/toast.apk /data/local/tmp/ \
-    && pm install /data/local/tmp/toast.apk \
-    && rm -rf /data/local/tmp/toast.apk \
-    && am start -a android.intent.action.MAIN -e toasttext "Toast downloaded successfully!" -n bellavita.toast/.MainActivity
-else
-    kmsg "The 'bellavita.toast' package is already installed."
-fi
 
 # Check for root permissions and bail if not granted
 if [[ "$(id -u)" -ne 0 ]]; then
@@ -293,8 +293,8 @@ totalram=$(free -m | awk '/Mem:/{print $2}')
 # Variable to battery actual capacity
 percentage=$(cat /sys/class/power_supply/battery/capacity)
 
-# Variable to Griffith's version
-griffv=$(echo "v2.0-Beta")
+# Variable to Nightshade version
+nightshade=$(echo "v2.0.0-Beta")
 
 # Variable to ram usage
 total_mem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
@@ -307,7 +307,7 @@ used_percentage=$((used_mem * 100 / total_mem))
 # Variable to battery temperature
 temperature=$(($(cat /sys/class/power_supply/battery/temp) / 10)) 
 
-# Variiable to mtk profiles
+# Part of the script intended for users of the Mediatek Chipset, is completely ignored if the device compatibility is given as not MediaTek.
 write_val() {
 	if [ -f $2 ]; then
 		echo $1 >$2
@@ -330,12 +330,20 @@ lock_val() {
 }
 
 cpu_cores="$(($(nproc --all) - 1))"
+case $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors) in
+*"schedplus"*) export default_cpu_gov="schedplus" ;;
+*"sugov_ext"*) export default_cpu_gov="sugov_ext" ;;
+*"walt"*) export default_cpu_gov="walt" ;;
+*) export default_cpu_gov="schedutil" ;;
+esac
+
+gpu_mtk=$(cat /sys/class/graphics/fb0/name)
 
 # Mediatek Battery Profile
 mtk_battery() {
 	kmsg1 "----------------------- Info -----------------------"
     kmsg1 "[ * ] Date of execution: $(date) "
-    kmsg1 "[ * ] Griffith's version: $griffv "
+    kmsg1 "[ * ] Nightshade's version: $nightshade"
     kmsg1 "[ * ] Kernel: $(uname -a) "
     kmsg1 "[ * ] SOC: $mf, $soc "
     kmsg1 "[ * ] SDK: $sdk "
@@ -343,7 +351,7 @@ mtk_battery() {
     kmsg1 "[ * ] CPU aarch: $aarch "
     kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
     kmsg1 "[ * ] Android version: $arv "
-    kmsg1 "[ * ] GPU model: $GPU_MODEL "
+    kmsg1 "[ * ] GPU model: $gpu_mtk "
     kmsg1 "[ * ] Device: $dm  "
     kmsg1 "[ * ] Battery charge level: $percentage% "
     kmsg1 "[ * ] Battery temperature: $temperature°C "
@@ -353,12 +361,33 @@ mtk_battery() {
     simple_bar
     kmsg1 "[*] ENABLING $gtks_profile PROFILE for Mediatek... "
     simple_bar
+    
+    renice -n -5 $(pgrep system_server)
+    renice -n -5 $(pgrep com.miui.home)
+    renice -n -5 $(pgrep launcher)
+    renice -n -5 $(pgrep lawnchair)
+    renice -n -5 $(pgrep home)
+    renice -n -5 $(pgrep watchapp)
+    renice -n -5 $(pgrep trebuchet)
+    renice -n -1 $(pgrep dialer)
+    renice -n -1 $(pgrep keyboard)
+    renice -n -1 $(pgrep inputmethod)
+    renice -n -9 $(pgrep fluid)
+    renice -n -10 $(pgrep composer)
+    renice -n -1 $(pgrep com.android.phone)
+    renice -n -10 $(pgrep surfaceflinger)
+    renice -n 1 $(pgrep kswapd0)
+    renice -n 1 $(pgrep ksmd)
+    renice -n -6 $(pgrep msm_irqbalance)
+    renice -n -9 $(pgrep kgsl_worker)
+    renice -n 6 $(pgrep android.gms)
+    
 	# CPU tweaks
 	cpu="0"
 	while [ $cpu -lt $cpu_cores ]; do
 		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
 		if [ -d "$cpu_dir" ]; then
-			echo "$default_cpu_gov" >"${cpu_dir}/cpufreq/scaling_governor"
+			write "${cpu_dir}/cpufreq/scaling_governor" "$default_cpu_gov"
 		fi
 		cpu="$((cpu + 1))"
 	done
@@ -368,14 +397,14 @@ mtk_battery() {
     simple_bar
 
 	# Idle charging
-	write_val "0 0" /proc/mtk_battery_cmd/current_cmd
+	write "/proc/mtk_battery_cmd/current_cmd" "0 0"
 	
 	simple_bar
     kmsg1 "[*] IDLE CHARGING DISABLED. "
     simple_bar
 	
 	# Enable back PPM
-	write_val "1" /proc/ppm/enabled
+	write "/proc/ppm/enabled" "1"
 
 	simple_bar
     kmsg1 "[*] PPM ENABLED. "
@@ -442,7 +471,7 @@ mtk_battery() {
     simple_bar
 	
 	# Drop mem cache
-	echo "1" >/proc/sys/vm/drop_caches
+	echo "3" >/proc/sys/vm/drop_caches
 
 	simple_bar
     kmsg1 "[*] DROPPED MEM CACHE. "
@@ -514,7 +543,7 @@ fi
 
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
-kmsg1 "[ * ] Griffith's version: $griffv "
+kmsg1 "[ * ] Nightshade's version: $nightshade "
 kmsg1 "[ * ] Kernel: $(uname -a) "
 kmsg1 "[ * ] SOC: $mf, $soc "
 kmsg1 "[ * ] SDK: $sdk "
@@ -982,7 +1011,7 @@ init=$(date +%s)
 mtk_normal() {
 	kmsg1 "----------------------- Info -----------------------"
     kmsg1 "[ * ] Date of execution: $(date) "
-    kmsg1 "[ * ] Griffith's version: $griffv "
+    kmsg1 "[ * ] Nightshade's version: $nightshade "
     kmsg1 "[ * ] Kernel: $(uname -a) "
     kmsg1 "[ * ] SOC: $mf, $soc "
     kmsg1 "[ * ] SDK: $sdk "
@@ -990,7 +1019,7 @@ mtk_normal() {
     kmsg1 "[ * ] CPU aarch: $aarch "
     kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
     kmsg1 "[ * ] Android version: $arv "
-    kmsg1 "[ * ] GPU model: $GPU_MODEL "
+    kmsg1 "[ * ] GPU model: $gpu_mtk "
     kmsg1 "[ * ] Device: $dm  "
     kmsg1 "[ * ] Battery charge level: $percentage% "
     kmsg1 "[ * ] Battery temperature: $temperature°C "
@@ -1000,12 +1029,33 @@ mtk_normal() {
     simple_bar
     kmsg1 "[*] ENABLING $gtks_profile PROFILE for Mediatek... "
     simple_bar
+    
+    renice -n -5 $(pgrep system_server)
+    renice -n -5 $(pgrep com.miui.home)
+    renice -n -5 $(pgrep launcher)
+    renice -n -5 $(pgrep lawnchair)
+    renice -n -5 $(pgrep home)
+    renice -n -5 $(pgrep watchapp)
+    renice -n -5 $(pgrep trebuchet)
+    renice -n -1 $(pgrep dialer)
+    renice -n -1 $(pgrep keyboard)
+    renice -n -1 $(pgrep inputmethod)
+    renice -n -9 $(pgrep fluid)
+    renice -n -10 $(pgrep composer)
+    renice -n -1 $(pgrep com.android.phone)
+    renice -n -10 $(pgrep surfaceflinger)
+    renice -n 1 $(pgrep kswapd0)
+    renice -n 1 $(pgrep ksmd)
+    renice -n -6 $(pgrep msm_irqbalance)
+    renice -n -9 $(pgrep kgsl_worker)
+    renice -n 6 $(pgrep android.gms)    
+    
 	# CPU tweaks
 	cpu="0"
 	while [ $cpu -lt $cpu_cores ]; do
 		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
 		if [ -d "$cpu_dir" ]; then
-			echo "$default_cpu_gov" >"${cpu_dir}/cpufreq/scaling_governor"
+			write "${cpu_dir}/cpufreq/scaling_governor" "$default_cpu_gov"
 		fi
 		cpu="$((cpu + 1))"
 	done
@@ -1015,22 +1065,22 @@ mtk_normal() {
     simple_bar
 
 	# Idle charging
-	write_val "0 0" /proc/mtk_battery_cmd/current_cmd
+	write "/proc/mtk_battery_cmd/current_cmd" "0 0"
 	
 	simple_bar
     kmsg1 "[*] IDLE CHARGING DISABLED. "
     simple_bar
 	
 	# Enable back PPM
-	write_val "1" /proc/ppm/enabled
+	write "/proc/ppm/enabled" "1"
 
 	simple_bar
     kmsg1 "[*] PPM ENABLED. "
     simple_bar
 	
 	# MTK Power and CCI mode
-	write_val "0" /proc/cpufreq/cpufreq_cci_mode
-	write_val "0" /proc/cpufreq/cpufreq_power_mode
+	write "/proc/cpufreq/cpufreq_cci_mode" "0"
+	write "/proc/cpufreq/cpufreq_power_mode" "0"
 
 	simple_bar
     kmsg1 "[*] CPU POWER AND CCI MODE TWEAKED. "
@@ -1047,16 +1097,16 @@ mtk_normal() {
 	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
 		echo "0" >/proc/gpufreq/gpufreq_opp_freq 2>/dev/null
 	else
-		echo "0 0" >/proc/gpufreqv2/fix_custom_freq_volt
+		write "/proc/gpufreqv2/fix_custom_freq_volt" "0 0" 
 	fi
 
 	# Disable GPU Power limiter
 	if [ -f "/proc/gpufreq/gpufreq_power_limited" ]; then
-		echo "ignore_batt_oc 0" >/proc/gpufreq/gpufreq_power_limited
-		echo "ignore_batt_percent 0" >/proc/gpufreq/gpufreq_power_limited
-		echo "ignore_low_batt 0" >/proc/gpufreq/gpufreq_power_limited
-		echo "ignore_thermal_protect 0" >/proc/gpufreq/gpufreq_power_limited
-		echo "ignore_pbm_limited 0" >/proc/gpufreq/gpufreq_power_limited
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_batt_oc 0"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_batt_percent 0"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_low_batt 0"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_thermal_protect 0" 
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_pbm_limited 0"
 	fi
 	
 	simple_bar
@@ -1064,14 +1114,14 @@ mtk_normal() {
     simple_bar
 
 	# Disable Power Budget management for new 5.x kernels
-	write_val "stop 0" /proc/pbm/pbm_stop
+	write "/proc/pbm/pbm_stop" "stop 0"
 
 	simple_bar
     kmsg1 "[*] POWER BUDGET MANAGEMENT TWEAKED. "
     simple_bar
 	
 	# Disable battery current limiter
-	write_val "stop 0" /proc/mtk_batoc_throttling/battery_oc_protect_stop
+	write "/proc/mtk_batoc_throttling/battery_oc_protect_stop" "stop 0"
 
 	simple_bar
     kmsg1 "[*] BATTERY CURRENT LIMITER DISABLED. "
@@ -1079,9 +1129,9 @@ mtk_normal() {
 	
 	# DRAM Frequency
 	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
-		echo "-1" >/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp
+		write "/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp" "-1"
 	else
-		echo "-1" >/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp
+		write "/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp" "-1" 
 	fi
 
 	simple_bar
@@ -1089,14 +1139,14 @@ mtk_normal() {
     simple_bar
 	
 	# Drop mem cache
-	echo "1" >/proc/sys/vm/drop_caches
+	write "/proc/sys/vm/drop_caches" "3"
 
 	simple_bar
     kmsg1 "[*] DROPPED MEM CACHE. "
     simple_bar
 	
 	# Mediatek's APU freq
-	write_val "-1" /sys/module/mmdvfs_pmqos/parameters/force_step
+	write "/sys/module/mmdvfs_pmqos/parameters/force_step" "-1"
 
 	simple_bar
     kmsg1 "[*] MEDIATEK's APU FREQ TWEAKED. "
@@ -1104,11 +1154,11 @@ mtk_normal() {
 	
 	# Touchpanel
 	tp_path="/proc/touchpanel"
-	write_val "0" $tp_path/game_switch_enable
-	write_val "1" $tp_path/oplus_tp_limit_enable
-	write_val "1" $tp_path/oppo_tp_limit_enable
-	write_val "0" $tp_path/oplus_tp_direction
-	write_val "0" $tp_path/oppo_tp_direction
+	write "$tp_path/game_switch_enable" "0"
+	write "$tp_path/oplus_tp_limit_enable" "1"
+	write "$tp_path/oppo_tp_limit_enable" "1"
+	write "$tp_path/oplus_tp_direction" "0"
+	write "$tp_path/oppo_tp_direction" "0"
 	
 	simple_bar
     kmsg1 "[*] TOUCHPANEL TWEAKED. "
@@ -1156,7 +1206,7 @@ fi
 
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
-kmsg1 "[ * ] Griffith's version: $griffv "
+kmsg1 "[ * ] Nightshade's version: $nightshade "
 kmsg1 "[ * ] Kernel: $(uname -a) "
 kmsg1 "[ * ] SOC: $mf, $soc "
 kmsg1 "[ * ] SDK: $sdk "
@@ -1603,7 +1653,7 @@ init=$(date +%s)
 mtk_perf() {
 	kmsg1 "----------------------- Info -----------------------"
     kmsg1 "[ * ] Date of execution: $(date) "
-    kmsg1 "[ * ] Griffith's version: $griffv "
+    kmsg1 "[ * ] Nightshade's version: $nightshade "
     kmsg1 "[ * ] Kernel: $(uname -a) "
     kmsg1 "[ * ] SOC: $mf, $soc "
     kmsg1 "[ * ] SDK: $sdk "
@@ -1611,7 +1661,7 @@ mtk_perf() {
     kmsg1 "[ * ] CPU aarch: $aarch "
     kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
     kmsg1 "[ * ] Android version: $arv "
-    kmsg1 "[ * ] GPU model: $GPU_MODEL "
+    kmsg1 "[ * ] GPU model: $gpu_mtk "
     kmsg1 "[ * ] Device: $dm  "
     kmsg1 "[ * ] Battery charge level: $percentage% "
     kmsg1 "[ * ] Battery temperature: $temperature°C "
@@ -1621,6 +1671,27 @@ mtk_perf() {
     simple_bar
     kmsg1 "[*] ENABLING $gtks_profile PROFILE for Mediatek... "
     simple_bar
+    
+    renice -n -5 $(pgrep system_server)
+    renice -n -5 $(pgrep com.miui.home)
+    renice -n -5 $(pgrep launcher)
+    renice -n -5 $(pgrep lawnchair)
+    renice -n -5 $(pgrep home)
+    renice -n -5 $(pgrep watchapp)
+    renice -n -5 $(pgrep trebuchet)
+    renice -n -1 $(pgrep dialer)
+    renice -n -1 $(pgrep keyboard)
+    renice -n -1 $(pgrep inputmethod)
+    renice -n -9 $(pgrep fluid)
+    renice -n -10 $(pgrep composer)
+    renice -n -1 $(pgrep com.android.phone)
+    renice -n -10 $(pgrep surfaceflinger)
+    renice -n 1 $(pgrep kswapd0)
+    renice -n 1 $(pgrep ksmd)
+    renice -n -6 $(pgrep msm_irqbalance)
+    renice -n -9 $(pgrep kgsl_worker)
+    renice -n 6 $(pgrep android.gms)    
+    
 	# CPU tweaks
 	cpu="0"
 	while [ $cpu -lt $cpu_cores ]; do
@@ -1773,7 +1844,7 @@ fi
 
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
-kmsg1 "[ * ] Griffith's version: $griffv "
+kmsg1 "[ * ] Nightshade's version: $nightshade "
 kmsg1 "[ * ] Kernel: $(uname -a) "
 kmsg1 "[ * ] SOC: $mf, $soc "
 kmsg1 "[ * ] SDK: $sdk "
@@ -2244,7 +2315,6 @@ init=$(date +%s)
 # Gaming Profile
 gaming() {
 init=$(date +%s)
-
 # Checking mtk device
 simple_bar
 kmsg1 "[ * ] Checking device compatibility"
@@ -2273,11 +2343,11 @@ used_percentage=$((used_mem * 100 / total_mem))
 # Kill background apps
 while IFS= read -r pkg_nm; do
     [[ "$pkg_nm" != "com.tweaker.griffith" ]] && am force-stop "$pkg_nm"
-done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[*] CLEANED BACKGROUND APPS. "
+done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[ * ] Cleaned background apps. " && am start -a android.intent.action.MAIN -e toasttext "Cleaned background apps!" -n bellavita.toast/.MainActivity
 
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
-kmsg1 "[ * ] Griffith's version: $griffv "
+kmsg1 "[ * ] Nightshade's version: $nightshade "
 kmsg1 "[ * ] Kernel: $(uname -a) "
 kmsg1 "[ * ] SOC: $mf, $soc "
 kmsg1 "[ * ] SDK: $sdk "
@@ -2770,7 +2840,7 @@ fi
 
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
-kmsg1 "[ * ] Griffith's version: $griffv "
+kmsg1 "[ * ] Nightshade's version: $nightshade "
 kmsg1 "[ * ] Kernel: $(uname -a) "
 kmsg1 "[ * ] SOC: $mf, $soc "
 kmsg1 "[ * ] SDK: $sdk "
