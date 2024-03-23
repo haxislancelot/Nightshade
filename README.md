@@ -31,7 +31,7 @@ Nightshade is a simple application with some alternative modes that aim to impro
 
 ## Support 
 
- - [![Telegram](https://img.shields.io/badge/Join%20Us%20on-Telegram-blue)](https://t.me/nihilprojects) 
+[![Telegram](https://img.shields.io/badge/Join%20Us%20on-Telegram-blue)](https://t.me/nihilprojects) 
 
 ## Disclaimer
 
