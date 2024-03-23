@@ -3119,7 +3119,8 @@ do
 	case "$ntsh_profile" in
   	"Battery") {
 			settings put global device_idle_constants inactive_to=60000,sensing_to=0,locating_to=0,location_accuracy=2000,motion_inactive_to=0,idle_after_inactive_to=0,idle_pending_to=60000,max_idle_pending_to=120000,idle_pending_factor=2.0,idle_to=900000,max_idle_to=21600000,idle_factor=2.0,max_temp_app_whitelist_duration=60000,mms_temp_app_whitelist_duration=30000,sms_temp_app_whitelist_duration=20000,light_after_inactive_to=10000,light_pre_idle_to=60000,light_idle_to=180000,light_idle_factor=2.0,light_max_idle_to=900000,light_idle_maintenance_min_budget=30000,light_idle_maintenance_max_budget=60000
-			start thermal-engine
+			start thermal-engine]
+                        am start -a android.intent.action.MAIN -e toasttext "Applying battery profile..." -n bellavita.toast/.MainActivity
 			battery
 			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Battery profile was successfully applied!'" > /dev/null
 			echo "3" > "/proc/sys/vm/drop_caches"
@@ -3129,6 +3130,7 @@ do
 	  "Balanced") {
 	  	  settings delete global device_idle_constants
 			start thermal-engine 
+                        am start -a android.intent.action.MAIN -e toasttext "Applying balanced profile..." -n bellavita.toast/.MainActivity
 			balanced
 	 	   su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Balanced profile was successfully applied!'" > /dev/null	
 	 	   echo "3"  > "/proc/sys/vm/drop_caches"	
@@ -3138,6 +3140,7 @@ do
 	  "Performance") {
 			settings delete global device_idle_constants
 			start thermal-engine
+                        am start -a android.intent.action.MAIN -e toasttext "Applying performance profile..." -n bellavita.toast/.MainActivity
 			performance
 			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Performance profile was successfully applied!'" > /dev/null
 			echo "3"  > "/proc/sys/vm/drop_caches"
@@ -3147,6 +3150,7 @@ do
 	  "Gaming") {
 			settings delete global device_idle_constants
 			stop thermal-engine
+                        am start -a android.intent.action.MAIN -e toasttext "Applying gaming profile..." -n bellavita.toast/.MainActivity
 			gaming
 			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Gaming profile was successfully applied!'" > /dev/null
 			echo "3" > "/proc/sys/vm/drop_caches"
@@ -3154,7 +3158,8 @@ do
 		};;
 	  
 	  "Thermal") {
-	  	  settings delete global device_idle_constants
+	  	        settings delete global device_idle_constants
+                        am start -a android.intent.action.MAIN -e toasttext "Applying thermal profile..." -n bellavita.toast/.MainActivity
 			thermal
 			su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Thermal profile was successfully applied!'" > /dev/null
 			echo "3" > "/proc/sys/vm/drop_caches"
