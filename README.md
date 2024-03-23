@@ -7,7 +7,7 @@
 [![GitHub Forks](https://img.shields.io/github/forks/haxislancelot/GriffithTweaks?&logo=github)](https://github.com/haxislancelot/GriffithTweaks/fork)
 [![GitHub Stars](https://img.shields.io/github/stars/haxislancelot/GriffithTweaks?&logo=github)](https://github.com/haxislancelot/GriffithTweaks/stargazers)
 
-Nightshadehtshade is a simple application with some alternative modes that aim to improve the energy efficiency or performance of your device.
+Nightshade is a simple application with some alternative modes that aim to improve the energy efficiency or performance of your device.
 
 ## Screenshots
 
