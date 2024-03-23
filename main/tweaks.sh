@@ -339,6 +339,8 @@ esac
 
 gpu_mtk=$(cat /sys/class/graphics/fb0/name)
 
+am start -a android.intent.action.MAIN -e toasttext "Applying profile..." -n bellavita.toast/.MainActivity
+
 # Mediatek Battery Profile
 mtk_battery() {
 	kmsg1 "----------------------- Info -----------------------"
