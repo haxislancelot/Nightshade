@@ -50,7 +50,7 @@ if ! pm list packages | grep -q 'bellavita.toast'; then
     && rm -rf /data/local/tmp/toast.apk \
     && am start -a android.intent.action.MAIN -e toasttext "Toast downloaded successfully!" -n bellavita.toast/.MainActivity
 else
-    kmsg1 "[ * ] The 'bellavita.toast' package is already installed." 
+    kmsg1 "[ ! ] The 'bellavita.toast' package is already installed." 
 fi
 
 # Write
@@ -307,13 +307,7 @@ used_percentage=$((used_mem * 100 / total_mem))
 # Variable to battery temperature
 temperature=$(($(cat /sys/class/power_supply/battery/temp) / 10)) 
 
-# Part of the script intended for users of the Mediatek Chipset, is completely ignored if the device compatibility is given as not MediaTek.
-write_val() {
-	if [ -f $2 ]; then
-		echo $1 >$2
-	fi
-}
-
+# Lock_val
 lock_val() {
 	[ ! -f "$2" ] && return
 	umount "$2"
@@ -329,6 +323,7 @@ lock_val() {
 	rm /dev/mount_mask_$TIME
 }
 
+# Variable for default cpu 
 cpu_cores="$(($(nproc --all) - 1))"
 case $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors) in
 *"schedplus"*) export default_cpu_gov="schedplus" ;;
@@ -337,10 +332,20 @@ case $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors) in
 *) export default_cpu_gov="schedutil" ;;
 esac
 
-gpu_mtk=$(cat /sys/class/graphics/fb0/name)
+# Variable for mediatek gpu
+mediatek_gpu() {
+if [[ $GPU_MODEL == " " ]]; then
+	GPU_MODEL=$(cat /sys/class/graphics/fb0/name)
+fi
+}
+
+if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
+    mediatek_gpu
+else
+    echo "Ignore this" > /dev/null
+fi
 
 am start -a android.intent.action.MAIN -e toasttext "Applying profile..." -n bellavita.toast/.MainActivity
-
 # Mediatek Battery Profile
 mtk_battery() {
 	kmsg1 "----------------------- Info -----------------------"
@@ -353,7 +358,7 @@ mtk_battery() {
     kmsg1 "[ * ] CPU aarch: $aarch "
     kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
     kmsg1 "[ * ] Android version: $arv "
-    kmsg1 "[ * ] GPU model: $gpu_mtk "
+    kmsg1 "[ * ] GPU model: $GPU_MODEL "
     kmsg1 "[ * ] Device: $dm  "
     kmsg1 "[ * ] Battery charge level: $percentage% "
     kmsg1 "[ * ] Battery temperature: $temperature°C "
@@ -388,6 +393,14 @@ mtk_battery() {
     kmsg1 "[*] RENICED PROCESSES. "
     simple_bar
     
+    # Disable logd and statsd to reduce overhead.
+    stop logd
+    stop statsd
+
+    simple_bar
+    kmsg1 "[*] DISABLED STATSD AND LOGD. "
+    simple_bar
+    
 	# CPU tweaks
 	cpu="0"
 	while [ $cpu -lt $cpu_cores ]; do
@@ -410,15 +423,15 @@ mtk_battery() {
     simple_bar
 	
 	# Enable back PPM
-	write "/proc/ppm/enabled" "1"
+	write "/proc/ppm/enabled" "0"
 
 	simple_bar
-    kmsg1 "[*] PPM ENABLED. "
+    kmsg1 "[*] PPM DISABLED. "
     simple_bar
 	
 	# MTK Power and CCI mode
 	write "/proc/cpufreq/cpufreq_cci_mode" "0"
-	write "/proc/cpufreq/cpufreq_power_mode" "0"
+	write "/proc/cpufreq/cpufreq_power_mode" "1"
 	
 	simple_bar
     kmsg1 "[*] CPU POWER AND CCI MODE TWEAKED. "
@@ -501,11 +514,6 @@ mtk_battery() {
 	simple_bar
     kmsg1 "[*] TOUCHPANEL TWEAKED. "
     simple_bar
-	
-	# CPU Power mode to low power
-	write "/proc/cpufreq/cpufreq_power_mode" "1"
-	# Disable PPM (this is fire dumpster)
-	write "/proc/ppm/enabled" "0"
 	
 	simple_bar
     kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
@@ -1025,7 +1033,7 @@ mtk_normal() {
     kmsg1 "[ * ] CPU aarch: $aarch "
     kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
     kmsg1 "[ * ] Android version: $arv "
-    kmsg1 "[ * ] GPU model: $gpu_mtk "
+    kmsg1 "[ * ] GPU model: $GPU_MODEL "
     kmsg1 "[ * ] Device: $dm  "
     kmsg1 "[ * ] Battery charge level: $percentage% "
     kmsg1 "[ * ] Battery temperature: $temperature°C "
@@ -1059,6 +1067,14 @@ mtk_normal() {
     simple_bar
     kmsg1 "[*] RENICED PROCESSES. "
     simple_bar
+    
+    # Disable logd and statsd to reduce overhead.
+    stop logd
+    stop statsd
+
+    simple_bar
+    kmsg1 "[*] DISABLED STATSD AND LOGD. "
+    simple_bar    
     
 	# CPU tweaks
 	cpu="0"
@@ -1671,7 +1687,7 @@ mtk_perf() {
     kmsg1 "[ * ] CPU aarch: $aarch "
     kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
     kmsg1 "[ * ] Android version: $arv "
-    kmsg1 "[ * ] GPU model: $gpu_mtk "
+    kmsg1 "[ * ] GPU model: $GPU_MODEL "
     kmsg1 "[ * ] Device: $dm  "
     kmsg1 "[ * ] Battery charge level: $percentage% "
     kmsg1 "[ * ] Battery temperature: $temperature°C "
@@ -1705,6 +1721,14 @@ mtk_perf() {
     simple_bar
     kmsg1 "[*] RENICED PROCESSES. "
     simple_bar
+    
+    # Disable logd and statsd to reduce overhead.
+    stop logd
+    stop statsd
+
+    simple_bar
+    kmsg1 "[*] DISABLED STATSD AND LOGD. "
+    simple_bar    
     
 	# CPU tweaks
 	cpu="0"
@@ -3091,7 +3115,6 @@ ntsh_mode=$(getprop persist.nightshade.mode)
 
 while true
 do
-	sleep 3
 	if $boot_run_once
 	then
 		[ "$(getprop persist.nightshade.mode)" == "$ntsh_mode" ] && continue
