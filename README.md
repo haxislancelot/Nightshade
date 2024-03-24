@@ -11,9 +11,7 @@ Nightshade is a simple application with some alternative modes that aim to impro
 
 ## Screenshots
 
-![Screenshot 1](https://github.com/haxislancelot/GriffithTweaks/raw/main/screenshots/Screenshot_20240225-022617_Griffith.png)
-![Screenshot 2](https://github.com/haxislancelot/GriffithTweaks/raw/main/screenshots/Screenshot_20240225-022621_Griffith.png)
-![Screenshot 3](https://github.com/haxislancelot/GriffithTweaks/raw/main/screenshots/Screenshot_20240225-022627_Pixel%20Launcher.png)
+![Screenshot 1](https://raw.githubusercontent.com/haxislancelot/Nightshade/main/Screenshot_20240323-203016_Nightshade.png)
 
 ## FAQ
 
@@ -44,11 +42,9 @@ Nightshade is a simple application with some alternative modes that aim to impro
  - Nightshade only works on devices running Android 7.0 or higher, keep that in mind.
  - You must allow root before starting the application if you are using KSU, but if you have magisk it will ask automatically.
 
-## Installation guide 
+## Installation 
 
-* Download [here](https://github.com/haxislancelot/GriffithTweaks/releases).
-
-* Refer to this [guide](https://telegra.ph/How-to-use-Grittith-Kernel-Tweaker-02-18) if you encounter difficulties.
+* Download [here](https://github.com/haxislancelot/Nightshade/releases).
 
 ## Credits and special thanks
 
