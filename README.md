@@ -40,6 +40,7 @@ Nightshade is a simple application with some alternative modes that aim to impro
 ## Requirements 
 
  - Nightshade only works on devices running Android 7.0 or higher, keep that in mind.
+ - For the application to work normally you need to curl.
 
 ## Installation
 
