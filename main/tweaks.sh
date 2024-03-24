@@ -384,6 +384,10 @@ mtk_battery() {
     renice -n -9 $(pgrep kgsl_worker)
     renice -n 6 $(pgrep android.gms)
     
+    simple_bar
+    kmsg1 "[*] RENICED PROCESSES. "
+    simple_bar
+    
 	# CPU tweaks
 	cpu="0"
 	while [ $cpu -lt $cpu_cores ]; do
@@ -1052,6 +1056,10 @@ mtk_normal() {
     renice -n -9 $(pgrep kgsl_worker)
     renice -n 6 $(pgrep android.gms)    
     
+    simple_bar
+    kmsg1 "[*] RENICED PROCESSES. "
+    simple_bar
+    
 	# CPU tweaks
 	cpu="0"
 	while [ $cpu -lt $cpu_cores ]; do
@@ -1693,6 +1701,10 @@ mtk_perf() {
     renice -n -6 $(pgrep msm_irqbalance)
     renice -n -9 $(pgrep kgsl_worker)
     renice -n 6 $(pgrep android.gms)    
+    
+    simple_bar
+    kmsg1 "[*] RENICED PROCESSES. "
+    simple_bar
     
 	# CPU tweaks
 	cpu="0"
