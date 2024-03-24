@@ -40,7 +40,6 @@ Nightshade is a simple application with some alternative modes that aim to impro
 ## Requirements 
 
  - Nightshade only works on devices running Android 7.0 or higher, keep that in mind.
- - You must allow root before starting the application if you are using KSU, but if you have magisk it will ask automatically.
 
 ## Installation
 
