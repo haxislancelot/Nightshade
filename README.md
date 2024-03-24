@@ -42,9 +42,13 @@ Nightshade is a simple application with some alternative modes that aim to impro
  - Nightshade only works on devices running Android 7.0 or higher, keep that in mind.
  - You must allow root before starting the application if you are using KSU, but if you have magisk it will ask automatically.
 
-## Installation 
+## Installation
 
 * Download [here](https://github.com/haxislancelot/Nightshade/releases).
+- Before starting the app, grant superuser permission. If you're using Magisk, it will prompt for permission upon opening, just confirm.
+- The first time you launch the app, ensure you have internet access as scripts and configurations will be downloaded automatically. After this setup, internet access is not required for subsequent openings, but it will keep you updated if available.
+- Every time your device restarts, open the app to activate your preferred mode. It always remembers the last mode used and applies it upon opening. This process typically takes three to seven seconds.
+
 
 ## Credits and special thanks
 
