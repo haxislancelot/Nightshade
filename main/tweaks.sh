@@ -1798,7 +1798,7 @@ mtk_perf() {
 	write "$tp_path/oplus_tp_limit_enable" "0"
 	write "$tp_path/oppo_tp_limit_enable" "0"
 	write "$tp_path/oplus_tp_direction" "1"
-	write "$tp_path/oppo_tp_direction "1"
+	write "$tp_path/oppo_tp_direction" "1"
 	
 	simple_bar
     kmsg1 "[*] TOUCHPANEL TWEAKED. "
