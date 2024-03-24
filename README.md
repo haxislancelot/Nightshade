@@ -11,7 +11,7 @@ Nightshade is a simple application with some alternative modes that aim to impro
 
 ## Screenshots
 
-![Screenshot 1](https://raw.githubusercontent.com/haxislancelot/Nightshade/main/Screenshot_20240323-203016_Nightshade.png)
+![Screenshot 1](https://raw.githubusercontent.com/haxislancelot/Nightshade/main/Nightshade-app-debug.png)
 
 ## FAQ
 
