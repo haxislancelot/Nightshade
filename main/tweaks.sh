@@ -2383,10 +2383,8 @@ fi
 
 # Kill background apps
 while IFS= read -r pkg_nm; do
-    if [[ "$pkg_nm" != "com.nihil.nightshade" && "$pkg_nm" != "bellavita.toast" ]]; then
-        am force-stop "$pkg_nm"
-    fi
-done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[ * ] Cleaned background apps."
+    [[ "$pkg_nm" != "com.nihil.nightshade" ]] && am force-stop "$pkg_nm"
+done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[ * ] Cleaned background apps. "
 
 # Variable to ram usage
 total_mem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
