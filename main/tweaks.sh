@@ -1753,7 +1753,7 @@ mtk_perf() {
 		write "/proc/gpufreq/gpufreq_power_limited" "ignore_batt_percent 1"
 		write "/proc/gpufreq/gpufreq_power_limited" "ignore_low_batt 1"
 		write "/proc/gpufreq/gpufreq_power_limited" "ignore_thermal_protect 1"
-		write "/proc/gpufreq/gpufreq_power_limited" "ignore_pbm_limited 1"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_pbm_limited" 1"
 	fi
 
 	simple_bar
