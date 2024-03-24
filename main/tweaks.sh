@@ -519,7 +519,7 @@ mtk_battery() {
 
     init=$(date +%s)
 	
-	su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Battery profile was successfully applied!'" > /dev/null
+    am start -a android.intent.action.MAIN -e toasttext "Battery profile was successfully applied!" -n bellavita.toast/.MainActivity
 }
 
 # Battery Profile
@@ -1182,7 +1182,7 @@ mtk_normal() {
 
     init=$(date +%s)
 	
-	su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Balanced profile was successfully applied!'" > /dev/null
+	am start -a android.intent.action.MAIN -e toasttext "Balanced profile was successfully applied!" -n bellavita.toast/.MainActivity
 }
 
 # Balanced Profile
@@ -1699,7 +1699,7 @@ mtk_perf() {
 	while [ $cpu -lt $cpu_cores ]; do
 		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
 		if [ -d "$cpu_dir" ]; then
-			echo "performance" >"${cpu_dir}/cpufreq/scaling_governor"
+			write "${cpu_dir}/cpufreq/scaling_governor" "performance"
 		fi
 		cpu="$((cpu + 1))"
 	done
@@ -1709,8 +1709,8 @@ mtk_perf() {
     simple_bar
 	
 	# MTK Power and CCI mode
-	write_val "1" /proc/cpufreq/cpufreq_cci_mode
-	write_val "3" /proc/cpufreq/cpufreq_power_mode
+	write "/proc/cpufreq/cpufreq_cci_mode" "1"
+	write "/proc/cpufreq/cpufreq_power_mode" "3"
 
 	simple_bar
     kmsg1 "[*] MTK POWER AND CCI MODE TWEAKED. "
@@ -1724,14 +1724,14 @@ mtk_perf() {
     simple_bar
 	
 	# Idle charging
-	write_val "0 1" /proc/mtk_battery_cmd/current_cmd
+	write "/proc/mtk_battery_cmd/current_cmd" "0 1"
 
 	simple_bar
     kmsg1 "[*] IDLE CHARGING ENABLED. "
     simple_bar
 	
 	# Disable PPM (this is fire dumpster)
-	write_val "0" /proc/ppm/enabled
+	write "/proc/ppm/enabled" "0"
 
 	simple_bar
     kmsg1 "[*] PPM DISABLED. "
@@ -1740,20 +1740,20 @@ mtk_perf() {
 	# GPU Frequency
 	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
 		gpu_freq="$(cat /proc/gpufreq/gpufreq_opp_dump | grep -o 'freq = [0-9]*' | sed 's/freq = //' | sort -nr | head -n 1)"
-		echo "$gpu_freq" >/proc/gpufreq/gpufreq_opp_freq
+		write "/proc/gpufreq/gpufreq_opp_freq" "$gpu_freq"
 	else
 		gpu_freq="$(cat /proc/gpufreqv2/gpu_working_opp_table | awk '{print $3}' | sed 's/,//g' | sort -nr | head -n 1)"
 		gpu_volt="$(cat /proc/gpufreqv2/gpu_working_opp_table | awk -v freq="$freq" '$0 ~ freq {gsub(/.*, volt: /, ""); gsub(/,.*/, ""); print}')"
-		echo "${gpu_freq} ${gpu_volt}" >/proc/gpufreqv2/fix_custom_freq_volt
+		write "/proc/gpufreqv2/fix_custom_freq_volt" "${gpu_freq} ${gpu_volt}" 
 	fi
 
 	# Disable GPU Power limiter
 	if [ -f "/proc/gpufreq/gpufreq_power_limited" ]; then
-		echo "ignore_batt_oc 1" >/proc/gpufreq/gpufreq_power_limited
-		echo "ignore_batt_percent 1" >/proc/gpufreq/gpufreq_power_limited
-		echo "ignore_low_batt 1" >/proc/gpufreq/gpufreq_power_limited
-		echo "ignore_thermal_protect 1" >/proc/gpufreq/gpufreq_power_limited
-		echo "ignore_pbm_limited 1" >/proc/gpufreq/gpufreq_power_limited
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_batt_oc 1"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_batt_percent 1"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_low_batt 1"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_thermal_protect 1"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_pbm_limited 1"
 	fi
 
 	simple_bar
@@ -1761,7 +1761,7 @@ mtk_perf() {
     simple_bar
 	
 	# Disable battery current limiter
-	write_val "stop 1" /proc/mtk_batoc_throttling/battery_oc_protect_stop
+	write "/proc/mtk_batoc_throttling/battery_oc_protect_stop" "stop 1" 
 
 	simple_bar
     kmsg1 "[*] DISABLED BATTERY CURRENT LIMITER. "
@@ -1769,9 +1769,9 @@ mtk_perf() {
 	
 	# DRAM Frequency
 	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
-		echo "0" >/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp
+		write "sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp" "0"
 	else
-		echo "0" >/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp
+		write "/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp" "0"
 	fi
 
 	simple_bar
@@ -1779,14 +1779,14 @@ mtk_perf() {
     simple_bar
 	
 	# Drop mem cache
-	echo "3" >/proc/sys/vm/drop_caches
+	write "/proc/sys/vm/drop_caches" "3"
 
 	simple_bar
     kmsg1 "[*] DROPPED MEM CACHE. "
     simple_bar
 	
 	# Mediatek's APU freq
-	write_val "0" /sys/module/mmdvfs_pmqos/parameters/force_step
+	write "/sys/module/mmdvfs_pmqos/parameters/force_step" "0"
 
 	simple_bar
     kmsg1 "[*] MEDIATEK's APU FREQUENCY TWEAKED. "
@@ -1794,16 +1794,16 @@ mtk_perf() {
 	
 	# Touchpanel
 	tp_path="/proc/touchpanel"
-	write_val "1" $tp_path/game_switch_enable
-	write_val "0" $tp_path/oplus_tp_limit_enable
-	write_val "0" $tp_path/oppo_tp_limit_enable
-	write_val "1" $tp_path/oplus_tp_direction
-	write_val "1" $tp_path/oppo_tp_direction
+	write "$tp_path/game_switch_enable" "1"
+	write "$tp_path/oplus_tp_limit_enable" "0"
+	write "$tp_path/oppo_tp_limit_enable" "0"
+	write "$tp_path/oplus_tp_direction" "1"
+	write "$tp_path/oppo_tp_direction "1"
 	
 	simple_bar
     kmsg1 "[*] TOUCHPANEL TWEAKED. "
     simple_bar
-    
+     
     simple_bar
     kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
     simple_bar
@@ -1820,7 +1820,7 @@ mtk_perf() {
 
     init=$(date +%s)
 	
-	su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' 'Performance profile was successfully applied!'" > /dev/null
+	am start -a android.intent.action.MAIN -e toasttext "Performance profile was successfully applied!" -n bellavita.toast/.MainActivity
 }
 
 # Performance Profile
@@ -3123,7 +3123,7 @@ do
 			settings put global device_idle_constants inactive_to=60000,sensing_to=0,locating_to=0,location_accuracy=2000,motion_inactive_to=0,idle_after_inactive_to=0,idle_pending_to=60000,max_idle_pending_to=120000,idle_pending_factor=2.0,idle_to=900000,max_idle_to=21600000,idle_factor=2.0,max_temp_app_whitelist_duration=60000,mms_temp_app_whitelist_duration=30000,sms_temp_app_whitelist_duration=20000,light_after_inactive_to=10000,light_pre_idle_to=60000,light_idle_to=180000,light_idle_factor=2.0,light_max_idle_to=900000,light_idle_maintenance_min_budget=30000,light_idle_maintenance_max_budget=60000
 			start thermal-engine
 			battery
-			am start -a android.intent.action.MAIN -e toasttext "Battery profile applied." -n bellavita.toast/.MainActivity
+			am start -a android.intent.action.MAIN -e toasttext "Battery profile was successfully applied!" -n bellavita.toast/.MainActivity
 			echo "3" > "/proc/sys/vm/drop_caches"
 			exit
 		};;
@@ -3132,7 +3132,7 @@ do
 	  	  settings delete global device_idle_constants
 			start thermal-engine
 			balanced
-			am start -a android.intent.action.MAIN -e toasttext "Balanced profile applied." -n bellavita.toast/.MainActivity
+			am start -a android.intent.action.MAIN -e toasttext "Balanced profile was successfully applied!" -n bellavita.toast/.MainActivity
 	 	   echo "3"  > "/proc/sys/vm/drop_caches"	
 	 	   exit
 		};;
@@ -3141,7 +3141,7 @@ do
 			settings delete global device_idle_constants
 			start thermal-engine
 			performance
-			am start -a android.intent.action.MAIN -e toasttext "Performance profile applied." -n bellavita.toast/.MainActivity
+			am start -a android.intent.action.MAIN -e toasttext "Performance profile was successfully applied!" -n bellavita.toast/.MainActivity
 			echo "3"  > "/proc/sys/vm/drop_caches"
 			exit
 		};;
@@ -3150,7 +3150,7 @@ do
 			settings delete global device_idle_constants
 			stop thermal-engine
 			gaming
-			am start -a android.intent.action.MAIN -e toasttext "Gaming profile applied." -n bellavita.toast/.MainActivity
+			am start -a android.intent.action.MAIN -e toasttext "Gaming profile was successfully applied!" -n bellavita.toast/.MainActivity
 			echo "3" > "/proc/sys/vm/drop_caches"
 			exit
 		};;
@@ -3158,7 +3158,7 @@ do
 	  "Thermal") {
 	  	  settings delete global device_idle_constants
 			thermal
-			am start -a android.intent.action.MAIN -e toasttext "Thermal profile applied." -n bellavita.toast/.MainActivity
+			am start -a android.intent.action.MAIN -e toasttext "Gaming profile was successfully applied!" -n bellavita.toast/.MainActivity
 			echo "3" > "/proc/sys/vm/drop_caches"
 			exit
 	   };;
