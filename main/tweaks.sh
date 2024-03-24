@@ -417,9 +417,9 @@ mtk_battery() {
     simple_bar
 	
 	# MTK Power and CCI mode
-	write_val "0" /proc/cpufreq/cpufreq_cci_mode
-	write_val "0" /proc/cpufreq/cpufreq_power_mode
-
+	write "/proc/cpufreq/cpufreq_cci_mode" "0"
+	write "/proc/cpufreq/cpufreq_power_mode" "0"
+	
 	simple_bar
     kmsg1 "[*] CPU POWER AND CCI MODE TWEAKED. "
     simple_bar
@@ -435,16 +435,16 @@ mtk_battery() {
 	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
 		echo "0" >/proc/gpufreq/gpufreq_opp_freq 2>/dev/null
 	else
-		echo "0 0" >/proc/gpufreqv2/fix_custom_freq_volt
+		write "/proc/gpufreqv2/fix_custom_freq_volt" "0 0"
 	fi
 
 	# Disable GPU Power limiter
 	if [ -f "/proc/gpufreq/gpufreq_power_limited" ]; then
-		echo "ignore_batt_oc 0" >/proc/gpufreq/gpufreq_power_limited
-		echo "ignore_batt_percent 0" >/proc/gpufreq/gpufreq_power_limited
-		echo "ignore_low_batt 0" >/proc/gpufreq/gpufreq_power_limited
-		echo "ignore_thermal_protect 0" >/proc/gpufreq/gpufreq_power_limited
-		echo "ignore_pbm_limited 0" >/proc/gpufreq/gpufreq_power_limited
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_batt_oc 0"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_batt_percent 0"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_low_batt 0"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_thermal_protect 0"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_pbm_limited 0"
 	fi
 	
 	simple_bar
@@ -452,14 +452,14 @@ mtk_battery() {
     simple_bar
 
 	# Disable Power Budget management for new 5.x kernels
-	write_val "stop 0" /proc/pbm/pbm_stop
+	write "/proc/pbm/pbm_stop" "stop 0"
 
 	simple_bar
     kmsg1 "[*] POWER BUDGET MANAGEMENT TWEAKED. "
     simple_bar
 	
 	# Disable battery current limiter
-	write_val "stop 0" /proc/mtk_batoc_throttling/battery_oc_protect_stop
+	write "/proc/mtk_batoc_throttling/battery_oc_protect_stop" "stop 0"
 
 	simple_bar
     kmsg1 "[*] BATTERY CURRENT LIMITER DISABLED. "
@@ -467,9 +467,9 @@ mtk_battery() {
 	
 	# DRAM Frequency
 	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
-		echo "-1" >/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp
+		write "/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp" "-1"
 	else
-		echo "-1" >/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp
+		write "/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp" "-1"
 	fi
 
 	simple_bar
@@ -477,35 +477,35 @@ mtk_battery() {
     simple_bar
 	
 	# Drop mem cache
-	echo "3" >/proc/sys/vm/drop_caches
+	write "/proc/sys/vm/drop_caches" "3"
 
 	simple_bar
     kmsg1 "[*] DROPPED MEM CACHE. "
     simple_bar
 	
 	# Mediatek's APU freq
-	write_val "-1" /sys/module/mmdvfs_pmqos/parameters/force_step
+	write "/sys/module/mmdvfs_pmqos/parameters/force_step" "-1"
 
 	simple_bar
     kmsg1 "[*] MEDIATEK's APU FREQ TWEAKED. "
     simple_bar
-	
+    
 	# Touchpanel
 	tp_path="/proc/touchpanel"
-	write_val "0" $tp_path/game_switch_enable
-	write_val "1" $tp_path/oplus_tp_limit_enable
-	write_val "1" $tp_path/oppo_tp_limit_enable
-	write_val "0" $tp_path/oplus_tp_direction
-	write_val "0" $tp_path/oppo_tp_direction
+	write "$tp_path/game_switch_enable" "0"
+	write "$tp_path/oplus_tp_limit_enable" "1"
+	write "$tp_path/oppo_tp_limit_enable" "1"
+	write "$tp_path/oplus_tp_direction" "0"
+	write "$tp_path/oppo_tp_direction" "0"
 	
 	simple_bar
     kmsg1 "[*] TOUCHPANEL TWEAKED. "
     simple_bar
 	
 	# CPU Power mode to low power
-	write_val "1" /proc/cpufreq/cpufreq_power_mode
+	write "/proc/cpufreq/cpufreq_power_mode" "1"
 	# Disable PPM (this is fire dumpster)
-	write_val "0" /proc/ppm/enabled
+	write "/proc/ppm/enabled" "0"
 	
 	simple_bar
     kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
@@ -532,14 +532,14 @@ init=$(date +%s)
 
 # Checking mtk device
 simple_bar
-kmsg1 "[ * ] Checking device compatibility"
+kmsg1 "[ * ] Checking device compatibility..."
 chipset=$(grep "Hardware" /proc/cpuinfo | uniq | cut -d ':' -f 2 | sed 's/^[ \t]*//')
 if [ -z "$chipset" ]; then
     chipset=$(getprop "ro.hardware")
 fi
 
 if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
-    kmsg1 "[ * ] Device is Mediatek, executing mtk_battery..."
+    kmsg1 "[ ! ] Device is Mediatek, executing mtk_battery..."
     settings put global device_idle_constants inactive_to=60000,sensing_to=0,locating_to=0,location_accuracy=2000,motion_inactive_to=0,idle_after_inactive_to=0,idle_pending_to=60000,max_idle_pending_to=120000,idle_pending_factor=2.0,idle_to=900000,max_idle_to=21600000,idle_factor=2.0,max_temp_app_whitelist_duration=60000,mms_temp_app_whitelist_duration=30000,sms_temp_app_whitelist_duration=20000,light_after_inactive_to=10000,light_pre_idle_to=60000,light_idle_to=180000,light_idle_factor=2.0,light_max_idle_to=900000,light_idle_maintenance_min_budget=30000,light_idle_maintenance_max_budget=60000
     mtk_battery
     exit
@@ -1199,14 +1199,14 @@ init=$(date +%s)
 
 # Checking mtk device
 simple_bar
-kmsg1 "[ * ] Checking device compatibility"
+kmsg1 "[ * ] Checking device compatibility..."
 chipset=$(grep "Hardware" /proc/cpuinfo | uniq | cut -d ':' -f 2 | sed 's/^[ \t]*//')
 if [ -z "$chipset" ]; then
     chipset=$(getprop "ro.hardware")
 fi
 
 if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
-    kmsg1 "[ * ] Device is Mediatek, executing mtk_normal..."
+    kmsg1 "[ ! ] Device is Mediatek, executing mtk_normal..."
     settings delete global device_idle_constants
     mtk_normal
     exit
@@ -1841,14 +1841,14 @@ init=$(date +%s)
 
 # Checking mtk device
 simple_bar
-kmsg1 "[ * ] Checking device compatibility"
+kmsg1 "[ * ] Checking device compatibility..."
 chipset=$(grep "Hardware" /proc/cpuinfo | uniq | cut -d ':' -f 2 | sed 's/^[ \t]*//')
 if [ -z "$chipset" ]; then
     chipset=$(getprop "ro.hardware")
 fi
 
 if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
-    kmsg1 "[ * ] Device is Mediatek, executing mtk_perf..."
+    kmsg1 "[ ! ] Device is Mediatek, executing mtk_perf..."
     settings delete global device_idle_constants
     mtk_perf
     exit
@@ -2331,14 +2331,14 @@ gaming() {
 init=$(date +%s)
 # Checking mtk device
 simple_bar
-kmsg1 "[ * ] Checking device compatibility"
+kmsg1 "[ * ] Checking device compatibility..."
 chipset=$(grep "Hardware" /proc/cpuinfo | uniq | cut -d ':' -f 2 | sed 's/^[ \t]*//')
 if [ -z "$chipset" ]; then
     chipset=$(getprop "ro.hardware")
 fi
 
 if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
-    kmsg1 "[ * ] Device is Mediatek, your device does not support this mode!"
+    kmsg1 "[ ! ] Device is Mediatek, your device does not support this mode!"
     simple_bar
     su -lp 2000 -c "cmd notification post -S bigtext -t 'Nightshade' 'Tag' '[ERROR] Your device does not support this mode!'" > /dev/null
     exit
@@ -2836,14 +2836,14 @@ init=$(date +%s)
 
 # Checking mtk device
 simple_bar
-kmsg1 "[ * ] Checking device compatibility"
+kmsg1 "[ * ] Checking device compatibility..."
 chipset=$(grep "Hardware" /proc/cpuinfo | uniq | cut -d ':' -f 2 | sed 's/^[ \t]*//')
 if [ -z "$chipset" ]; then
     chipset=$(getprop "ro.hardware")
 fi
 
 if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
-    kmsg1 "[ * ] Device is Mediatek, your device does not support this mode!"
+    kmsg1 "[ ! ] Device is Mediatek, your device does not support this mode!"
     simple_bar
     su -lp 2000 -c "cmd notification post -S bigtext -t 'Nightshade' 'Tag' '[ERROR] Your device does not support this mode!'" > /dev/null
     exit
