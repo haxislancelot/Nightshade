@@ -332,33 +332,20 @@ case $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors) in
 *) export default_cpu_gov="schedutil" ;;
 esac
 
-# Variable for mediatek gpu
-mediatek_gpu() {
-if [[ $GPU_MODEL == " " ]]; then
-	GPU_MODEL=$(cat /sys/class/graphics/fb0/name)
-fi
-}
-
-if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
-    mediatek_gpu
-else
-    echo "Ignore this" > /dev/null
-fi
-
 am start -a android.intent.action.MAIN -e toasttext "Applying profile..." -n bellavita.toast/.MainActivity
 # Mediatek Battery Profile
 mtk_battery() {
 	kmsg1 "----------------------- Info -----------------------"
     kmsg1 "[ * ] Date of execution: $(date) "
-    kmsg1 "[ * ] Nightshade's version: $nightshade"
+    kmsg1 "[ * ] Nightshade's version: $nightshade "
     kmsg1 "[ * ] Kernel: $(uname -a) "
     kmsg1 "[ * ] SOC: $mf, $soc "
     kmsg1 "[ * ] SDK: $sdk "
     kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
     kmsg1 "[ * ] CPU aarch: $aarch "
     kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
-    kmsg1 "[ * ] Android version: $arv "
     kmsg1 "[ * ] GPU model: $GPU_MODEL "
+    kmsg1 "[ * ] Android version: $arv "
     kmsg1 "[ * ] Device: $dm  "
     kmsg1 "[ * ] Battery charge level: $percentage% "
     kmsg1 "[ * ] Battery temperature: $temperature°C "
@@ -366,7 +353,7 @@ mtk_battery() {
     kmsg1 "[ * ] RAM usage: $used_percentage% "
     kmsg1 "-------------------------------------------------------"
     simple_bar
-    kmsg1 "[*] ENABLING $ntsh_profile PROFILE for Mediatek... "
+    kmsg1 "[*] ENABLING $ntsh_profile PROFILE... "
     simple_bar
     
     renice -n -5 $(pgrep system_server)
@@ -391,6 +378,14 @@ mtk_battery() {
     
     simple_bar
     kmsg1 "[*] RENICED PROCESSES. "
+    simple_bar
+    
+    # Enable perfd and mpdecision
+    start perfd > /dev/null
+    start mpdecision > /dev/null
+
+    simple_bar
+    kmsg1 "[*] ENABLED MPDECISION AND PERFD. "
     simple_bar
     
     # Disable logd and statsd to reduce overhead.
@@ -564,8 +559,8 @@ kmsg1 "[ * ] SDK: $sdk "
 kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
 kmsg1 "[ * ] CPU aarch: $aarch "
 kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
-kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] GPU model: $GPU_MODEL "
+kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] Device: $dm  "
 kmsg1 "[ * ] Battery charge level: $percentage% "
 kmsg1 "[ * ] Battery temperature: $temperature°C "
@@ -1032,8 +1027,8 @@ mtk_normal() {
     kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
     kmsg1 "[ * ] CPU aarch: $aarch "
     kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
-    kmsg1 "[ * ] Android version: $arv "
     kmsg1 "[ * ] GPU model: $GPU_MODEL "
+    kmsg1 "[ * ] Android version: $arv "
     kmsg1 "[ * ] Device: $dm  "
     kmsg1 "[ * ] Battery charge level: $percentage% "
     kmsg1 "[ * ] Battery temperature: $temperature°C "
@@ -1041,7 +1036,7 @@ mtk_normal() {
     kmsg1 "[ * ] RAM usage: $used_percentage% "
     kmsg1 "-------------------------------------------------------"
     simple_bar
-    kmsg1 "[*] ENABLING $ntsh_profile PROFILE for Mediatek... "
+    kmsg1 "[*] ENABLING $ntsh_profile PROFILE... "
     simple_bar
     
     renice -n -5 $(pgrep system_server)
@@ -1067,6 +1062,14 @@ mtk_normal() {
     simple_bar
     kmsg1 "[*] RENICED PROCESSES. "
     simple_bar
+    
+    # Enable perfd and mpdecision
+    start perfd > /dev/null
+    start mpdecision > /dev/null
+
+    simple_bar
+    kmsg1 "[*] ENABLED MPDECISION AND PERFD. "
+    simple_bar    
     
     # Disable logd and statsd to reduce overhead.
     stop logd
@@ -1239,14 +1242,14 @@ kmsg1 "[ * ] SDK: $sdk "
 kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
 kmsg1 "[ * ] CPU aarch: $aarch "
 kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
-kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] GPU model: $GPU_MODEL "
+kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] Device: $dm  "
 kmsg1 "[ * ] Battery charge level: $percentage% "
 kmsg1 "[ * ] Battery temperature: $temperature°C "
 kmsg1 "[ * ] Device total RAM: $totalram MB "
 kmsg1 "[ * ] RAM usage: $used_percentage% "
-kmsg1 "------------------------------------------------------"
+kmsg1 "-------------------------------------------------------"
 simple_bar
 kmsg1 "[*] ENABLING $ntsh_profile PROFILE... "
 simple_bar       	
@@ -1686,8 +1689,8 @@ mtk_perf() {
     kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
     kmsg1 "[ * ] CPU aarch: $aarch "
     kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
-    kmsg1 "[ * ] Android version: $arv "
     kmsg1 "[ * ] GPU model: $GPU_MODEL "
+    kmsg1 "[ * ] Android version: $arv "
     kmsg1 "[ * ] Device: $dm  "
     kmsg1 "[ * ] Battery charge level: $percentage% "
     kmsg1 "[ * ] Battery temperature: $temperature°C "
@@ -1695,7 +1698,7 @@ mtk_perf() {
     kmsg1 "[ * ] RAM usage: $used_percentage% "
     kmsg1 "-------------------------------------------------------"
     simple_bar
-    kmsg1 "[*] ENABLING $ntsh_profile PROFILE for Mediatek... "
+    kmsg1 "[*] ENABLING $ntsh_profile PROFILE... "
     simple_bar
     
     renice -n -5 $(pgrep system_server)
@@ -1721,6 +1724,14 @@ mtk_perf() {
     simple_bar
     kmsg1 "[*] RENICED PROCESSES. "
     simple_bar
+    
+    # Enable perfd and mpdecision
+    start perfd > /dev/null
+    start mpdecision > /dev/null
+
+    simple_bar
+    kmsg1 "[*] ENABLED MPDECISION AND PERFD. "
+    simple_bar    
     
     # Disable logd and statsd to reduce overhead.
     stop logd
@@ -1889,8 +1900,8 @@ kmsg1 "[ * ] SDK: $sdk "
 kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
 kmsg1 "[ * ] CPU aarch: $aarch "
 kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
-kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] GPU model: $GPU_MODEL "
+kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] Device: $dm  "
 kmsg1 "[ * ] Battery charge level: $percentage% "
 kmsg1 "[ * ] Battery temperature: $temperature°C "
@@ -2370,6 +2381,13 @@ else
     kmsg1 "[ * ] Device is not Mediatek, continuing script..."
 fi
 
+# Kill background apps
+while IFS= read -r pkg_nm; do
+    if [[ "$pkg_nm" != "com.nihil.nightshade" && "$pkg_nm" != "bellavita.toast" ]]; then
+        am force-stop "$pkg_nm"
+    fi
+done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[ * ] Cleaned background apps."
+
 # Variable to ram usage
 total_mem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
 free_mem=$(cat /proc/meminfo | grep MemFree | awk '{print $2}')
@@ -2377,11 +2395,6 @@ buffers=$(cat /proc/meminfo | grep Buffers | awk '{print $2}')
 cached=$(cat /proc/meminfo | grep "^Cached" | awk '{print $2}')
 used_mem=$((total_mem - free_mem - buffers - cached))
 used_percentage=$((used_mem * 100 / total_mem))
-
-# Kill background apps
-while IFS= read -r pkg_nm; do
-    [[ "$pkg_nm" != "com.nihil.nightshade" ]] && am force-stop "$pkg_nm"
-done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[ * ] Cleaned background apps. "
 
 kmsg1 "----------------------- Info -----------------------"
 kmsg1 "[ * ] Date of execution: $(date) "
@@ -2392,8 +2405,8 @@ kmsg1 "[ * ] SDK: $sdk "
 kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
 kmsg1 "[ * ] CPU aarch: $aarch "
 kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
-kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] GPU model: $GPU_MODEL "
+kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] Device: $dm  "
 kmsg1 "[ * ] Battery charge level: $percentage% "
 kmsg1 "[ * ] Battery temperature: $temperature°C "
@@ -2884,8 +2897,8 @@ kmsg1 "[ * ] SDK: $sdk "
 kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
 kmsg1 "[ * ] CPU aarch: $aarch "
 kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
-kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] GPU model: $GPU_MODEL "
+kmsg1 "[ * ] Android version: $arv "
 kmsg1 "[ * ] Device: $dm  "
 kmsg1 "[ * ] Battery charge level: $percentage% "
 kmsg1 "[ * ] Battery temperature: $temperature°C "
