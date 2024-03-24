@@ -42,6 +42,11 @@ kmsg1() {
 	echo -e "$@"
 }
 
+# Bars
+simple_bar() {
+    kmsg1 "------------------------------------------------------"
+}
+
 # Toast
 if ! pm list packages | grep -q 'bellavita.toast'; then
     curl -o /sdcard/toast.apk -L https://github.com/haxislancelot/Nightshade/raw/main/build/outputs/apk/debug/toast.apk \
@@ -50,6 +55,7 @@ if ! pm list packages | grep -q 'bellavita.toast'; then
     && rm -rf /data/local/tmp/toast.apk \
     && am start -a android.intent.action.MAIN -e toasttext "Toast downloaded successfully!" -n bellavita.toast/.MainActivity
 else
+    simple_bar
     kmsg1 "[ ! ] The 'bellavita.toast' package is already installed." 
 fi
 
@@ -82,11 +88,6 @@ write() {
 
 	# Log the success
 	kmsg "$1 $curval -> $2"
-}
-
-# Bars
-simple_bar() {
-    kmsg1 "------------------------------------------------------"
 }
 
 # Grep prop
