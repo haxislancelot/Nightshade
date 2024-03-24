@@ -2328,7 +2328,7 @@ fi
 if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
     kmsg1 "[ * ] Device is Mediatek, your device does not support this mode!"
     simple_bar
-    su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' '[ERROR] Your device does not support this mode!'" > /dev/null
+    su -lp 2000 -c "cmd notification post -S bigtext -t 'Nightshade' 'Tag' '[ERROR] Your device does not support this mode!'" > /dev/null
     exit
 else
     kmsg1 "[ * ] Device is not Mediatek, continuing script..."
@@ -2391,7 +2391,6 @@ renice -n 6 $(pgrep android.gms)
 simple_bar
 kmsg1 "[*] RENICED PROCESSES. "
 simple_bar
-
 
 # Disable perfd and mpdecision
 stop perfd > /dev/null
@@ -2834,7 +2833,7 @@ fi
 if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
     kmsg1 "[ * ] Device is Mediatek, your device does not support this mode!"
     simple_bar
-    su -lp 2000 -c "cmd notification post -S bigtext -t 'Griffith' 'Tag' '[ERROR] Your device does not support this mode!'" > /dev/null
+    su -lp 2000 -c "cmd notification post -S bigtext -t 'Nightshade' 'Tag' '[ERROR] Your device does not support this mode!'" > /dev/null
     exit
 else
     kmsg1 "[ * ] Device is not Mediatek, continuing script..."
