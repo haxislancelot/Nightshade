@@ -51,6 +51,6 @@ Nightshade is a simple application with some alternative modes that aim to impro
 
 ## Credits and special thanks
 
-* Special thanks to [raidenkkj](https://github.com/raidenkkj), [lowr4m](https://github.com/lowr4m) and [Rem01Gaming](https://github.com/Rem01Gaming) for their valuable contributions.
+* Special thanks to [raidenkkj](https://github.com/raidenkkj) and [Rem01Gaming](https://github.com/Rem01Gaming) for their valuable contributions, because I used part of your projects here.
 
-A heartfelt thank you to everyone who contributed to this project. <3
+♥️ A heartfelt thank you to everyone who contributed to this project. <3
