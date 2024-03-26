@@ -17,8 +17,10 @@
 #
 # Copyright (C) 2024 haxislancelot
 
+# Variables for 'nightshade.conf'
 config_file="/sdcard/.NTSH/nightshade.conf"
 github_url="https://raw.githubusercontent.com/haxislancelot/Nightshade/main/nightshade.conf"
+cli="https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/start.sh"
 
 # Logs
 GFLOG=/sdcard/.NTSH/nightshade.log
@@ -84,10 +86,6 @@ else
     echo "[ * ] 'nightshade.conf' file found."
 fi
 
-#!/bin/bash
-
-cli="https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/start.sh"
-
 # Check if the configuration file exists
 if [ -f "$config_file" ]; then
     # Read variables from the configuration file
@@ -97,11 +95,11 @@ if [ -f "$config_file" ]; then
     # Verify that CLI support is enabled
     if [ "$cli_support" = "True" ]; then
         # Download and place the start.sh file in the /sdcard/.NTSH directory
-        ksmg1 "[ * ] Downloading start.sh file for CLI support..."
+        kmsg1 "[ * ] Downloading start.sh file for CLI support..."
         curl -o "/sdcard/.NTSH/start.sh" "$cli"
         
         if [ $? -eq 0 ]; then
-            ksmg1 "[ * ] File 'start.sh' downloaded successfully."
+            kmsg1 "[ * ] File 'start.sh' downloaded successfully."
         else
             kmsg1 "[ ! ] Error downloading 'start.sh' file."
         fi
@@ -110,17 +108,17 @@ if [ -f "$config_file" ]; then
     # Check if plugins are enabled
     if [ "$plugins_enabled" = "True" ]; then
         # Download and place the plugins in /sdcard/.NTSH/plugins
-        echo "Baixando o arquivo start.sh para os plugins..."
+        kmsg1 "[ * ] Downloading 'start.sh' file for the plugins..."
         curl -o "/sdcard/.NTSH/plugins/battery.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/battery.sh"
         
         if [ $? -eq 0 ]; then
-            echo "Arquivo start.sh para plugins baixado com sucesso."
+            kmsg1 "[ * ] 'start.sh' file for plugins downloaded successfully."
         else
-            echo "Erro ao baixar o arquivo start.sh para plugins."
+            kmsg1 "[ ! ] Error downloading 'start.sh' file for plugins."
         fi
     fi
 else
-    echo "Arquivo de configuração não encontrado. Não é possível continuar."
+    kmsg1 "[ ! ] Configuration file not found. Cannot continue."
     exit 1
 fi
 
