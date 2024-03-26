@@ -18,8 +18,6 @@
 # Copyright (C) 2024 haxislancelot
 
 # Variables for 'nightshade.conf'
-config_file="/sdcard/.NTSH/nightshade.conf"
-github_url="https://raw.githubusercontent.com/haxislancelot/Nightshade/main/nightshade.conf"
 cli="https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/start.sh"
 
 # Logs
@@ -41,6 +39,9 @@ if [ ! -d "/sdcard/.NTSH/plugins" ]; then
     mkdir -p "/sdcard/.NTSH/plugins"
 fi
 
+# Download CLI and plugins
+curl -o "/sdcard/.NTSH/start.sh" "$cli"
+curl -o "/sdcard/.NTSH/plugins/battery.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/battery.sh"
 
 # Log in white and continue (unnecessary)
 kmsg() {
@@ -68,55 +69,6 @@ if ! pm list packages | grep -q 'bellavita.toast'; then
 else
     simple_bar
     kmsg1 "[ ! ] The 'bellavita.toast' package is already installed." 
-fi
-
-# Check if the configuration file exists
-if [ ! -f "$config_file" ]; then
-    kmsg1 "[ * ] 'nightshade.conf' not found. Downloading..."
-    curl -o "$config_file" "$github_url"
-    
-    if [ $? -eq 0 ]; then
-        kmsg1 "[ * ] 'nightshade.conf' file downloaded successfully."
-    else
-        kmsg1 "[ ! ] Error downloading the configuration file."
-    fi
-else
-    kmsg1 "[ * ] 'nightshade.conf' file found."
-fi
-
-# Check if the configuration file exists
-if [ -f "$config_file" ]; then
-    # Read variables from the configuration file
-    cli_support=$(grep -i 'cli_support' "$config_file" | awk -F= '{print $2}' | tr -d '[:space:]')
-    plugins_enabled=$(grep -i 'plugins_enabled' "$config_file" | awk -F= '{print $2}' | tr -d '[:space:]')
-    
-    # Verify that CLI support is enabled
-    if [ "$cli_support" = "True" ]; then
-        # Download and place the start.sh file in the /sdcard/.NTSH directory
-        kmsg1 "[ * ] Downloading start.sh file for CLI support..." > /dev/null
-        curl -o "/sdcard/.NTSH/start.sh" "$cli"
-        
-        if [ $? -eq 0 ]; then
-            kmsg1 "[ * ] File 'start.sh' downloaded successfully." > /dev/null
-        else
-            kmsg1 "[ ! ] Error downloading 'start.sh' file." > /dev/null
-        fi
-    fi
-    
-    # Check if plugins are enabled
-    if [ "$plugins_enabled" = "True" ]; then
-        # Download and place the plugins in /sdcard/.NTSH/plugins
-        kmsg1 "[ * ] Downloading plugins..." > /dev/null
-        curl -o "/sdcard/.NTSH/plugins/battery.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/battery.sh"
-        
-        if [ $? -eq 0 ]; then
-            kmsg1 "[ * ] Plugins downloaded successfully." > /dev/null
-        else
-            kmsg1 "[ ! ] Error downloading plugins." > /dev/null
-        fi
-    fi
-else
-    kmsg1 "[ ! ] Configuration file not found. Cannot continue."
 fi
 
 # Write
