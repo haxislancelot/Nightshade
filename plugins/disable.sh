@@ -6,7 +6,7 @@
 
 menu() {
 clear
-echo "--- Gapps Disabler by haxislancelot @ Github ---"
+echo -e "\e[44m\e[97m--- Gapps Disabler by haxislancelot @ Github ---\e[0m"
 sleep 0.2
 echo ""
 sleep 0.2
