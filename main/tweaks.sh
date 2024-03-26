@@ -81,7 +81,7 @@ if [ ! -f "$config_file" ]; then
         kmsg1 "[ ! ] Error downloading the configuration file."
     fi
 else
-    echo "[ * ] 'nightshade.conf' file found."
+    kmsg1 "[ * ] 'nightshade.conf' file found."
 fi
 
 # Check if the configuration file exists
