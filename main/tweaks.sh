@@ -40,9 +40,10 @@ if [ ! -d "/sdcard/.NTSH/plugins" ]; then
 fi
 
 # Download CLI and plugins
-curl -o "/sdcard/.NTSH/start.sh" "$cli"
-curl -o "/sdcard/.NTSH/plugins/battery.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/battery.sh"
-curl -o "/sdcard/.NTSH/plugins/disable.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/disable.sh"
+# curl -o "/sdcard/.NTSH/start.sh" "$cli"
+# curl -o "/sdcard/.NTSH/plugins/battery.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/battery.sh"
+# curl -o "/sdcard/.NTSH/plugins/disable.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/disable.sh"
+
 
 # Log in white and continue (unnecessary)
 kmsg() {
