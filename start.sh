@@ -44,7 +44,7 @@ R='\033[0;31m'
 N='\033[0;90m'
 
 # Device information
-version=$(echo "v2.0.2-Beta")
+version=$(echo "v2.0.1-Beta")
 author=$(echo "haxislancelot @ Github")
 uptime=$(uptime)
 kernel=$(uname -r)
