@@ -1,3 +1,4 @@
+# Download all scripts and then allocate them
 curl -o /sdcard/.NTSH/plugins/batt.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/batt.sh"
 curl -o /sdcard/.NTSH/plugins/doze.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/doze.sh"
 curl -o /sdcard/.NTSH/plugins/gapp.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/gapp.sh"
