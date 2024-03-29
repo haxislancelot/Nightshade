@@ -18,13 +18,13 @@ fi
 ask_update_script() {
 	clear
     while true; do
-        echo "\033[0;90mDo you want to update the main script? (yes/no)"
+        echo "\033[0;90mDo you want to update the main script and plugins? (yes/no)"
         echo -n "> ${F}"
         read answer
         case $answer in
             [Yy]* )
-                echo "\033[0;90mDownloading the main script...${F}"
-                curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/main/tweaks.sh" && echo "${G}Main script updated successfully!${F}"
+                echo "\033[0;90mDownloading...${F}"
+                curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/main/tweaks.sh" && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/plugins_list" && sh /sdcard/plugins_list.sh && rm -rf /sdcard/plugins_list.sh && echo "${G}Main script and plugins updated successfully!${F}"
                 echo -n "\033[0;90mClick to continue...${F}"
                 read && main_menu
                 break;;
