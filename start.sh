@@ -1,7 +1,6 @@
 #!/system/bin/sh
 clear
 
-
 # Check if the user is not root
 if [ "$(whoami)" != "root" ]; then
     su -c chmod +x /data/data/com.termux/files/home/start.sh
