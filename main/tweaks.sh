@@ -44,7 +44,6 @@ fi
 # curl -o "/sdcard/.NTSH/plugins/battery.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/battery.sh"
 # curl -o "/sdcard/.NTSH/plugins/disable.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/disable.sh"
 
-
 # Log in white and continue (unnecessary)
 kmsg() {
 	echo -e "[*] $@" >> $GFLOG
@@ -2398,7 +2397,12 @@ fi
 
 # Kill background apps
 while IFS= read -r pkg_nm; do
-    [[ "$pkg_nm" != "com.nihil.nightshade" ]] && am force-stop "$pkg_nm"
+    case "$pkg_nm" in
+        "com.nihil.nightshade" | "com.termux" | "bellavita.toast")
+            continue ;;
+        *)
+            am force-stop "$pkg_nm" ;;
+    esac
 done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[ * ] Cleaned background apps. "
 
 # Variable to ram usage
