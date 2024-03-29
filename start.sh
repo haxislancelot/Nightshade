@@ -1,7 +1,6 @@
 #!/system/bin/sh
 clear
 
-
 # Check if the user is not root
 if [ "$(whoami)" != "root" ]; then
     su -c chmod +x /data/data/com.termux/files/home/start.sh
@@ -27,7 +26,7 @@ ask_update_script() {
                 echo "\033[0;90mDownloading...${F}"
                 curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/main/tweaks.sh" && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/plugins_list" && sh /sdcard/plugins_list.sh && rm -rf /sdcard/plugins_list.sh && echo "${G}Main script and plugins updated successfully!${F}"
                 echo -n "\033[0;90mClick to continue...${F}"
-                read && main_menu
+                read && exit && sh start.sh
                 break;;
             [Nn]* )
                 echo "Not updating the main script."
