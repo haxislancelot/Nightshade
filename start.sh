@@ -26,8 +26,6 @@ ask_update_script() {
                 echo "\033[0;90mDownloading...${F}"
                 curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/main/tweaks.sh" && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/plugins_list" && sh /sdcard/plugins_list.sh && rm -rf /sdcard/plugins_list.sh && echo "${G}Main script and plugins updated successfully!${F}"
                 echo -n "\033[0;90mClick to continue...${F}"
-                echo "${G}Main script and plugins updated successfully!${F}"
-                echo -n "\033[0;90mClick to continue...${F}"
                 read &&
                 sh start.sh
                 break;;
