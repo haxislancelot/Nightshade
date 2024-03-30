@@ -18,14 +18,6 @@ fi
 if [ ! -d "/sdcard/.NTSH" ]; then
     # If it doesn't exist, create the directory
     mkdir -p "/sdcard/.NTSH"
-else
-    # If it exists, do nothing
-    :
-fi
-
-# Check if the directory /sdcard/.NTSH/plugins exists
-if [ ! -d "/sdcard/.NTSH/plugins" ]; then
-    # If it doesn't exist, create the directory
     mkdir -p "/sdcard/.NTSH/plugins"
 else
     # If it exists, do nothing
@@ -33,12 +25,10 @@ else
 fi
 
 # Checks if the main script exists, if not download the main script and plugins
-if [ ! -d "/sdcard/.tweaks.sh" ]; then
-    # If it doesn't exist, create the file
-    curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/main/tweaks.sh" > /dev/null 2>&1 && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/plugins_list" > /dev/null 2>&1 && sh /sdcard/plugins_list.sh > /dev/null 2>&1 && rm -rf /sdcard/plugins_list.sh > /dev/null 2>&1
+if [[ -e "/sdcard/.tweaks.sh" ]]; then
+	:
 else
-    # If it exists, do nothing
-    :
+	curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/main/tweaks.sh" > /dev/null 2>&1 && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/plugins_list" > /dev/null 2>&1 && sh /sdcard/plugins_list.sh > /dev/null 2>&1 && rm -rf /sdcard/plugins_list.sh > /dev/null 2>&1
 fi
 
 # Function to ask the user if he wants to update the main script
