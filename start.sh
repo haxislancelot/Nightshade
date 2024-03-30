@@ -32,6 +32,14 @@ else
     :
 fi
 
+# Checks if the main script exists, if not download the main script and plugins
+if [ ! -d "/sdcard/.tweaks.sh" ]; then
+    # If it doesn't exist, create the file
+    curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/main/tweaks.sh" && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/plugins_list" && sh /sdcard/plugins_list.sh && rm -rf /sdcard/plugins_list.sh
+else
+    # If it exists, do nothing
+    :
+fi
 
 # Function to ask the user if he wants to update the main script
 ask_update_script() {
@@ -131,6 +139,8 @@ main_menu() {
     echo "[ - ] Support [ 3 ]"
     sleep 0
     echo "[ - ] Update [ 4 ]"
+    sleep 0
+    echo "[ - ] Exit [ 0 ]"
     echo ""
     sleep 0
     echo -ne "${G}Enter your choice: ${F}"
@@ -150,6 +160,9 @@ main_menu() {
         4)
             ask_update_script
             main_menu
+            ;;
+        0)
+            exit
             ;;
         *)
             echo -e "\e[41mInvalid choice!\e[0m"
