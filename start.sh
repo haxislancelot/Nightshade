@@ -24,10 +24,10 @@ if [ "$(whoami)" != "root" ]; then
 fi
 
 # Check if curl is installed
-# if ! command -v curl &> /dev/null; then
-#    echo "Please install curl before using this script."
-#    exit 1
-#fi
+if ! command -v curl &> /dev/null; then
+    echo "Please install curl before using this script."
+    exit 1
+fi
 
 # Check if the directory /sdcard/.NTSH exists
 if [ ! -d "/sdcard/.NTSH" ]; then
