@@ -222,7 +222,7 @@ mode() {
             sh /sdcard/.tweaks.sh > /dev/null 2>&1
             mode
             ;;
-        6)
+        0)
             main_menu
             ;;
         *)
