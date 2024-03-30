@@ -14,6 +14,25 @@ if ! command -v curl &> /dev/null; then
     exit 1
 fi
 
+# Check if the directory /sdcard/.NTSH exists
+if [ ! -d "/sdcard/.NTSH" ]; then
+    # If it doesn't exist, create the directory
+    mkdir -p "/sdcard/.NTSH"
+else
+    # If it exists, do nothing
+    :
+fi
+
+# Check if the directory /sdcard/.NTSH/plugins exists
+if [ ! -d "/sdcard/.NTSH/plugins" ]; then
+    # If it doesn't exist, create the directory
+    mkdir -p "/sdcard/.NTSH/plugins"
+else
+    # If it exists, do nothing
+    :
+fi
+
+
 # Function to ask the user if he wants to update the main script
 ask_update_script() {
 	clear
@@ -227,7 +246,7 @@ execute_plugin() {
 plugins() {
 	clear
 	sleep 0
-	echo "\033[0;90mType x to return to main menu"
+	echo "${G}Type x to return to main menu${F}"
 	echo ""
 	sleep 0
     list_plugins
