@@ -2,18 +2,18 @@
 # Thanks @raidenkk on Telegram and Rem01Gaming on Github for your contributions.
 # This file is part of Nightshade.
 #
-# GriffithTweaks is free software: you can redistribute it and/or modify
+# Nightshade is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# GriffithTweaks is distributed in the hope that it will be useful,
+# Nightshade is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with GriffithTweaks.  If not, see <https://www.gnu.org/licenses/>.
+# along with Nightshade.  If not, see <https://www.gnu.org/licenses/>.
 #
 # Copyright (C) 2024 haxislancelot
 
