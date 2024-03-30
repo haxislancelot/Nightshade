@@ -98,7 +98,7 @@ battery_info() {
         3) toggle_background_apps ;;
         4) toggle_location_services ;;
         0) plugins ;;
-        *) echo -e "\e[41mInvalid choice!\e[0m"; sleep 1; battery_menu ;;
+        *) echo -e "\e[41mInvalid choice!\e[0m"; sleep 1; battery_info ;;
     esac
 }
 
