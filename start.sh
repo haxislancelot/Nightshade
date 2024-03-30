@@ -1,4 +1,19 @@
 #!/system/bin/sh
+#
+# Nightshade is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Nightshade is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Nightshade.  If not, see <https://www.gnu.org/licenses/>.
+#
+# Copyright (C) 2024 haxislancelot
 clear
 
 # Check if the user is not root
@@ -175,7 +190,7 @@ mode() {
     sleep 0
     echo "[ - ] Gaming [ 5 ]"
     sleep 0
-    echo "[ - ] Return to main menu [ 6 ]"
+    echo "[ - ] Return to main menu [ 0 ]"
     echo ""
     sleep 0
     echo -ne "${G}Enter your choice: ${F}"
