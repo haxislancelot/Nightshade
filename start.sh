@@ -51,7 +51,7 @@ ask_update_script() {
         case $answer in
             [Yy]* )
                 echo "\033[0;90mDownloading...${F}"
-                curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/main/tweaks.sh" && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/plugins_list" && sh /sdcard/plugins_list.sh && rm -rf /sdcard/plugins_list.sh && echo "${G}Main script and plugins updated successfully!${F}"
+                curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/main/tweaks.sh" > /dev/null 2>&1 && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/plugins_list" > /dev/null 2>&1 && sh /sdcard/plugins_list.sh > /dev/null 2>&1 && rm -rf /sdcard/plugins_list.sh > /dev/null 2>&1 && echo "${G}Main script and plugins updated successfully!${F}"
                 echo -n "\033[0;90mClick to continue...${F}"
                 read &&
                 sh start.sh
