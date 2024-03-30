@@ -1,6 +1,6 @@
 #!/system/bin/sh
 # Thanks @raidenkk on Telegram and Rem01Gaming on Github for your contributions.
-# This file is part of GriffithTweaks.
+# This file is part of Nightshade.
 #
 # GriffithTweaks is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
