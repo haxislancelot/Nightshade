@@ -30,6 +30,7 @@ case $choice in
         pm disable com.google.android.apps.nbu.files > /dev/null 2>&1
         pm disable com.google.android.apps.safetyhub > /dev/null 2>&1
         pm disable com.google.android.apps.wellbeing > /dev/null 2>&1
+        pm disable com.google.android.calendar > /dev/null 2>&1
         echo "${G}Gapps disabled!${F}"
         sleep 1
         disable_menu
@@ -42,6 +43,7 @@ case $choice in
         pm enable com.google.android.apps.nbu.files > /dev/null 2>&1
         pm enable com.google.android.apps.safetyhub > /dev/null 2>&1
         pm enable com.google.android.apps.wellbeing > /dev/null 2>&1
+        pm enable com.google.android.calendar > /dev/null 2>&1
         echo "${G}Gapps enabled!${F}"
         sleep 1
         disable_menu        
