@@ -109,12 +109,12 @@ toggle_power_saving() {
         settings put global low_power 0
         echo "${G}Power Saving Mode Disabled!${F}"
         sleep 1
-        battery_menu
+        battery_info
     else
         settings put global low_power 1
         echo "${G}Power Saving Mode Enabled!"
         sleep 1
-        battery_menu
+        battery_info
     fi
 }
 
@@ -123,7 +123,7 @@ reduce_brightness() {
     settings put system screen_brightness 30
     echo "${G}Screen Brightness Adjusted!${F}"
     sleep 1
-    battery_menu
+    battery_info
 }
 
 # Function to switch background applications
@@ -133,12 +133,12 @@ toggle_background_apps() {
         settings put global background_process_limit 0
         echo "${G}Background Apps Enabled!${F}"
         sleep 1
-        battery_menu
+        battery_info
     else
         settings put global background_process_limit 1
         echo "${G}Background Apps Disabled!${F}"
         sleep 1
-        battery_menu
+        battery_info
     fi
 }
 
@@ -149,12 +149,12 @@ toggle_location_services() {
         settings put secure location_mode 0
         echo "${G}Location Services Disbled!${F}"
         sleep 1
-        battery_menu
+        battery_info
     else
         settings put secure location_mode 1
         echo "${G}Location Services Enabled!${F}"
         sleep 1
-        battery_menu
+        battery_info
     fi
 }
 
