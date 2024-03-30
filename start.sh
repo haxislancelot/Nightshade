@@ -246,7 +246,7 @@ execute_plugin() {
 plugins() {
 	clear
 	sleep 0
-	echo "${G}Type x to return to main menu${F}"
+	echo "${G}Type x to return to main menu\033[0;90m"
 	echo ""
 	sleep 0
     list_plugins
