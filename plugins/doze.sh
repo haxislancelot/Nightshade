@@ -4,32 +4,26 @@
 # Do not use this in your script or project without asking for my permission.
 # https://t.me/donottellmyname
 
-# Colors
-F='\033[0m'
-G='\033[0;32m'
-R='\033[0;31m'
-N='\033[0;90m'
-
 doze_tweak() {
 	clear
-    echo -e "\e[44m\e[97m--- Doze Tweaker by haxislancelot @ Github ---\e[0m"
-    sleep 0.1
+    echo -e "${G}--- Doze Tweaker by haxislancelot @ Github ---${F}"
+    sleep 0
     echo ""
     echo "\033[0;90mProlong inactivity [ 1 ]"
-    sleep 0.1
+    sleep 0
     echo "Ignore Light Doze [ 2 ]"
-    sleep 0.1
+    sleep 0
     echo "Simulate Deep Doze [ 3 ]"
-    sleep 0.1
+    sleep 0
     echo "Progressive inactivity [ 4 ]"
-    sleep 0.1
+    sleep 0
     echo "Prolonged inactivity [ 5 ]"
-    sleep 0.1
+    sleep 0
     echo "Reset [ 6 ]"
-    sleep 0.1
-    echo "Exit [ 0 ]"
+    sleep 0
+    echo "Return to plugins menu [ 0 ]"
     echo ""
-    sleep 0.1
+    sleep 0
     echo -ne "${G}Select: ${F}"
     read -s selc
     while true; do

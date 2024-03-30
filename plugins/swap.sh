@@ -6,16 +6,16 @@
 
 swap_menu() {
 	clear
-    echo -e "\e[44m\e[97m--- Swap Creator by haxislancelot @ Github ---\e[0m"
-    sleep 0.1
+    echo -e "${G}--- Swap Creator by haxislancelot @ Github ---${F}"
+    sleep 0
     echo ""
-    echo "Custom Swap Size [ 1 ]"
-    sleep 0.1
+    echo "\033[0;90mCustom Swap Size [ 1 ]"
+    sleep 0
     echo "Delete Swap [ 2 ]"
-    sleep 0.1
-    echo "Exit [ 0 ]"
+    sleep 0
+    echo "Return to plugins menu [ 0 ]"
     echo ""
-    sleep 0.1
+    sleep 0
     echo -ne "${G}Select: ${F}"
     read -s mswap
     while true; do
@@ -23,7 +23,7 @@ swap_menu() {
             1)
                 echo -ne "${G}Swap Size (MB):${F} "
                 read -s swap_size
-                echo -ne "${G}do you want to swap with size $swap_size MB? enter (y/n):${F} "
+                echo -ne "${G}Do you want to swap with size $swap_size MB? enter (y/n):${F} "
                 read -s choice
                 if [ "$choice" == "y" ]; then
                 echo ""
@@ -36,7 +36,8 @@ swap_menu() {
                 ;;
             2)
                 rm -f /data/local/tmp/swap
-                echo "Done!"
+                echo "${G}Swap deleted successfully!${F}"
+                sleep 1
                 swap_menu
                 ;;
             0)
