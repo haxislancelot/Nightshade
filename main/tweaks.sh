@@ -1694,6 +1694,17 @@ init=$(date +%s)
 
 # Mediatek Performance Profile
 mtk_perf() {
+	
+	# Kill background apps
+    while IFS= read -r pkg_nm; do
+        case "$pkg_nm" in
+            "com.nihil.nightshade" | "com.termux" | "bellavita.toast")
+                continue ;;
+            *)
+                am force-stop "$pkg_nm" ;;
+        esac
+    done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[ * ] Cleaned background apps. "
+    
 	kmsg1 "----------------------- Info -----------------------"
     kmsg1 "[ * ] Date of execution: $(date) "
     kmsg1 "[ * ] Nightshade's version: $nightshade "
