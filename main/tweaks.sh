@@ -447,9 +447,12 @@ mtk_battery() {
 	
 	# GPU Frequency
 	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
-		echo "0" >/proc/gpufreq/gpufreq_opp_freq 2>/dev/null
+		gpu_freq="$(cat /proc/gpufreq/gpufreq_opp_dump | grep -o 'freq = [0-9]*' | sed 's/freq = //' | sort -n | head -n 1)"
+		write "/proc/gpufreq/gpufreq_opp_freq" "$gpu_freq"
 	else
-		write "/proc/gpufreqv2/fix_custom_freq_volt" "0 0"
+		gpu_freq="$(cat /proc/gpufreqv2/gpu_working_opp_table | awk '{print $3}' | sed 's/,//g' | sort -n | head -n 1)"
+		gpu_volt="$(cat /proc/gpufreqv2/gpu_working_opp_table | awk -v freq="$freq" '$0 ~ freq {gsub(/.*, volt: /, ""); gsub(/,.*/, ""); print}')"
+		write "/proc/gpufreqv2/fix_custom_freq_volt" "${gpu_freq} ${gpu_volt}"
 	fi
 
 	# Disable GPU Power limiter
@@ -479,12 +482,11 @@ mtk_battery() {
     kmsg1 "[*] BATTERY CURRENT LIMITER DISABLED. "
     simple_bar
 	
-	# DRAM Frequency
-	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
-		write "/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp" "-1"
-	else
-		write "/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp" "-1"
-	fi
+	# DRAM frequency
+	write "/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp" "$(cat /sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_opp_table | grep -o '\[[^]]*\]' | grep -oE '[+-]?[0-9]+' | sort -nr | head -n 1)"
+	write "/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp" "$(cat /sys/kernel/helio-dvfsrc/dvfsrc_opp_table | grep -o '\[[^]]*\]' | grep -oE '[+-]?[0-9]+' | sort -nr | head -n 1)"
+	write "/sys/class/devfreq/mtk-dvfsrc-devfreq/governor" "powersave"
+	write "/sys/devices/platform/soc/1c00f000.dvfsrc/mtk-dvfsrc-devfreq/devfreq/mtk-dvfsrc-devfreq/governor" "powersave"
 
 	simple_bar
     kmsg1 "[*] DRAM FREQUENCY TWEAKED. "
@@ -496,10 +498,10 @@ mtk_battery() {
 	simple_bar
     kmsg1 "[*] DROPPED MEM CACHE. "
     simple_bar
-	
+    
 	# Mediatek's APU freq
-	write "/sys/module/mmdvfs_pmqos/parameters/force_step" "-1"
-
+	write "/sys/module/mmdvfs_pmqos/parameters/force_step" "$(cat /sys/module/mmdvfs_pmqos/parameters/dump_setting | grep -o '\[[^]]*\]' | grep -oE '[+-]?[0-9]+' | sort -n | tail -n 1)"
+	
 	simple_bar
     kmsg1 "[*] MEDIATEK's APU FREQ TWEAKED. "
     simple_bar
@@ -514,6 +516,13 @@ mtk_battery() {
 	
 	simple_bar
     kmsg1 "[*] TOUCHPANEL TWEAKED. "
+    simple_bar
+    
+    # Eara Thermal
+	write "/sys/kernel/eara_thermal/enable" "1"
+	
+	simple_bar
+    kmsg1 "[*] EARA THERMAL ENABLED. "
     simple_bar
 	
 	simple_bar
@@ -1163,11 +1172,10 @@ mtk_normal() {
     simple_bar
 	
 	# DRAM Frequency
-	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
-		write "/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp" "-1"
-	else
-		write "/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp" "-1" 
-	fi
+	write "/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp" "-1"
+	write "/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp" "-1"
+	write "/sys/class/devfreq/mtk-dvfsrc-devfreq/governor" "simple_ondemand"
+	write "/sys/devices/platform/soc/1c00f000.dvfsrc/mtk-dvfsrc-devfreq/devfreq/mtk-dvfsrc-devfreq/governor" "simple_ondemand"
 
 	simple_bar
     kmsg1 "[*] DRAM FREQUENCY TWEAKED. "
@@ -1199,6 +1207,13 @@ mtk_normal() {
     kmsg1 "[*] TOUCHPANEL TWEAKED. "
     simple_bar
 	
+    # Eara Thermal
+	write "/sys/kernel/eara_thermal/enable" "1"
+	
+	simple_bar
+    kmsg1 "[*] EARA THERMAL ENABLED. "
+    simple_bar
+    
 	simple_bar
     kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
     simple_bar
