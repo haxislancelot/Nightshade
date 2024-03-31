@@ -412,10 +412,88 @@ mtk_battery() {
 		cpu="$((cpu + 1))"
 	done
 	
+	# CPU perf enable
+	write "/sys/devices/system/cpu/perf/enable" "0"
+	
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
     simple_bar
 
+    # CPUStune
+    
+	# CPU Load settings
+	write "/dev/cpuset/foreground/cpus" "0-7"
+	write "/dev/cpuset/background/cpus" "0-3"
+	write "/dev/cpuset/system-background/cpus" "0-3"
+	write "/dev/cpuset/top-app/cpus" "0-7"
+	write "/dev/cpuset/restricted/cpus" "0-7"
+	
+	# Realtime
+	write "/dev/stune/rt/schedtune.boost" "30"
+	write "/dev/stune/rt/schedtune.prefer_idle" "0"
+	
+	# Background
+	write "/dev/stune/background/schedtune.util.max.effective" "1024"
+	write "/dev/stune/background/schedtune.util.min.effective" "0"
+	write "/dev/stune/background/schedtune.util.max" "1024"
+	write "/dev/stune/background/schedtune.util.min" "0"
+	write "/dev/stune/background/schedtune.boost" "0"
+	write "/dev/stune/background/schedtune.prefer_idle" "0"
+	
+	# Foreground
+	write "/dev/stune/foreground/schedtune.util.max.effective" "1024"
+	write "/dev/stune/foreground/schedtune.util.min.effective" "512"
+	write "/dev/stune/foreground/schedtune.util.max" "1024"
+	write "/dev/stune/foreground/schedtune.util.min" "512"
+	write "/dev/stune/foreground/schedtune.boost" "50"
+	write "/dev/stune/foreground/schedtune.prefer_idle" "0"
+	
+	# Top-App
+	write "/dev/stune/top-app/schedtune.util.max.effective" "1024"
+	write "/dev/stune/top-app/schedtune.util.min.effective" "512"
+	write "/dev/stune/top-app/schedtune.util.max" "1024"
+	write "/dev/stune/top-app/schedtune.util.min" "512"
+	write "/dev/stune/top-app/schedtune.boost" "40"
+	write "/dev/stune/top-app/schedtune.prefer_idle" "0"
+	
+	# Global
+	write "/dev/stune/schedtune.util.min" "512"
+	write "/dev/stune/schedtune.util.max" "1024"
+	write "/dev/stune/schedtune.util.max.effective" "1024"
+	write "/dev/stune/schedtune.util.min.effective" "512"
+	write "/dev/stune/schedtune.boost" "0"
+	write "/dev/stune/schedtune.prefer_idle" "0"
+    
+	simple_bar
+    kmsg1 "[*] CPUSTUNE TWEAKED. "
+    simple_bar
+    
+    # GED modules
+	write "/sys/module/ged/parameters/gx_game_mode" "0"
+	write "/sys/module/ged/parameters/gx_force_cpu_boost" "0"
+	write "/sys/module/ged/parameters/boost_amp" "0"
+	write "/sys/module/ged/parameters/boost_extra" "0"
+	write "/sys/module/ged/parameters/boost_gpu_enable" "0"
+	write "/sys/module/ged/parameters/enable_cpu_boost" "1"
+	write "/sys/module/ged/parameters/enable_gpu_boost" "1"
+	write "/sys/module/ged/parameters/enable_game_self_frc_detect" "0"
+	write "/sys/module/ged/parameters/gpu_idle" "95"
+	write "/sys/module/ged/parameters/cpu_boost_policy" "0"
+	write "/sys/module/ged/parameters/ged_force_mdp_enable" "0"
+	write "/sys/module/ged/parameters/ged_smart_boost" "0"
+	write "/sys/module/ged/parameters/gx_3D_benchmark_on" "0"
+    
+	simple_bar
+    kmsg1 "[*] GED MODULES TWEAKED. "
+    simple_bar
+    
+    # I/O Scheduler
+    write "/sys/block/mmcblk0/queue/scheduler" "cfq"
+	
+    simple_bar
+    kmsg1 "[*] I/O SCHEDULER TWEAKED. "
+    simple_bar
+    
 	# Idle charging
 	write "/proc/mtk_battery_cmd/current_cmd" "0 0"
 	
@@ -433,9 +511,18 @@ mtk_battery() {
 	# MTK Power and CCI mode
 	write "/proc/cpufreq/cpufreq_cci_mode" "0"
 	write "/proc/cpufreq/cpufreq_power_mode" "1"
-	
+	# write "/proc/cpufreq/cpufreq_imax_thermal_protect" "0"
+	# write "/proc/cpufreq/cpufreq_imax_enable" "1"
+    write "/proc/cpufreq/MT_CPU_DVFS_L/cpufreq_oppidx" "2"
+    write "/proc/cpufreq/MT_CPU_DVFS_L/cpufreq_turbo_mode" "0 0 0"
+    write "/proc/cpufreq/cpufreq_sched_disable" "0"
+    # write "/proc/cpuidle/state/enabled" "100 1 0"
+    # write "/proc/cpuidle/state/enabled" "100 2"
+    # write "/proc/cpuidle/state/enabled" "100 3 0"
+    # write "/proc/cpuidle/state/enabled" "100 4 0"
+    
 	simple_bar
-    kmsg1 "[*] CPU POWER AND CCI MODE TWEAKED. "
+    kmsg1 "[*] CPUFREQ TWEAKED. "
     simple_bar
 	
 	# EAS/HMP Switch
@@ -463,6 +550,9 @@ mtk_battery() {
 		write "/proc/gpufreq/gpufreq_power_limited" "ignore_thermal_protect 0"
 		write "/proc/gpufreq/gpufreq_power_limited" "ignore_pbm_limited 0"
 	fi
+	
+	# Change GPU Power Policy to always_on
+	write "/proc/mali/always_on" "0"
 	
 	simple_bar
     kmsg1 "[*] GPU TWEAKED. "
@@ -1105,10 +1195,88 @@ mtk_normal() {
 		cpu="$((cpu + 1))"
 	done
 	
+	# CPU perf enable
+	write "/sys/devices/system/cpu/perf/enable" "0"
+	
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
     simple_bar
+    
+    # CPUStune
+    
+	# CPU Load settings
+	write "/dev/cpuset/foreground/cpus" "0-7"
+	write "/dev/cpuset/background/cpus" "0-3"
+	write "/dev/cpuset/system-background/cpus" "0-3"
+	write "/dev/cpuset/top-app/cpus" "0-7"
+	write "/dev/cpuset/restricted/cpus" "0-7"
+	
+	# Realtime
+	write "/dev/stune/rt/schedtune.boost" "30"
+	write "/dev/stune/rt/schedtune.prefer_idle" "0"
+	
+	# Background
+	write "/dev/stune/background/schedtune.util.max.effective" "1024"
+	write "/dev/stune/background/schedtune.util.min.effective" "0"
+	write "/dev/stune/background/schedtune.util.max" "1024"
+	write "/dev/stune/background/schedtune.util.min" "0"
+	write "/dev/stune/background/schedtune.boost" "0"
+	write "/dev/stune/background/schedtune.prefer_idle" "0"
+	
+	# Foreground
+	write "/dev/stune/foreground/schedtune.util.max.effective" "1024"
+	write "/dev/stune/foreground/schedtune.util.min.effective" "512"
+	write "/dev/stune/foreground/schedtune.util.max" "1024"
+	write "/dev/stune/foreground/schedtune.util.min" "512"
+	write "/dev/stune/foreground/schedtune.boost" "50"
+	write "/dev/stune/foreground/schedtune.prefer_idle" "0"
+	
+	# Top-App
+	write "/dev/stune/top-app/schedtune.util.max.effective" "1024"
+	write "/dev/stune/top-app/schedtune.util.min.effective" "512"
+	write "/dev/stune/top-app/schedtune.util.max" "1024"
+	write "/dev/stune/top-app/schedtune.util.min" "512"
+	write "/dev/stune/top-app/schedtune.boost" "40"
+	write "/dev/stune/top-app/schedtune.prefer_idle" "0"
+	
+	# Global
+	write "/dev/stune/schedtune.util.min" "512"
+	write "/dev/stune/schedtune.util.max" "1024"
+	write "/dev/stune/schedtune.util.max.effective" "1024"
+	write "/dev/stune/schedtune.util.min.effective" "512"
+	write "/dev/stune/schedtune.boost" "0"
+	write "/dev/stune/schedtune.prefer_idle" "0"
+    
+	simple_bar
+    kmsg1 "[*] CPUSTUNE TWEAKED. "
+    simple_bar
+    
+    # GED modules
+	write "/sys/module/ged/parameters/gx_game_mode" "0"
+	write "/sys/module/ged/parameters/gx_force_cpu_boost" "0"
+	write "/sys/module/ged/parameters/boost_amp" "0"
+	write "/sys/module/ged/parameters/boost_extra" "0"
+	write "/sys/module/ged/parameters/boost_gpu_enable" "0"
+	write "/sys/module/ged/parameters/enable_cpu_boost" "1"
+	write "/sys/module/ged/parameters/enable_gpu_boost" "1"
+	write "/sys/module/ged/parameters/enable_game_self_frc_detect" "0"
+	write "/sys/module/ged/parameters/gpu_idle" "95"
+	write "/sys/module/ged/parameters/cpu_boost_policy" "0"
+	write "/sys/module/ged/parameters/ged_force_mdp_enable" "0"
+	write "/sys/module/ged/parameters/ged_smart_boost" "0"
+	write "/sys/module/ged/parameters/gx_3D_benchmark_on" "0"
+    
+	simple_bar
+    kmsg1 "[*] GED MODULES TWEAKED. "
+    simple_bar
 
+    # I/O Scheduler
+    write "/sys/block/mmcblk0/queue/scheduler" "cfq"
+	
+    simple_bar
+    kmsg1 "[*] I/O SCHEDULER TWEAKED. "
+    simple_bar
+    
 	# Idle charging
 	write "/proc/mtk_battery_cmd/current_cmd" "0 0"
 	
@@ -1118,7 +1286,23 @@ mtk_normal() {
 	
 	# Enable back PPM
 	write "/proc/ppm/enabled" "1"
-
+	write "/proc/ppm/policy_status" "0 1"
+	write "/proc/ppm/policy_status" "1 1"
+	write "/proc/ppm/policy_status" "2 1"
+	write "/proc/ppm/policy_status" "3 1"
+	write "/proc/ppm/policy_status" "4 1"
+	write "/proc/ppm/policy_status" "5 1"
+	write "/proc/ppm/policy_status" "6 1"
+	write "/proc/ppm/policy_status" "7 1"
+	write "/proc/ppm/policy_status" "8 0"
+	write "/proc/ppm/policy_status" "9 1"
+	
+	# Set to maximum CPU frequency
+	write "/proc/ppm/policy/hard_userlimit_max_cpu_freq" "1 2550000"
+	write "/proc/ppm/policy/hard_userlimit_min_cpu_freq" "1 2550000"
+	write "/proc/ppm/policy/hard_userlimit_max_cpu_freq" "0 2010000"
+	write "/proc/ppm/policy/hard_userlimit_min_cpu_freq" "0 2010000"
+	
 	simple_bar
     kmsg1 "[*] PPM ENABLED. "
     simple_bar
@@ -1126,11 +1310,20 @@ mtk_normal() {
 	# MTK Power and CCI mode
 	write "/proc/cpufreq/cpufreq_cci_mode" "0"
 	write "/proc/cpufreq/cpufreq_power_mode" "0"
-
-	simple_bar
-    kmsg1 "[*] CPU POWER AND CCI MODE TWEAKED. "
-    simple_bar
+    # write "/proc/cpufreq/cpufreq_imax_thermal_protect" "0"
+	# write "/proc/cpufreq/cpufreq_imax_enable" "1"
+    write "/proc/cpufreq/MT_CPU_DVFS_L/cpufreq_oppidx" "2"
+    write "/proc/cpufreq/MT_CPU_DVFS_L/cpufreq_turbo_mode" "0 0 0"
+    write "/proc/cpufreq/cpufreq_sched_disable" "0"
+    # write "/proc/cpuidle/state/enabled" "100 1 0"
+    # write "/proc/cpuidle/state/enabled" "100 2"
+    # write "/proc/cpuidle/state/enabled" "100 3 0"
+    # write "/proc/cpuidle/state/enabled" "100 4 0"
 	
+	simple_bar
+    kmsg1 "[*] CPUFREQ TWEAKED. "
+    simple_bar
+    
 	# EAS/HMP Switch
 	lock_val "1" /sys/devices/system/cpu/eas/enable
 
@@ -1153,6 +1346,9 @@ mtk_normal() {
 		write "/proc/gpufreq/gpufreq_power_limited" "ignore_thermal_protect 0" 
 		write "/proc/gpufreq/gpufreq_power_limited" "ignore_pbm_limited 0"
 	fi
+	
+	# Change GPU Power Policy to always_on
+	write "/proc/mali/always_on" "0"
 	
 	simple_bar
     kmsg1 "[*] GPU TWEAKED. "
@@ -1774,16 +1970,103 @@ mtk_perf() {
 		cpu="$((cpu + 1))"
 	done
 
+	# CPU perf enable
+	write "/sys/devices/system/cpu/perf/enable" "1"
+	
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
     simple_bar
+    
+    # CPUStune
+    
+	# CPU Load settings
+	write "/dev/cpuset/foreground/cpus" "0-7"
+	write "/dev/cpuset/background/cpus" "0-3"
+	write "/dev/cpuset/system-background/cpus" "0-3"
+	write "/dev/cpuset/top-app/cpus" "0-7"
+	write "/dev/cpuset/restricted/cpus" "0-7"
 	
+	# Realtime
+	write "/dev/stune/rt/schedtune.boost" "30"
+	write "/dev/stune/rt/schedtune.prefer_idle" "0"
+	
+	# Background
+	write "/dev/stune/background/schedtune.util.max.effective" "1024"
+	write "/dev/stune/background/schedtune.util.min.effective" "0"
+	write "/dev/stune/background/schedtune.util.max" "1024"
+	write "/dev/stune/background/schedtune.util.min" "0"
+	write "/dev/stune/background/schedtune.boost" "0"
+	write "/dev/stune/background/schedtune.prefer_idle" "0"
+	
+	# Foreground
+	write "/dev/stune/foreground/schedtune.util.max.effective" "1024"
+	write "/dev/stune/foreground/schedtune.util.min.effective" "512"
+	write "/dev/stune/foreground/schedtune.util.max" "1024"
+	write "/dev/stune/foreground/schedtune.util.min" "512"
+	write "/dev/stune/foreground/schedtune.boost" "50"
+	write "/dev/stune/foreground/schedtune.prefer_idle" "0"
+	
+	# Top-App
+	write "/dev/stune/top-app/schedtune.util.max.effective" "1024"
+	write "/dev/stune/top-app/schedtune.util.min.effective" "512"
+	write "/dev/stune/top-app/schedtune.util.max" "1024"
+	write "/dev/stune/top-app/schedtune.util.min" "512"
+	write "/dev/stune/top-app/schedtune.boost" "40"
+	write "/dev/stune/top-app/schedtune.prefer_idle" "0"
+	
+	# Global
+	write "/dev/stune/schedtune.util.min" "512"
+	write "/dev/stune/schedtune.util.max" "1024"
+	write "/dev/stune/schedtune.util.max.effective" "1024"
+	write "/dev/stune/schedtune.util.min.effective" "512"
+	write "/dev/stune/schedtune.boost" "0"
+	write "/dev/stune/schedtune.prefer_idle" "0"
+    
+	simple_bar
+    kmsg1 "[*] CPUSTUNE TWEAKED. "
+    simple_bar
+    
+    # GED modules
+	write "/sys/module/ged/parameters/gx_game_mode" "0"
+	write "/sys/module/ged/parameters/gx_force_cpu_boost" "0"
+	write "/sys/module/ged/parameters/boost_amp" "0"
+	write "/sys/module/ged/parameters/boost_extra" "0"
+	write "/sys/module/ged/parameters/boost_gpu_enable" "0"
+	write "/sys/module/ged/parameters/enable_cpu_boost" "1"
+	write "/sys/module/ged/parameters/enable_gpu_boost" "1"
+	write "/sys/module/ged/parameters/enable_game_self_frc_detect" "0"
+	write "/sys/module/ged/parameters/gpu_idle" "95"
+	write "/sys/module/ged/parameters/cpu_boost_policy" "0"
+	write "/sys/module/ged/parameters/ged_force_mdp_enable" "0"
+	write "/sys/module/ged/parameters/ged_smart_boost" "0"
+	write "/sys/module/ged/parameters/gx_3D_benchmark_on" "0"
+    
+	simple_bar
+    kmsg1 "[*] GED MODULES TWEAKED. "
+    simple_bar
+    
+    # I/O Scheduler
+    write "/sys/block/mmcblk0/queue/scheduler" "cfq"
+	
+    simple_bar
+    kmsg1 "[*] I/O SCHEDULER TWEAKED. "
+    simple_bar
+    
 	# MTK Power and CCI mode
 	write "/proc/cpufreq/cpufreq_cci_mode" "1"
 	write "/proc/cpufreq/cpufreq_power_mode" "3"
-
+	# write "/proc/cpufreq/cpufreq_imax_thermal_protect" "0"
+	# write "/proc/cpufreq/cpufreq_imax_enable" "1"
+    write "/proc/cpufreq/MT_CPU_DVFS_L/cpufreq_oppidx" "2"
+    write "/proc/cpufreq/MT_CPU_DVFS_L/cpufreq_turbo_mode" "0 0 0"
+    write "/proc/cpufreq/cpufreq_sched_disable" "0"
+    # write "/proc/cpuidle/state/enabled" "100 1 0"
+    # write "/proc/cpuidle/state/enabled" "100 2"
+    # write "/proc/cpuidle/state/enabled" "100 3 0"
+    # write "/proc/cpuidle/state/enabled" "100 4 0"
+	
 	simple_bar
-    kmsg1 "[*] MTK POWER AND CCI MODE TWEAKED. "
+    kmsg1 "[*] CPUFREQ TWEAKED. "
     simple_bar
 	
 	# EAS/HMP Switch
@@ -1826,6 +2109,9 @@ mtk_perf() {
 		write "/proc/gpufreq/gpufreq_power_limited" "ignore_pbm_limited 1"
 	fi
 
+	# Change GPU Power Policy to always_on
+	write "/proc/mali/always_on" "0"
+	
 	simple_bar
     kmsg1 "[*] GPU TWEAKED. "
     simple_bar
@@ -2583,7 +2869,6 @@ mtk_gaming() {
 	write "/proc/ppm/policy_status" "8 0"
 	write "/proc/ppm/policy_status" "9 1"
 	
-	
 	# Set to maximum CPU frequency
 	write "/proc/ppm/policy/hard_userlimit_max_cpu_freq" "1 2550000"
 	write "/proc/ppm/policy/hard_userlimit_min_cpu_freq" "1 2550000"
@@ -2597,15 +2882,15 @@ mtk_gaming() {
 	# MTK Power and CCI mode
 	write "/proc/cpufreq/cpufreq_cci_mode" "1"
 	write "/proc/cpufreq/cpufreq_power_mode" "3"
-    write "/proc/cpufreq/cpufreq_imax_thermal_protect" "0"
-	write "/proc/cpufreq/cpufreq_imax_enable" "1"
+    # write "/proc/cpufreq/cpufreq_imax_thermal_protect" "0"
+	# write "/proc/cpufreq/cpufreq_imax_enable" "1"
     write "/proc/cpufreq/MT_CPU_DVFS_L/cpufreq_oppidx" "0"
     write "/proc/cpufreq/MT_CPU_DVFS_L/cpufreq_turbo_mode" "1 0 0"
     write "/proc/cpufreq/cpufreq_sched_disable" "1"
-    write "/proc/cpuidle/state/enabled" "100 1 0"
-    write "/proc/cpuidle/state/enabled" "100 2"
-    write "/proc/cpuidle/state/enabled" "100 3 0"
-    write "/proc/cpuidle/state/enabled" "100 4 0"
+    # write "/proc/cpuidle/state/enabled" "100 1 0"
+    # write "/proc/cpuidle/state/enabled" "100 2"
+    # write "/proc/cpuidle/state/enabled" "100 3 0"
+    # write "/proc/cpuidle/state/enabled" "100 4 0"
     
 	simple_bar
     kmsg1 "[*] CPUFREQ TWEAKED. "
@@ -2687,7 +2972,7 @@ mtk_gaming() {
 	write "$tp_path/oppo_tp_limit_enable" "1"
 	write "$tp_path/oplus_tp_direction" "1"
 	write "$tp_path/oppo_tp_direction" "0"
-	write "/sys/kernel/oplus_display/LCM_CABC" "0"
+	# write "/sys/kernel/oplus_display/LCM_CABC" "0"
 	
 	simple_bar
     kmsg1 "[*] TOUCHPANEL TWEAKED. "
