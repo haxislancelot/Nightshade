@@ -17,9 +17,6 @@
 #
 # Copyright (C) 2024 haxislancelot
 
-# Variables for 'nightshade.conf'
-cli="https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/start.sh"
-
 # Logs
 GFLOG=/sdcard/.NTSH/nightshade.log
 
@@ -38,11 +35,6 @@ fi
 if [ ! -d "/sdcard/.NTSH/plugins" ]; then
     mkdir -p "/sdcard/.NTSH/plugins"
 fi
-
-# Download CLI and plugins
-# curl -o "/sdcard/.NTSH/start.sh" "$cli"
-# curl -o "/sdcard/.NTSH/plugins/battery.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/battery.sh"
-# curl -o "/sdcard/.NTSH/plugins/disable.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/disable.sh"
 
 # Log in white and continue (unnecessary)
 kmsg() {
@@ -1694,17 +1686,6 @@ init=$(date +%s)
 
 # Mediatek Performance Profile
 mtk_perf() {
-	
-	# Kill background apps
-    while IFS= read -r pkg_nm; do
-        case "$pkg_nm" in
-            "com.nihil.nightshade" | "com.termux" | "bellavita.toast")
-                continue ;;
-            *)
-                am force-stop "$pkg_nm" ;;
-        esac
-    done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[ * ] Cleaned background apps. "
-    
 	kmsg1 "----------------------- Info -----------------------"
     kmsg1 "[ * ] Date of execution: $(date) "
     kmsg1 "[ * ] Nightshade's version: $nightshade "
