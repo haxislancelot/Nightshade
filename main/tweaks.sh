@@ -1797,7 +1797,7 @@ mtk_perf() {
 	else
 		gpu_freq="$(cat /proc/gpufreqv2/gpu_working_opp_table | awk '{print $3}' | sed 's/,//g' | sort -nr | head -n 1)"
 		gpu_volt="$(cat /proc/gpufreqv2/gpu_working_opp_table | awk -v freq="$freq" '$0 ~ freq {gsub(/.*, volt: /, ""); gsub(/,.*/, ""); print}')"
-		write "/proc/gpufreqv2/fix_custom_freq_volt" "${gpu_freq} ${gpu_volt}" 
+		write "/proc/gpufreqv2/fix_custom_freq_volt" "${gpu_freq} ${gpu_volt}"
 	fi
 
 	# Disable GPU Power limiter
@@ -1821,11 +1821,10 @@ mtk_perf() {
     simple_bar
 	
 	# DRAM Frequency
-	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
-		write "sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp" "0"
-	else
-		write "/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp" "0"
-	fi
+	write "/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp" "0"
+	write "/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp" "0"
+	write "/sys/class/devfreq/mtk-dvfsrc-devfreq/governor" "performance"
+	write "/sys/devices/platform/soc/1c00f000.dvfsrc/mtk-dvfsrc-devfreq/devfreq/mtk-dvfsrc-devfreq/governor" "performance"
 
 	simple_bar
     kmsg1 "[*] DRAM FREQUENCY TWEAKED. "
@@ -1857,6 +1856,13 @@ mtk_perf() {
     kmsg1 "[*] TOUCHPANEL TWEAKED. "
     simple_bar
      
+    # Eara Thermal
+	write "/sys/kernel/eara_thermal/enable" "0"
+	
+	simple_bar
+    kmsg1 "[*] EARA THERMAL DISABLED. "
+    simple_bar
+    
     simple_bar
     kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
     simple_bar
