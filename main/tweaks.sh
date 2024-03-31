@@ -2717,7 +2717,7 @@ mtk_gaming() {
 
     init=$(date +%s)
 	
-	am start -a android.intent.action.MAIN -e toasttext "Balanced profile was successfully applied!" -n bellavita.toast/.MainActivity
+	am start -a android.intent.action.MAIN -e toasttext "Gaming profile was successfully applied!" -n bellavita.toast/.MainActivity
 }
 
 # Gaming Profile
