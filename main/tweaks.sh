@@ -299,7 +299,7 @@ totalram=$(free -m | awk '/Mem:/{print $2}')
 percentage=$(cat /sys/class/power_supply/battery/capacity)
 
 # Variable to Nightshade version
-nightshade=$(echo "v2.0.1-Beta")
+nightshade=$(echo "v2.0.2-Beta")
 
 # Variable to ram usage
 total_mem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
