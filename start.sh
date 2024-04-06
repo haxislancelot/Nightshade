@@ -14,7 +14,6 @@
 # along with Nightshade.  If not, see <https://www.gnu.org/licenses/>.
 #
 # Copyright (C) 2024 haxislancelot
-#
 clear
 
 # Check if the user is not root
@@ -206,6 +205,9 @@ main_menu() {
     
 mode() {
     clear
+    sleep 0
+    echo "${G}Select the desired mode\033[0;90m"
+    echo ""
     sleep 0
     echo "\033[0;90m[ - ] Performance [ 1 ]"
     sleep 0
