@@ -14,6 +14,7 @@
 # along with Nightshade.  If not, see <https://www.gnu.org/licenses/>.
 #
 # Copyright (C) 2024 haxislancelot
+#
 clear
 
 # Check if the user is not root
