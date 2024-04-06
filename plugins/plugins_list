@@ -3,4 +3,5 @@ curl -o /sdcard/.NTSH/plugins/batt.sh "https://raw.githubusercontent.com/haxisla
 curl -o /sdcard/.NTSH/plugins/doze.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/doze.sh" > /dev/null 2>&1
 curl -o /sdcard/.NTSH/plugins/gapp.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/gapp.sh" > /dev/null 2>&1
 curl -o /sdcard/.NTSH/plugins/swap.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/swap.sh" > /dev/null 2>&1
+curl -o /sdcard/.NTSH/plugins/mtkfest.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/mtkfest.sh" > /dev/null 2>&1
 curl -o start.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/start.sh" > /dev/null 2>&1
