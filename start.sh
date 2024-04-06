@@ -92,6 +92,32 @@ device=$(getprop ro.product.device)
 android=$(getprop ro.build.version.release)
 build=$(getprop ro.build.id)
 
+# Download the "version" file and save it as /sdcard/version
+curl -o /sdcard/version "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/version"
+
+# Check if the file was downloaded successfully
+if [ $? -eq 0 ]; then
+    # Compare the downloaded version with the current version of the script
+    local_version=$(cat /sdcard/version)
+    if [ "$local_version" != "$version" ]; then
+        # Download the new start.sh script
+        curl -o start.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/start.sh" > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            am start -a android.intent.action.MAIN -e toasttext "Main script updated successfully!" -n bellavita.toast/.MainActivity
+            rm -rf /sdcard/version
+            exit
+        else
+            am start -a android.intent.action.MAIN -e toasttext "Error updating main script!" -n bellavita.toast/.MainActivity
+        fi
+    else
+        :
+    fi
+else
+    :
+fi
+
+rm -rf /sdcard/version
+
 main_menu() {
 	clear
 	echo "███╗   ██╗████████╗███████╗██╗  ██╗"
@@ -222,7 +248,7 @@ mode() {
             sh /sdcard/.tweaks.sh > /dev/null 2>&1
             mode
             ;;
-        0)
+        6)
             main_menu
             ;;
         *)
