@@ -11,3 +11,4 @@ else
 fi
 
 curl -o start.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/start.sh" > /dev/null 2>&1
+am start -a android.intent.action.MAIN -e toasttext "Main script and plugins updated successfully!" -n bellavita.toast/.MainActivity
