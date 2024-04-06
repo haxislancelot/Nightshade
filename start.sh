@@ -76,7 +76,7 @@ R='\033[0;31m'
 N='\033[0;90m'
 
 # Device information
-version=$(echo "v2.0.2-Beta")
+version=$(echo "v2.0.1-Beta")
 author=$(echo "haxislancelot @ Github")
 uptime=$(uptime)
 kernel=$(uname -r)
@@ -100,12 +100,13 @@ if [ $? -eq 0 ]; then
     # Compare the downloaded version with the current version of the script
     local_version=$(cat /sdcard/version)
     if [ "$local_version" != "$version" ]; then
-        # Download the new start.sh script
+        # Download the new start.sh and tweaks.sh script
         curl -o start.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/start.sh" > /dev/null 2>&1
+        curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/main/tweaks.sh" > /dev/null 2>&1 
         if [ $? -eq 0 ]; then
-            am start -a android.intent.action.MAIN -e toasttext "Main script updated successfully!" -n bellavita.toast/.MainActivity
+            am start -a android.intent.action.MAIN -e toasttext "Main script updated successfully!" -n bellavita.toast/.MainActivity > /dev/null 2>&1
             rm -rf /sdcard/version
-            exit
+            sh /data/data/com.termux/files/home/start.sh
         else
             am start -a android.intent.action.MAIN -e toasttext "Error updating main script!" -n bellavita.toast/.MainActivity
         fi
