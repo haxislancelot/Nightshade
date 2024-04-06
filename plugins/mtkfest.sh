@@ -385,7 +385,7 @@ mtkfest_menu() {
 		echo -e "$(yes "─" | sed ${LINE}'q' | tr -d '\n')\n"
 		echo -e "[] MTKFEST Tweak Menu\033[0m\n"
 
-		echo -e "1. Enable Scheduler switch\n2. Enable Idle Charging\n3. Enable Memory Cache drop\n4. APUs frequency lock\n5. Update gamelist from cloud\n6. Exit\n"
+		echo -e "1. Enable Scheduler switch\n2. Enable Idle Charging\n3. Enable Memory Cache drop\n4. APUs frequency lock\n5. Exit\n"
 		echo -ne "Select the number: "
 		read selected_prompt
 		clear
@@ -395,17 +395,7 @@ mtkfest_menu() {
 		2) menu_value_tune "Enable Idle charging\nPassthrough power from charger to hardware without touching the battery while playing games." "${data_dir}/idle_charging_enabled" ;;
 		3) menu_value_tune "Drop Memory cache\nCan help devices with low memory volume, can causes some trouble." "${data_dir}/drop_cache_enabled" ;;
 		4) menu_value_tune "APUs frequency lock\nLock APUs to highest frequency while playing games, you maybe not need this." "${data_dir}/apu_freq_lock" ;;
-		5)
-			clear
-			echo "[*] Downloading gamelist.txt from Gits..."
-			if ! hash curl 2>/dev/null; then
-				echo "[-] 'curl' not found, Aborting..." && exit 0
-			fi
-			curl -o ${data_dir}/gamelist.txt -L https://gist.github.com/Rem01Gaming/02f2cf5c67119b361e6a6349392845bf/raw/gamelist.txt
-			echo "[*] Reboot is needed for applying new gamelist"
-			exit 0
-			;;
-		6) clear && break ;;
+		5) clear && break ;;
 		esac
 
 		clear
