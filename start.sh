@@ -93,7 +93,7 @@ android=$(getprop ro.build.version.release)
 build=$(getprop ro.build.id)
 
 # Download the "version" file and save it as /sdcard/version
-curl -o /sdcard/version "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/version"
+curl -o /sdcard/version "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/version" > /dev/null 2>&1
 
 # Check if the file was downloaded successfully
 if [ $? -eq 0 ]; then
