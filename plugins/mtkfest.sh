@@ -1,5 +1,6 @@
-#!/bin/sh
+#!/system/bin/sh
 # This file is part of Mtkfest.
+# Edited and adapted as a Nightshade plugin by haxislancelot @ Github.
 #
 # Mtkfest is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -385,7 +386,7 @@ mtkfest_menu() {
 		echo -e "[] MTKFEST Tweak Menu\033[0m\n"
 
 		echo -e "1. Enable Scheduler switch\n2. Enable Idle Charging\n3. Enable Memory Cache drop\n4. APUs frequency lock\n5. Update gamelist from cloud\n6. Exit\n"
-		echo "Select the number: "
+		echo -ne "Select the number: "
 		read selected_prompt
 		clear
 
