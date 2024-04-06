@@ -395,7 +395,7 @@ mtkfest_menu() {
 		2) menu_value_tune "Enable Idle charging\nPassthrough power from charger to hardware without touching the battery while playing games." "${data_dir}/idle_charging_enabled" ;;
 		3) menu_value_tune "Drop Memory cache\nCan help devices with low memory volume, can causes some trouble." "${data_dir}/drop_cache_enabled" ;;
 		4) menu_value_tune "APUs frequency lock\nLock APUs to highest frequency while playing games, you maybe not need this." "${data_dir}/apu_freq_lock" ;;
-		5) clear && break ;;
+		5) clear && plugins ;;
 		esac
 
 		clear
