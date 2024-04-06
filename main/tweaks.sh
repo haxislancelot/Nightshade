@@ -3513,6 +3513,319 @@ kmsg1 "[*] EXECUTION DONE IN $exectime SECONDS. "
 simple_bar
 }
 
+# Mediatek Thermal Profile
+mtk_thermal() {
+	init=$(date +%s)
+	kmsg1 "----------------------- Info -----------------------"
+    kmsg1 "[ * ] Date of execution: $(date) "
+    kmsg1 "[ * ] Nightshade's version: $nightshade "
+    kmsg1 "[ * ] Kernel: $(uname -a) "
+    kmsg1 "[ * ] SOC: $mf, $soc "
+    kmsg1 "[ * ] SDK: $sdk "
+    kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
+    kmsg1 "[ * ] CPU aarch: $aarch "
+    kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
+    kmsg1 "[ * ] GPU model: $GPU_MODEL "
+    kmsg1 "[ * ] Android version: $arv "
+    kmsg1 "[ * ] Device: $dm  "
+    kmsg1 "[ * ] Battery charge level: $percentage% "
+    kmsg1 "[ * ] Battery temperature: $temperature°C "
+    kmsg1 "[ * ] Device total RAM: $totalram MB "
+    kmsg1 "[ * ] RAM usage: $used_percentage% "
+    kmsg1 "-------------------------------------------------------"
+    simple_bar
+    kmsg1 "[*] ENABLING $ntsh_profile PROFILE... "
+    simple_bar
+    
+    renice -n -5 $(pgrep system_server)
+    renice -n -5 $(pgrep com.miui.home)
+    renice -n -5 $(pgrep launcher)
+    renice -n -5 $(pgrep lawnchair)
+    renice -n -5 $(pgrep home)
+    renice -n -5 $(pgrep watchapp)
+    renice -n -5 $(pgrep trebuchet)
+    renice -n -1 $(pgrep dialer)
+    renice -n -1 $(pgrep keyboard)
+    renice -n -1 $(pgrep inputmethod)
+    renice -n -9 $(pgrep fluid)
+    renice -n -10 $(pgrep composer)
+    renice -n -1 $(pgrep com.android.phone)
+    renice -n -10 $(pgrep surfaceflinger)
+    renice -n 1 $(pgrep kswapd0)
+    renice -n 1 $(pgrep ksmd)
+    renice -n -6 $(pgrep msm_irqbalance)
+    renice -n -9 $(pgrep kgsl_worker)
+    renice -n 6 $(pgrep android.gms)    
+    
+    simple_bar
+    kmsg1 "[*] RENICED PROCESSES. "
+    simple_bar
+    
+    # Enable perfd and mpdecision
+    start perfd > /dev/null
+    start mpdecision > /dev/null
+
+    simple_bar
+    kmsg1 "[*] ENABLED MPDECISION AND PERFD. "
+    simple_bar    
+    
+    # Disable logd and statsd to reduce overhead.
+    stop logd
+    stop statsd
+
+    simple_bar
+    kmsg1 "[*] DISABLED STATSD AND LOGD. "
+    simple_bar    
+    
+	# CPU tweaks
+	cpu="0"
+	while [ $cpu -lt $cpu_cores ]; do
+		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
+		if [ -d "$cpu_dir" ]; then
+			write "${cpu_dir}/cpufreq/scaling_governor" "schedutil"
+		fi
+		cpu="$((cpu + 1))"
+	done
+	
+	simple_bar
+    kmsg1 "[*] CPU TWEAKED. "
+    simple_bar
+    
+    # CPUStune
+    
+	# CPU Load settings
+	write "/dev/cpuset/foreground/cpus" "0-7"
+	write "/dev/cpuset/background/cpus" "0-2"
+	write "/dev/cpuset/system-background/cpus" "0-5"
+	write "/dev/cpuset/top-app/cpus" "0-7"
+	write "/dev/cpuset/restricted/cpus" "0"
+	
+	# Realtime
+	write "/dev/stune/rt/schedtune.boost" "0"
+	write "/dev/stune/rt/schedtune.prefer_idle" "1"
+	
+	# Background
+	write "/dev/stune/background/schedtune.util.max.effective" "0"
+	write "/dev/stune/background/schedtune.util.min.effective" "0"
+	write "/dev/stune/background/schedtune.util.max" "0"
+	write "/dev/stune/background/schedtune.util.min" "0"
+	write "/dev/stune/background/schedtune.boost" "0"
+	write "/dev/stune/background/schedtune.prefer_idle" "0"
+	
+	# Foreground
+	write "/dev/stune/foreground/schedtune.util.max.effective" "1024"
+	write "/dev/stune/foreground/schedtune.util.min.effective" "0"
+	write "/dev/stune/foreground/schedtune.util.max" "1024"
+	write "/dev/stune/foreground/schedtune.util.min" "0"
+	write "/dev/stune/foreground/schedtune.boost" "0"
+	write "/dev/stune/foreground/schedtune.prefer_idle" "1"
+	
+	# Top-App
+	write "/dev/stune/top-app/schedtune.util.max.effective" "1024"
+	write "/dev/stune/top-app/schedtune.util.min.effective" "0"
+	write "/dev/stune/top-app/schedtune.util.max" "1024"
+	write "/dev/stune/top-app/schedtune.util.min" "0"
+	write "/dev/stune/top-app/schedtune.boost" "0"
+	write "/dev/stune/top-app/schedtune.prefer_idle" "1"
+	
+	# Global
+	write "/dev/stune/schedtune.util.min" "0"
+	write "/dev/stune/schedtune.util.max" "1024"
+	write "/dev/stune/schedtune.util.max.effective" "1024"
+	write "/dev/stune/schedtune.util.min.effective" "0"
+	write "/dev/stune/schedtune.boost" "0"
+	write "/dev/stune/schedtune.prefer_idle" "1"
+    
+	simple_bar
+    kmsg1 "[*] CPUSTUNE TWEAKED. "
+    simple_bar
+	
+    # GED modules
+	write "/sys/module/ged/parameters/ged_smart_boost" "1"
+    write "/sys/module/ged/parameters/gpu_block" "1"
+    write "/sys/module/ged/parameters/gpu_bottom_freq" "1"
+    write "/sys/module/ged/parameters/gpu_cust_boost_freq" "1"
+    write "/sys/module/ged/parameters/gpu_cust_upbound_freq" "1"
+    write "/sys/module/ged/parameters/gpu_debug_enable" "1"
+    write "/sys/module/ged/parameters/gpu_dvfs_enable" "1"
+    write "/sys/module/ged/parameters/gpu_idle" "1"
+    write "/sys/module/ged/parameters/gpu_loading" "1"
+    write "/sys/module/ged/parameters/gx_boost_on" "1"
+    write "/sys/module/ged/parameters/gx_dfps" "1"
+    write "/sys/module/ged/parameters/gx_fb_dvfs_margin" "1"
+    write "/sys/module/ged/parameters/gx_force_cpu_boost" "1"
+    write "/sys/module/ged/parameters/gx_game_mode" "1"
+    write "/sys/module/ged/parameters/gx_top_app_pid" "0"
+    write "/sys/module/ged/parameters/is_GED_KPI_enabled" "0"
+    write "/sys/module/ged/parameters/ged_monitor_3D_fence_debug" "0"
+    write "/sys/module/ged/parameters/ged_monitor_3D_fence_disable" "0"
+    write "/sys/module/ged/parameters/ged_monitor_3D_fence_systrace" "0"
+    
+	simple_bar
+    kmsg1 "[*] GED MODULES TWEAKED. "
+    simple_bar
+	
+    # I/O Scheduler
+    write "/sys/block/mmcblk0/queue/scheduler" "cfq"
+	
+    simple_bar
+    kmsg1 "[*] I/O SCHEDULER TWEAKED. "
+    simple_bar
+    
+	# Idle charging
+	write "/proc/mtk_battery_cmd/current_cmd" "0 0"
+	
+	simple_bar
+    kmsg1 "[*] IDLE CHARGING DISABLED. "
+    simple_bar
+	
+	# Enable back PPM
+	write "/proc/ppm/enabled" "1"
+    write "/proc/ppm/policy_status" "0 0"  # Desativa PPM_POLICY_PTPOD
+    write "/proc/ppm/policy_status" "1 1"  # Ativa PPM_POLICY_UT
+    write "/proc/ppm/policy_status" "2 0"  # Desativa PPM_POLICY_FORCE_LIMIT
+    write "/proc/ppm/policy_status" "3 0"  # Desativa PPM_POLICY_PWR_THRO
+    write "/proc/ppm/policy_status" "4 1"  # Ativa PPM_POLICY_THERMAL
+    write "/proc/ppm/policy_status" "5 0"  # Desativa PPM_POLICY_DLPT
+    write "/proc/ppm/policy_status" "6 0"  # Desativa PPM_POLICY_HARD_USER_LIMIT
+    write "/proc/ppm/policy_status" "7 0"  # Desativa PPM_POLICY_USER_LIMIT
+    write "/proc/ppm/policy_status" "8 0"  # Desativa PPM_POLICY_LCM_OFF
+    write "/proc/ppm/policy_status" "9 1"  # Ativa PPM_POLICY_SYS_BOOST
+	
+	# Set to maximum CPU frequency
+	write "/proc/ppm/policy/hard_userlimit_max_cpu_freq" "1 2550000"
+	write "/proc/ppm/policy/hard_userlimit_min_cpu_freq" "1 2550000"
+	write "/proc/ppm/policy/hard_userlimit_max_cpu_freq" "0 2010000"
+	write "/proc/ppm/policy/hard_userlimit_min_cpu_freq" "0 2010000"
+	
+	simple_bar
+    kmsg1 "[*] THROTTLE THERMAL ENABLED. "
+    simple_bar
+	
+	# MTK Power and CCI mode, respectivamente  1 e 3
+	write "/proc/cpufreq/cpufreq_cci_mode" "0"
+	write "/proc/cpufreq/cpufreq_power_mode" "0"
+    # write "/proc/cpufreq/cpufreq_imax_thermal_protect" "0"
+	# write "/proc/cpufreq/cpufreq_imax_enable" "1"
+    write "/proc/cpufreq/MT_CPU_DVFS_L/cpufreq_oppidx" "0"
+    write "/proc/cpufreq/MT_CPU_DVFS_L/cpufreq_turbo_mode" "0 0 0"
+    write "/proc/cpufreq/cpufreq_sched_disable" "0"
+    # write "/proc/cpuidle/state/enabled" "100 1 0"
+    # write "/proc/cpuidle/state/enabled" "100 2"
+    # write "/proc/cpuidle/state/enabled" "100 3 0"
+    # write "/proc/cpuidle/state/enabled" "100 4 0"
+    
+	simple_bar
+    kmsg1 "[*] CPUFREQ TWEAKED. "
+    simple_bar
+	
+	# EAS/HMP Switch
+	write "/sys/devices/system/cpu/eas/enable" "0"
+
+	simple_bar
+    kmsg1 "[*] EAS/HMP TWEAKED. "
+    simple_bar
+	
+	# GPU Frequency
+	if [ ! $(uname -r | cut -d'.' -f1,2 | sed 's/\.//') -gt 500 ]; then
+		write "/proc/gpufreq/gpufreq_opp_freq" "950000"
+	else
+		write "/proc/gpufreqv2/fix_custom_freq_volt" "0 0" 
+	fi
+
+	# Disable GPU Power limiter
+	if [ -f "/proc/gpufreq/gpufreq_power_limited" ]; then
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_batt_oc 1"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_batt_percent 1"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_low_batt 1"
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_thermal_protect 1" 
+		write "/proc/gpufreq/gpufreq_power_limited" "ignore_pbm_limited 1"
+	fi
+	
+	# Change GPU Power Policy to always_on
+	write "/proc/mali/always_on" "0"
+	
+	simple_bar
+    kmsg1 "[*] GPU TWEAKED. "
+    simple_bar
+
+	# Disable Power Budget management for new 5.x kernels
+	write "/proc/pbm/pbm_stop" "stop 0"
+
+	simple_bar
+    kmsg1 "[*] POWER BUDGET MANAGEMENT TWEAKED. "
+    simple_bar
+	
+	# Disable battery current limiter
+	write "/proc/mtk_batoc_throttling/battery_oc_protect_stop" "stop 0"
+
+	simple_bar
+    kmsg1 "[*] BATTERY CURRENT LIMITER DISABLED. "
+    simple_bar
+	
+	# DRAM Frequency
+	write "/sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp" "-1"
+	write "/sys/kernel/helio-dvfsrc/dvfsrc_force_vcore_dvfs_opp" "-1"
+	write "/sys/class/devfreq/mtk-dvfsrc-devfreq/governor" "simple_ondemand"
+	write "/sys/devices/platform/soc/1c00f000.dvfsrc/mtk-dvfsrc-devfreq/devfreq/mtk-dvfsrc-devfreq/governor" "simple_ondemand"
+
+	simple_bar
+    kmsg1 "[*] DRAM FREQUENCY TWEAKED. "
+    simple_bar
+	
+	# Drop mem cache
+	write "/proc/sys/vm/drop_caches" "3"
+
+	simple_bar
+    kmsg1 "[*] DROPPED MEM CACHE. "
+    simple_bar
+	
+	# Mediatek's APU freq
+	write "/sys/module/mmdvfs_pmqos/parameters/force_step" "-1"
+
+	simple_bar
+    kmsg1 "[*] MEDIATEK's APU FREQ TWEAKED. "
+    simple_bar
+	
+	# Touchpanel
+	tp_path="/proc/touchpanel"
+	write "$tp_path/game_switch_enable" "1"
+	write "$tp_path/oplus_tp_limit_enable" "1"
+	write "$tp_path/oppo_tp_limit_enable" "1"
+	write "$tp_path/oplus_tp_direction" "1"
+	write "$tp_path/oppo_tp_direction" "0"
+	# write "/sys/kernel/oplus_display/LCM_CABC" "0"
+	
+	simple_bar
+    kmsg1 "[*] TOUCHPANEL TWEAKED. "
+    simple_bar
+	
+    # Eara Thermal
+	write "/sys/kernel/eara_thermal/enable" "1"
+	
+	simple_bar
+    kmsg1 "[*] EARA THERMAL ENABLED. "
+    simple_bar
+    
+	simple_bar
+    kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
+    simple_bar
+
+    simple_bar
+    kmsg1 "[*] END OF EXECUTION: $(date)"
+    simple_bar
+    exit=$(date +%s)
+
+    exectime=$((exit - init))
+    simple_bar
+    kmsg1 "[*] EXECUTION DONE IN $exectime SECONDS. "
+    simple_bar
+
+    init=$(date +%s)
+	
+	am start -a android.intent.action.MAIN -e toasttext "Thermal profile was successfully applied!" -n bellavita.toast/.MainActivity
+}
+
 # Thermal Profile
 thermal() {
 init=$(date +%s)
@@ -3526,9 +3839,10 @@ if [ -z "$chipset" ]; then
 fi
 
 if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
-    kmsg1 "[ ! ] Device is Mediatek, your device does not support this mode!"
+    kmsg1 "[ ! ] Device is Mediatek, executing mtk_thermal..."
     simple_bar
-    su -lp 2000 -c "cmd notification post -S bigtext -t 'Nightshade' 'Tag' '[ERROR] Your device does not support this mode!'" > /dev/null
+    settings delete global device_idle_constants
+    mtk_thermal
     exit
 else
     kmsg1 "[ * ] Device is not Mediatek, continuing script..."
