@@ -106,7 +106,7 @@ if [ $? -eq 0 ]; then
         if [ $? -eq 0 ]; then
             am start -a android.intent.action.MAIN -e toasttext "Main script updated successfully!" -n bellavita.toast/.MainActivity > /dev/null 2>&1
             rm -rf /sdcard/version
-            sh /data/data/com.termux/files/home/start.sh
+            break && sh /data/data/com.termux/files/home/start.sh
         else
             am start -a android.intent.action.MAIN -e toasttext "Error updating main script!" -n bellavita.toast/.MainActivity
         fi
