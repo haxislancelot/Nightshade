@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Nightshade.  If not, see <https://www.gnu.org/licenses/>.
-#
 # Copyright (C) 2024 haxislancelot
 clear
 
