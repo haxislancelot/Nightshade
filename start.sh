@@ -121,6 +121,7 @@ rm -rf /sdcard/version
 
 main_menu() {
 	clear
+	sleep 0
 	echo "███╗   ██╗████████╗███████╗██╗  ██╗"
 	sleep 0
 	echo "████╗  ██║╚══██╔══╝██╔════╝██║  ██║"
@@ -198,6 +199,7 @@ main_menu() {
             break > /dev/null 2>&1
             ;;
         *)
+            sleep 0
             echo -e "\e[41mInvalid choice!\e[0m"
             sleep 1
             main_menu
@@ -229,34 +231,30 @@ mode() {
 
     case $choice in
         1)
-            setprop persist.nightshade.mode 4
-            sh /sdcard/.tweaks.sh > /dev/null 2>&1
+            setprop persist.nightshade.mode 4 && sh /sdcard/.tweaks.sh > /dev/null 2>&1
             mode
             ;;
         2)
-            setprop persist.nightshade.mode 2
-            sh /sdcard/.tweaks.sh > /dev/null 2>&1
+            setprop persist.nightshade.mode 2 && sh /sdcard/.tweaks.sh > /dev/null 2>&1
             mode
             ;;
         3)
-            setprop persist.nightshade.mode 3
-            sh /sdcard/.tweaks.sh > /dev/null 2>&1
+            setprop persist.nightshade.mode 3 && sh /sdcard/.tweaks.sh > /dev/null 2>&1
             mode
             ;;
         4)
-            setprop persist.nightshade.mode 6
-            sh /sdcard/.tweaks.sh > /dev/null 2>&1
+            setprop persist.nightshade.mode 6 && sh /sdcard/.tweaks.sh > /dev/null 2>&1
             mode
             ;;
         5)
-            setprop persist.nightshade.mode 5
-            sh /sdcard/.tweaks.sh > /dev/null 2>&1
+            setprop persist.nightshade.mode 5 && sh /sdcard/.tweaks.sh > /dev/null 2>&1
             mode
             ;;
         0)
             main_menu
             ;;
         *)
+            sleep 0
             echo -e "\e[41mInvalid choice!\e[0m"
             sleep 1
             mode
@@ -286,6 +284,7 @@ execute_plugin() {
         chmod +x "$plugin_path"
         . "$plugin_path"
     else
+        sleep 0
         echo -e "\e[41mInvalid plugin!\e[0m"
         sleep 1
         plugins
