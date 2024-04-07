@@ -194,7 +194,7 @@ main_menu() {
             main_menu
             ;;
         0)
-            exit
+            exit 1
             ;;
         *)
             echo -e "\e[41mInvalid choice!\e[0m"
