@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Nightshade.  If not, see <https://www.gnu.org/licenses/>.
+#
 # Copyright (C) 2024 haxislancelot
 clear
 
@@ -193,7 +194,8 @@ main_menu() {
             main_menu
             ;;
         0)
-            exit 1
+            clear
+            break > /dev/null 2>&1
             ;;
         *)
             echo -e "\e[41mInvalid choice!\e[0m"
@@ -293,7 +295,7 @@ execute_plugin() {
 plugins() {
 	clear
 	sleep 0
-	echo "${G}Type x to return to main menu\033[0;90m"
+	echo "${G}Type 0 to return to main menu\033[0;90m"
 	echo ""
 	sleep 0
     list_plugins
@@ -304,7 +306,7 @@ plugins() {
         echo -ne "${G}Enter your choice: ${F}"
         read selected_plugin_number
 
-        if [ "$selected_plugin_number" == "x" ]; then
+        if [ "$selected_plugin_number" == "0" ]; then
             main_menu
             break
         elif [ "$selected_plugin_number" == "plugins" ]; then
