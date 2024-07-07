@@ -4848,7 +4848,7 @@ do
 	  "Thermal") {
 	  	  settings delete global device_idle_constants
 			thermal
-			am start -a android.intent.action.MAIN -e toasttext "Gaming profile was successfully applied!" -n bellavita.toast/.MainActivity
+			am start -a android.intent.action.MAIN -e toasttext "Thermal profile was successfully applied!" -n bellavita.toast/.MainActivity
 			echo "3" > "/proc/sys/vm/drop_caches"
 			exit
 	   };;
