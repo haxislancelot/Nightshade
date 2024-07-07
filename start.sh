@@ -43,7 +43,7 @@ fi
 if [[ -e "/sdcard/.tweaks.sh" ]]; then
 	:
 else
-	curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/main/tweaks.sh" > /dev/null 2>&1 && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/plugins_list" > /dev/null 2>&1 && sh /sdcard/plugins_list.sh > /dev/null 2>&1 && rm -rf /sdcard/plugins_list.sh > /dev/null 2>&1
+	curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/main/tweaks.sh" > /dev/null 2>&1 && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/plugins/plugins_list" > /dev/null 2>&1 && sh /sdcard/plugins_list.sh > /dev/null 2>&1 && rm -rf /sdcard/plugins_list.sh > /dev/null 2>&1
 fi
 
 # Function to ask the user if he wants to update the main script
@@ -56,7 +56,7 @@ ask_update_script() {
         case $answer in
             [Yy]* )
                 echo "\033[0;90mDownloading...${F}"
-                curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/main/tweaks.sh" > /dev/null 2>&1 && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/plugins/plugins_list" > /dev/null 2>&1 && sh /sdcard/plugins_list.sh > /dev/null 2>&1 && rm -rf /sdcard/plugins_list.sh > /dev/null 2>&1 && echo "${G}Main script and plugins updated successfully!${F}"
+                curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/main/tweaks.sh" > /dev/null 2>&1 && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/plugins/plugins_list" > /dev/null 2>&1 && sh /sdcard/plugins_list.sh > /dev/null 2>&1 && rm -rf /sdcard/plugins_list.sh > /dev/null 2>&1 && echo "${G}Main script and plugins updated successfully!${F}"
                 echo -n "\033[0;90mClick to continue...${F}"
                 read &&
                 sh start.sh
@@ -76,7 +76,7 @@ R='\033[0;31m'
 N='\033[0;90m'
 
 # Device information
-version=$(echo "v2.0.2-Beta")
+version=$(echo "v2.0.3-Beta")
 author=$(echo "haxislancelot @ Github")
 uptime=$(uptime)
 kernel=$(uname -r)
@@ -93,7 +93,7 @@ android=$(getprop ro.build.version.release)
 build=$(getprop ro.build.id)
 
 # Download the "version" file and save it as /sdcard/version
-curl -o /sdcard/version "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/version" > /dev/null 2>&1
+curl -o /sdcard/version "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/version" > /dev/null 2>&1
 
 # Check if the file was downloaded successfully
 if [ $? -eq 0 ]; then
@@ -101,8 +101,8 @@ if [ $? -eq 0 ]; then
     local_version=$(cat /sdcard/version)
     if [ "$local_version" != "$version" ]; then
         # Download the new start.sh and tweaks.sh script
-        curl -o start.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/start.sh" > /dev/null 2>&1
-        curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/main/main/tweaks.sh" > /dev/null 2>&1 
+        curl -o start.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/main/start.sh" > /dev/null 2>&1
+        curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/main/tweaks.sh" > /dev/null 2>&1 
         if [ $? -eq 0 ]; then
             am start -a android.intent.action.MAIN -e toasttext "Main script updated successfully!" -n bellavita.toast/.MainActivity > /dev/null 2>&1
             rm -rf /sdcard/version
