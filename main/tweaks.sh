@@ -1207,7 +1207,7 @@ s5e8825_balanced() {
 	
 	for cpu in /sys/devices/system/cpu/cpu*/cpufreq/
     do
-	write "${cpu}schedutil/up_rate_limit_us" "$((SCHED_PERIOD_BALANCE / 1000))"
+	write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BATTERY / 1000))"
     done
     
     for cpu in /sys/devices/system/cpu/cpu*
@@ -1231,6 +1231,7 @@ s5e8825_balanced() {
     # FS Tweaks
     write "/proc/sys/fs/lease-break-time" "20"
 	write "/proc/sys/fs/leases-enable" "1"
+	write "/proc/sys/fs/aio-max-nr" "131072"
     
 	simple_bar
     kmsg1 "[*] FS TWEAKED. "
@@ -1332,7 +1333,7 @@ s5e8825_balanced() {
     kmsg1 "[*] GPU TWEAKED. "
     simple_bar
     
-    # Thermal zone tweaks.
+    # Thermal zone tweaks (Qualcomm Snapdragon 665 Thermal)
     write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "95000"
     write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "115000"
     write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "145000"
@@ -3009,7 +3010,8 @@ s5e8825_gaming() {
     # FS Tweaks
     write "/proc/sys/fs/lease-break-time" "20"
 	write "/proc/sys/fs/leases-enable" "1"
-    
+    write "/proc/sys/fs/aio-max-nr" "131072"
+	
 	simple_bar
     kmsg1 "[*] FS TWEAKED. "
     simple_bar
@@ -3109,6 +3111,15 @@ s5e8825_gaming() {
     
     simple_bar
     kmsg1 "[*] GPU TWEAKED. "
+    simple_bar
+    
+    # Thermal zone tweaks (Qualcomm Snapdragon 665 Thermal)
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "95000"
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "115000"
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "145000"
+    
+    simple_bar
+    kmsg1 "[*] THERMAL ZONE TWEAKED. "
     simple_bar
     
     simple_bar
@@ -4017,37 +4028,46 @@ s5e8825_thermal() {
 	while [ $cpu -lt $cpu_cores ]; do
 		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
 		if [ -d "$cpu_dir" ]; then
-			write "${cpu_dir}/cpufreq/scaling_governor" "$default_cpu_gov"
+			write "${cpu_dir}/cpufreq/scaling_governor" "schedutil"
 		fi
 		cpu="$((cpu + 1))"
 	done
 	
 	for cpu in /sys/devices/system/cpu/cpu*/cpufreq/
     do
-	write "${cpu}schedutil/up_rate_limit_us" "$((SCHED_PERIOD_BALANCE / 1000))"
+	write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BATTERY / 1000))"
     done
     
     for cpu in /sys/devices/system/cpu/cpu*
     do
-	    write "$cpu/online" "1"
+	    if [[ $percentage -le "20" ]]; then
+		    write "/sys/devices/system/cpu/cpu1/online" "0"
+		    write "/sys/devices/system/cpu/cpu2/online" "0"
+		    write "/sys/devices/system/cpu/cpu5/online" "0"
+		    write "/sys/devices/system/cpu/cpu6/online" "0"
+	    elif [[ $percentage -ge "20" ]]; then
+		    write "$cpu/online" "1"
+	    fi
     done
 	
 	# CPUStune
     
 	# CPU Load settings
-	write "/dev/cpuset/foreground/cpus" "0-7"
-	write "/dev/cpuset/background/cpus" "0-3"
-	write "/dev/cpuset/system-background/cpus" "0-3"
-	write "/dev/cpuset/top-app/cpus" "0-7"
-	write "/dev/cpuset/restricted/cpus" "0-7"
+	#write "/dev/cpuset/audio-app/cpus" "0-1"
+	write "/dev/cpuset/foreground/cpus" "0-1"
+	write "/dev/cpuset/background/cpus" "0-1, 4-5"
+	write "/dev/cpuset/system-background/cpus" "0-1"
+	write "/dev/cpuset/top-app/cpus" "0-1, 4-5"
+	write "/dev/cpuset/restricted/cpus" "0-1"
 	
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
     simple_bar
     
     # FS Tweaks
-    write "/proc/sys/fs/lease-break-time" "20"
+    write "/proc/sys/fs/lease-break-time" "15"
 	write "/proc/sys/fs/leases-enable" "1"
+	write "/proc/sys/fs/aio-max-nr" "131072"
     
 	simple_bar
     kmsg1 "[*] FS TWEAKED. "
@@ -4150,9 +4170,9 @@ s5e8825_thermal() {
     simple_bar
     
     # Thermal zone tweaks.
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "95000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "115000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "145000"
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "40000"
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "45000"
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "50000"
     
     simple_bar
     kmsg1 "[*] THERMAL ZONE TWEAKED. "
@@ -4174,7 +4194,7 @@ s5e8825_thermal() {
 
     init=$(date +%s)
 	
-	am start -a android.intent.action.MAIN -e toasttext "Balanced profile was successfully applied!" -n bellavita.toast/.MainActivity
+	am start -a android.intent.action.MAIN -e toasttext "Thermal profile was successfully applied!" -n bellavita.toast/.MainActivity
 }
 
 mtk_thermal() {
@@ -4502,8 +4522,13 @@ if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
     settings delete global device_idle_constants
     mtk_thermal
     exit
-else
-    kmsg1 "[ * ] Device is not Mediatek, continuing script..."
+fi
+
+if [[ $chipset == *s5e8825* ]]; then
+    kmsg1 "[ ! ] Device is Exynos 1280, executing s5e8825_thermal..."
+    settings delete global device_idle_constants
+    s5e8825_thermal
+    exit
 fi
 
 kmsg1 "----------------------- Info -----------------------"
