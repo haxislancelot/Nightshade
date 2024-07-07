@@ -76,7 +76,8 @@ R='\033[0;31m'
 N='\033[0;90m'
 
 # Device information
-version=$(echo "v2.0.3-Beta")
+version=$(echo "v2.0.3")
+branch=$(echo "beta")
 author=$(echo "haxislancelot @ Github")
 uptime=$(uptime)
 kernel=$(uname -r)
@@ -138,6 +139,8 @@ main_menu() {
     echo "${G}Time: `date`"
     sleep 0
     echo "Version: ${version}"
+    sleep 0
+    echo "Branch: ${branch}"
     sleep 0
     echo "Author: ${author}"
     sleep 0
