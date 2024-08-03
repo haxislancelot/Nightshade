@@ -352,9 +352,7 @@ fi
 if [[ $chipset == *s5e8825* ]]; then
     cpu_cores="$(($(nproc --all) - 1))"
     case $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors) in
-    *"schedplus"*) export default_cpu_gov="schedplus" ;;
-    *"sugov_ext"*) export default_cpu_gov="sugov_ext" ;;
-    *"walt"*) export default_cpu_gov="walt" ;;
+    *"ondemand"*) export default_cpu_gov="ondemand" ;;
     *) export default_cpu_gov="schedutil" ;;
     esac
 fi
@@ -1205,10 +1203,19 @@ s5e8825_balanced() {
 		cpu="$((cpu + 1))"
 	done
 	
-	for cpu in /sys/devices/system/cpu/cpu*/cpufreq/
-    do
-	write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BATTERY / 1000))"
-    done
+    if [ "$default_cpu_gov" = "schedutil" ]; then
+        for cpu in /sys/devices/system/cpu/cpu*/cpufreq/; do
+            write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BATTERY / 1000))"
+        done
+    elif [ "$default_cpu_gov" = "ondemand" ]; then
+        for cpu in /sys/devices/system/cpu/cpu*/cpufreq/; do
+            write "${cpu}ondemand/io_is_busy" "1"
+	        write "${cpu}ondemand/sampling_rate" "8000"
+	        write "${cpu}ondemand/up_threshold" "75"
+        done
+    else
+        kmsg1 "Invalid or undefined default_cpu_gov value."
+    fi
     
     for cpu in /sys/devices/system/cpu/cpu*
     do
@@ -1218,11 +1225,11 @@ s5e8825_balanced() {
 	# CPUStune
     
 	# CPU Load settings
-	write "/dev/cpuset/foreground/cpus" "0-7"
-	write "/dev/cpuset/background/cpus" "0-3"
+	write "/dev/cpuset/foreground/cpus" "0-4" #
+	write "/dev/cpuset/background/cpus" "0-3" #
 	write "/dev/cpuset/system-background/cpus" "0-3"
-	write "/dev/cpuset/top-app/cpus" "0-7"
-	write "/dev/cpuset/restricted/cpus" "0-7"
+	write "/dev/cpuset/top-app/cpus" "0-7" #
+	write "/dev/cpuset/restricted/cpus" "0-7" #
 	
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
@@ -1326,6 +1333,9 @@ s5e8825_balanced() {
     write "$mali/dvfs_governor" "1"
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
     write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
+    write "$mali/highspeed_load" "100" # Experimental
+    write "$mali/highspeed_clock" "897000" # Experimental
+    write "/sys/kernel/gpu/gpu_min_clock" "897000" # Experimental
     chmod 0644 > "$mali/dvfs"
     done
     
@@ -1334,12 +1344,19 @@ s5e8825_balanced() {
     simple_bar
     
     # Thermal zone tweaks (Qualcomm Snapdragon 665 Thermal)
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "95000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "115000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "145000"
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "20000"
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "75000"
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "85000"
     
     simple_bar
     kmsg1 "[*] THERMAL ZONE TWEAKED. "
+    simple_bar
+    
+    # Disable battery store mode
+    write "/sys/devices/platform/samsung_mobile_device/samsung_mobile_device:battery/power_supply/battery/store_mode" "0"
+    
+    simple_bar
+    kmsg1 "[*] BATTERY STORE MODE DISABLED. "
     simple_bar
     
     simple_bar
@@ -2984,7 +3001,7 @@ s5e8825_gaming() {
 	while [ $cpu -lt $cpu_cores ]; do
 		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
 		if [ -d "$cpu_dir" ]; then
-			write "${cpu_dir}/cpufreq/scaling_governor" "performance"
+			write "${cpu_dir}/cpufreq/scaling_governor" "userspace"
 		fi
 		cpu="$((cpu + 1))"
 	done
@@ -2997,11 +3014,11 @@ s5e8825_gaming() {
     # CPUStune
     
 	# CPU Load settings
-	write "/dev/cpuset/foreground/cpus" "0-7"
-	write "/dev/cpuset/background/cpus" "0-2"
-	write "/dev/cpuset/system-background/cpus" "0-5"
-	write "/dev/cpuset/top-app/cpus" "0-7"
-	write "/dev/cpuset/restricted/cpus" "0"
+	write "/dev/cpuset/foreground/cpus" "0-4" #
+	write "/dev/cpuset/background/cpus" "0-1" # 0-3 default
+	write "/dev/cpuset/system-background/cpus" "0-3"
+	write "/dev/cpuset/top-app/cpus" "0-7" #
+	write "/dev/cpuset/restricted/cpus" "0-7" #
     
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
@@ -3102,11 +3119,14 @@ s5e8825_gaming() {
     
     for mali in /sys/devices/platform/*.mali
     do
-    write "$mali/power_policy" "always_on"
+    write "$mali/power_policy" "coarse_demand"
     write "$mali/dvfs_governor" "4"
-    write "$mali/tmu" "0" # Thermal Management Until for thermal monitoring and control 
-    write "$mali/dvfs" "0" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
-    chmod 0000 > "$mali/dvfs"
+    write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
+    write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
+    write "$mali/highspeed_load" "100" # Experimental
+    write "$mali/highspeed_clock" "897000" # Experimental
+    write "/sys/kernel/gpu/gpu_min_clock" "897000" # Experimental
+    chmod 0644 > "$mali/dvfs"
     done
     
     simple_bar
@@ -3120,6 +3140,13 @@ s5e8825_gaming() {
     
     simple_bar
     kmsg1 "[*] THERMAL ZONE TWEAKED. "
+    simple_bar
+    
+    # Enable battery store mode
+    write "/sys/devices/platform/samsung_mobile_device/samsung_mobile_device:battery/power_supply/battery/store_mode" "1"
+    
+    simple_bar
+    kmsg1 "[*] BATTERY STORE MODE ENABLED. "
     simple_bar
     
     simple_bar
@@ -3138,6 +3165,7 @@ s5e8825_gaming() {
 
     init=$(date +%s)
 	
+    su -lp 2000 -c "cmd notification post -S bigtext -t 'Nightshade' 'Tag' 'Gaming mode activated on your Exynos 1280! Disable if it overheats or use a cooler.'" > /dev/null
 	am start -a android.intent.action.MAIN -e toasttext "Gaming profile was successfully applied!" -n bellavita.toast/.MainActivity
 }
 
@@ -4162,6 +4190,9 @@ s5e8825_thermal() {
     write "$mali/dvfs_governor" "1"
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
     write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
+    write "$mali/highspeed_load" "100" # Experimental
+    write "$mali/highspeed_clock" "897000" # Experimental
+    write "/sys/kernel/gpu/gpu_min_clock" "897000" # Experimental
     chmod 0644 > "$mali/dvfs"
     done
     
@@ -4176,6 +4207,13 @@ s5e8825_thermal() {
     
     simple_bar
     kmsg1 "[*] THERMAL ZONE TWEAKED. "
+    simple_bar
+    
+    # Disable battery store mode
+    write "/sys/devices/platform/samsung_mobile_device/samsung_mobile_device:battery/power_supply/battery/store_mode" "0"
+    
+    simple_bar
+    kmsg1 "[*] BATTERY STORE MODE DISABLED. "
     simple_bar
     
     simple_bar
