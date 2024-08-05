@@ -3166,8 +3166,6 @@ s5e8825_gaming() {
     simple_bar
 
     init=$(date +%s)
-	
-    su -lp 2000 -c "cmd notification post -S bigtext -t 'Nightshade' 'Tag' 'Gaming mode activated on your Exynos 1280! Disable if it overheats or use a cooler.'" > /dev/null
 	am start -a android.intent.action.MAIN -e toasttext "Gaming profile was successfully applied!" -n bellavita.toast/.MainActivity
 }
 
