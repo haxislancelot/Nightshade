@@ -1198,30 +1198,16 @@ s5e8825_balanced() {
 	while [ $cpu -lt $cpu_cores ]; do
 		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
 		if [ -d "$cpu_dir" ]; then
-			write "${cpu_dir}/cpufreq/scaling_governor" "$default_cpu_gov"
+			write "${cpu_dir}/cpufreq/scaling_governor" "schedutil"
 		fi
 		cpu="$((cpu + 1))"
 	done
 	
-    if [ "$default_cpu_gov" = "schedutil" ]; then
-        for cpu in /sys/devices/system/cpu/cpu*/cpufreq/; do
-            write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BATTERY / 1000))"
-        done
-    elif [ "$default_cpu_gov" = "ondemand" ]; then
-        for cpu in /sys/devices/system/cpu/cpu*/cpufreq/; do
-            write "${cpu}ondemand/io_is_busy" "1"
-	        write "${cpu}ondemand/sampling_rate" "8000"
-	        write "${cpu}ondemand/up_threshold" "75"
-        done
-    else
-        kmsg1 "Invalid or undefined default_cpu_gov value."
-    fi
-    
-    for cpu in /sys/devices/system/cpu/cpu*
+    for cpu in /sys/devices/system/cpu/cpu*/cpufreq/
     do
-	    write "$cpu/online" "1"
+	write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BATTERY / 1000))"
     done
-	
+    
 	# CPUStune
     
 	# CPU Load settings
@@ -1262,22 +1248,38 @@ s5e8825_balanced() {
     simple_bar
     
     # Set min and max clocks.
-    for minclk in /sys/devices/system/cpu/cpufreq/policy*/
+    for minclk in /sys/devices/system/cpu/cpufreq/policy0/
     do
 	    if [[ -e "${minclk}scaling_min_freq" ]]; then
-		    write "${minclk}scaling_min_freq" "100000"
-		    write "${minclk}scaling_max_freq" "$cpumxfreq"
+		    write "${minclk}scaling_min_freq" "533000"
+		    write "${minclk}scaling_max_freq" "2002000"
 	    fi
     done
-
-    for mnclk in /sys/devices/system/cpu/cpu*/cpufreq/
+    
+    for minclk in /sys/devices/system/cpu/cpufreq/policy6/
     do
-	    if [[ -e "${mnclk}scaling_min_freq" ]]; then
-		    write "${mnclk}scaling_min_freq" "100000"
-		    write "${mnclk}scaling_max_freq" "$cpumxfreq"
+	    if [[ -e "${minclk}scaling_min_freq" ]]; then
+		    write "${minclk}scaling_min_freq" "533000"
+		    write "${minclk}scaling_max_freq" "2400000"
 	    fi
     done
 
+    for mnclk in /sys/devices/system/cpu/cpu{0..5}/cpufreq/
+    do
+      if [[ -e "${mnclk}scaling_min_freq" ]]; then
+        write "${mnclk}scaling_min_freq" "533000"
+        write "${mnclk}scaling_max_freq" "2002000"
+      fi
+    done
+
+    for mnclk in /sys/devices/system/cpu/cpu{6..7}/cpufreq/
+    do
+      if [[ -e "${mnclk}scaling_min_freq" ]]; then
+        write "${mnclk}scaling_min_freq" "533000"
+        write "${mnclk}scaling_max_freq" "2400000"
+      fi
+    done
+    
     simple_bar
     kmsg1 "[*] SET MIN AND MAX CPU CLOCKS. "
     simple_bar
