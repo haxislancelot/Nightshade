@@ -1212,7 +1212,7 @@ s5e8825_balanced() {
     
 	# CPU Load settings
 	write "/dev/cpuset/foreground/cpus" "0-4" #
-	write "/dev/cpuset/background/cpus" "0-3" #
+	write "/dev/cpuset/background/cpus" "0-1" # 0-3 default
 	write "/dev/cpuset/system-background/cpus" "0-3"
 	write "/dev/cpuset/top-app/cpus" "0-7" #
 	write "/dev/cpuset/restricted/cpus" "0-7" #
