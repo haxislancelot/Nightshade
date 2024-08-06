@@ -2939,7 +2939,7 @@ s5e8825_gaming() {
             "com.nihil.nightshade" | "com.termux" | "bellavita.toast")
                 continue ;;
             *)
-                am force-stop "$pkg_nm" ;;
+                #am force-stop "$pkg_nm" ;;
         esac
     done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[ * ] Cleaned background apps. "
 
@@ -3072,7 +3072,7 @@ s5e8825_gaming() {
     for mnclk in /sys/devices/system/cpu/cpu{0..5}/cpufreq/
     do
       if [[ -e "${mnclk}scaling_min_freq" ]]; then
-        write "${mnclk}scaling_min_freq" "533000"
+        write "${mnclk}scaling_min_freq" "2002000"
         write "${mnclk}scaling_max_freq" "2002000"
       fi
     done
@@ -3080,7 +3080,7 @@ s5e8825_gaming() {
     for mnclk in /sys/devices/system/cpu/cpu{6..7}/cpufreq/
     do
       if [[ -e "${mnclk}scaling_min_freq" ]]; then
-        write "${mnclk}scaling_min_freq" "533000"
+        write "${mnclk}scaling_min_freq" "2400000"
         write "${mnclk}scaling_max_freq" "2400000"
       fi
     done
