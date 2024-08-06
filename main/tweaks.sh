@@ -3053,20 +3053,36 @@ s5e8825_gaming() {
     simple_bar
     
     # Set min and max clocks.
-    for minclk in /sys/devices/system/cpu/cpufreq/policy*/
+    for minclk in /sys/devices/system/cpu/cpufreq/policy0/
     do
 	    if [[ -e "${minclk}scaling_min_freq" ]]; then
-		    write "${minclk}scaling_min_freq" "$cpumxfreq"
-		    write "${minclk}scaling_max_freq" "$cpumxfreq"
+		    write "${minclk}scaling_min_freq" "2002000"
+		    write "${minclk}scaling_max_freq" "2002000"
+	    fi
+    done
+    
+    for minclk in /sys/devices/system/cpu/cpufreq/policy6/
+    do
+	    if [[ -e "${minclk}scaling_min_freq" ]]; then
+		    write "${minclk}scaling_min_freq" "2400000"
+		    write "${minclk}scaling_max_freq" "2400000"
 	    fi
     done
 
-    for mnclk in /sys/devices/system/cpu/cpu*/cpufreq/
+    for mnclk in /sys/devices/system/cpu/cpu{0..5}/cpufreq/
     do
-	    if [[ -e "${mnclk}scaling_min_freq" ]]; then
-		    write "${mnclk}scaling_min_freq" "$cpumxfreq"
-		    write "${mnclk}scaling_max_freq" "$cpumxfreq"
-	    fi
+      if [[ -e "${mnclk}scaling_min_freq" ]]; then
+        write "${mnclk}scaling_min_freq" "533000"
+        write "${mnclk}scaling_max_freq" "2002000"
+      fi
+    done
+
+    for mnclk in /sys/devices/system/cpu/cpu{6..7}/cpufreq/
+    do
+      if [[ -e "${mnclk}scaling_min_freq" ]]; then
+        write "${mnclk}scaling_min_freq" "533000"
+        write "${mnclk}scaling_max_freq" "2400000"
+      fi
     done
 
     simple_bar
