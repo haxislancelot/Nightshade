@@ -1336,6 +1336,7 @@ s5e8825_balanced() {
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
     write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
     write "$mali/highspeed_load" "100" # Experimental
+    write "$mali/highspeed_delay" "0" # Experimental
     write "$mali/highspeed_clock" "897000" # Experimental
     write "/sys/kernel/gpu/gpu_min_clock" "897000" # Experimental
     chmod 0644 > "$mali/dvfs"
@@ -3137,11 +3138,12 @@ s5e8825_gaming() {
     
     for mali in /sys/devices/platform/*.mali
     do
-    write "$mali/power_policy" "coarse_demand"
+    write "$mali/power_policy" "always_on" # default coarse_demand
     write "$mali/dvfs_governor" "4"
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
     write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
-    write "$mali/highspeed_load" "100" # Experimental
+    write "$mali/highspeed_load" "80" # Experimental
+    write "$mali/highspeed_delay" "3" # Experimental
     write "$mali/highspeed_clock" "897000" # Experimental
     write "/sys/kernel/gpu/gpu_min_clock" "897000" # Experimental
     chmod 0644 > "$mali/dvfs"
@@ -4207,6 +4209,7 @@ s5e8825_thermal() {
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
     write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
     write "$mali/highspeed_load" "100" # Experimental
+    write "$mali/highspeed_delay" "0" # Experimental
     write "$mali/highspeed_clock" "897000" # Experimental
     write "/sys/kernel/gpu/gpu_min_clock" "897000" # Experimental
     chmod 0644 > "$mali/dvfs"
