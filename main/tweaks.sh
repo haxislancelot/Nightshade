@@ -446,24 +446,24 @@ s5e8825_battery() {
     write "/proc/sys/fs/lease-break-time" "20"
 	write "/proc/sys/fs/leases-enable" "1"
 	write "/proc/sys/fs/aio-max-nr" "131072"
-    
+	
 	simple_bar
     kmsg1 "[*] FS TWEAKED. "
     simple_bar
 	
     # Tweak some kernel settings to improve overall performance.
-    write "/proc/sys/kernel/sched_child_runs_first" "0"
-    write "/proc/sys/kernel/perf_cpu_time_max_percent" "15"
-    write "/proc/sys/kernel/random/write_wakeup_threshold" "256"
+    write "/proc/sys/kernel/sched_child_runs_first" "1"
+    write "/proc/sys/kernel/perf_cpu_time_max_percent" "10"
+    write "/proc/sys/kernel/random/write_wakeup_threshold" "128"
     write "/proc/sys/kernel/random/urandom_min_reseed_secs" "90"
     write "/proc/sys/kernel/sched_tunable_scaling" "0"
     write "/proc/sys/kernel/sched_latency_ns" "$SCHED_PERIOD_BALANCE"
     write "/proc/sys/kernel/sched_min_granularity_ns" "$((SCHED_PERIOD_BALANCE / SCHED_TASKS_BALANCE))"
     write "/proc/sys/kernel/sched_wakeup_granularity_ns" "$((SCHED_PERIOD_BALANCE / 2))"
     write "/proc/sys/kernel/sched_migration_cost_ns" "5000000"
-    write "/proc/sys/kernel/sched_nr_migrate" "32"
+    write "/proc/sys/kernel/sched_nr_migrate" "8"
     write "/proc/sys/kernel/printk_devkmsg" "off"
-
+    
     simple_bar
     kmsg1 "[*] TWEAKED KERNEL SETTINGS. "
     simple_bar
@@ -507,16 +507,16 @@ s5e8825_battery() {
     
     # VM settings to improve overall user experience and smoothness.
     write "/proc/sys/vm/drop_caches" "3"
-    write "/proc/sys/vm/dirty_background_ratio" "10"
-    write "/proc/sys/vm/dirty_ratio" "30"
-    write "/proc/sys/vm/dirty_expire_centisecs" "1000"
+    write "/proc/sys/vm/dirty_background_ratio" "5"
+    write "/proc/sys/vm/dirty_ratio" "50"
+    write "/proc/sys/vm/dirty_expire_centisecs" "3000"
     write "/proc/sys/vm/dirty_writeback_centisecs" "3000"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60"
     write "/proc/sys/vm/swappiness" "100"
     write "/proc/sys/vm/laptop_mode" "0"
     write "/proc/sys/vm/vfs_cache_pressure" "50"
-
+    
     simple_bar
     kmsg1 "[*] APPLIED VM TWEAKS."
     simple_bar
@@ -541,8 +541,8 @@ s5e8825_battery() {
       write "${queue}add_random" "0"
       write "${queue}iostats" "0"
       write "${queue}read_ahead_kb" "128"
-      write "${queue}nomerges" "2"
-      write "${queue}rq_affinity" "1"
+      write "${queue}nomerges" "0"
+      write "${queue}rq_affinity" "0"
       write "${queue}nr_requests" "64"
     done
     
@@ -1037,7 +1037,6 @@ simple_bar
 kmsg1 "[*] TWEAKED I/O SCHEDULER. "
 simple_bar
 
-
 # CPU Tweaks
 for cpu in /sys/devices/system/cpu/cpu*/cpufreq/
 do
@@ -1068,7 +1067,6 @@ do
 		write "${cpu}interactive/hispeed_freq" "$cpumfreq"
 	fi
 done
-
 
 simple_bar
 kmsg1 "[*] TWEAKED CPU. "
