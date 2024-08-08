@@ -419,7 +419,7 @@ s5e8825_battery() {
 	while [ $cpu -lt $cpu_cores ]; do
 		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
 		if [ -d "$cpu_dir" ]; then
-			write "${cpu_dir}/cpufreq/scaling_governor" "schedutil"
+			write "${cpu_dir}/cpufreq/scaling_governor" "conservative"
 		fi
 		cpu="$((cpu + 1))"
 	done
@@ -553,13 +553,13 @@ s5e8825_battery() {
     for mali in /sys/devices/platform/*.mali
     do
     write "$mali/power_policy" "coarse_demand"
-    write "$mali/dvfs_governor" "1"
+    write "$mali/dvfs_governor" "2"
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
     write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
-    write "$mali/highspeed_load" "100" # Experimental
-    write "$mali/highspeed_delay" "0" # Experimental
-    write "$mali/highspeed_clock" "897000" # Experimental
-    write "/sys/kernel/gpu/gpu_min_clock" "897000" # Experimental
+    write "$mali/highspeed_load" "80"
+    write "$mali/highspeed_delay" "3"
+    write "$mali/highspeed_clock" "507000"
+    write "/sys/kernel/gpu/gpu_min_clock" "104000"
     chmod 0644 > "$mali/dvfs"
     done
     
@@ -3387,13 +3387,13 @@ s5e8825_gaming() {
     for mali in /sys/devices/platform/*.mali
     do
     write "$mali/power_policy" "always_on" # default coarse_demand
-    write "$mali/dvfs_governor" "2"
+    write "$mali/dvfs_governor" "4" # default 2
     write "$mali/tmu" "0" # Thermal Management Until for thermal monitoring and control 
     write "$mali/dvfs" "0" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
-    write "$mali/highspeed_load" "80" # Experimental
-    write "$mali/highspeed_delay" "3" # Experimental
-    write "$mali/highspeed_clock" "897000" # Experimental
-    write "/sys/kernel/gpu/gpu_min_clock" "897000" # Experimental
+    write "$mali/highspeed_load" "80"
+    write "$mali/highspeed_delay" "3"
+    write "$mali/highspeed_clock" "897000"
+    write "/sys/kernel/gpu/gpu_min_clock" "897000"
     chmod 0000 > "$mali/dvfs"
     done
     
