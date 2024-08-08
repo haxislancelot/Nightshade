@@ -553,7 +553,7 @@ s5e8825_battery() {
     for mali in /sys/devices/platform/*.mali
     do
     write "$mali/power_policy" "coarse_demand"
-    write "$mali/dvfs_governor" "2"
+    write "$mali/dvfs_governor" "3" # Static
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
     write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
     write "$mali/highspeed_load" "80"
@@ -1580,7 +1580,7 @@ s5e8825_balanced() {
     for mali in /sys/devices/platform/*.mali
     do
     write "$mali/power_policy" "coarse_demand"
-    write "$mali/dvfs_governor" "1"
+    write "$mali/dvfs_governor" "5" # Dynamic
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
     write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
     write "$mali/highspeed_load" "100" # Experimental
@@ -3387,7 +3387,7 @@ s5e8825_gaming() {
     for mali in /sys/devices/platform/*.mali
     do
     write "$mali/power_policy" "always_on" # default coarse_demand
-    write "$mali/dvfs_governor" "4" # default 2
+    write "$mali/dvfs_governor" "4" # Booster
     write "$mali/tmu" "0" # Thermal Management Until for thermal monitoring and control 
     write "$mali/dvfs" "0" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
     write "$mali/highspeed_load" "80"
@@ -4453,7 +4453,7 @@ s5e8825_thermal() {
     for mali in /sys/devices/platform/*.mali
     do
     write "$mali/power_policy" "coarse_demand"
-    write "$mali/dvfs_governor" "1"
+    write "$mali/dvfs_governor" "2" # Joint
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
     write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
     write "$mali/highspeed_load" "100" # Experimental
