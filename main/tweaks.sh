@@ -1583,10 +1583,10 @@ s5e8825_balanced() {
     write "$mali/dvfs_governor" "5" # Dynamic
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
     write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
-    write "$mali/highspeed_load" "100" # Experimental
-    write "$mali/highspeed_delay" "0" # Experimental
-    write "$mali/highspeed_clock" "897000" # Experimental
-    write "/sys/kernel/gpu/gpu_min_clock" "897000" # Experimental
+    write "$mali/highspeed_load" "80"
+    write "$mali/highspeed_delay" "3"
+    write "$mali/highspeed_clock" "897000"
+    write "/sys/kernel/gpu/gpu_min_clock" "104000"
     chmod 0644 > "$mali/dvfs"
     done
     
