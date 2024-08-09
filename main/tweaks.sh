@@ -916,7 +916,7 @@ fi
 
 if [[ $chipset == *s5e8825* ]]; then
     kmsg1 "[ ! ] Device is Exynos 1280, executing s5e8825_battery..."
-    settings delete global device_idle_constants
+    settings put global device_idle_constants inactive_to=60000,sensing_to=0,locating_to=0,location_accuracy=2000,motion_inactive_to=0,idle_after_inactive_to=0,idle_pending_to=60000,max_idle_pending_to=120000,idle_pending_factor=2.0,idle_to=900000,max_idle_to=21600000,idle_factor=2.0,max_temp_app_whitelist_duration=60000,mms_temp_app_whitelist_duration=30000,sms_temp_app_whitelist_duration=20000,light_after_inactive_to=10000,light_pre_idle_to=60000,light_idle_to=180000,light_idle_factor=2.0,light_max_idle_to=900000,light_idle_maintenance_min_budget=30000,light_idle_maintenance_max_budget=60000
     s5e8825_battery
     exit
 fi
@@ -2403,7 +2403,250 @@ simple_bar
 init=$(date +%s)
 }
 
-# Mediatek Performance Profile
+# Performance Profile
+s5e8825_performance() {
+	init=$(date +%s)
+	kmsg1 "----------------------- Info -----------------------"
+    kmsg1 "[ * ] Date of execution: $(date) "
+    kmsg1 "[ * ] Nightshade's version: $nightshade "
+    kmsg1 "[ * ] Kernel: $(uname -a) "
+    kmsg1 "[ * ] SOC: $mf, $soc "
+    kmsg1 "[ * ] SDK: $sdk "
+    kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
+    kmsg1 "[ * ] CPU aarch: $aarch "
+    kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
+    kmsg1 "[ * ] GPU model: $GPU_MODEL "
+    kmsg1 "[ * ] Android version: $arv "
+    kmsg1 "[ * ] Device: $dm  "
+    kmsg1 "[ * ] Battery charge level: $percentage% "
+    kmsg1 "[ * ] Battery temperature: $temperature°C "
+    kmsg1 "[ * ] Device total RAM: $totalram MB "
+    kmsg1 "[ * ] RAM usage: $used_percentage% "
+    kmsg1 "-------------------------------------------------------"
+    simple_bar
+    kmsg1 "[*] ENABLING $ntsh_profile PROFILE... "
+    simple_bar
+    
+    renice -n -5 $(pgrep system_server)
+    renice -n -5 $(pgrep com.miui.home)
+    renice -n -5 $(pgrep launcher)
+    renice -n -5 $(pgrep lawnchair)
+    renice -n -5 $(pgrep home)
+    renice -n -5 $(pgrep watchapp)
+    renice -n -5 $(pgrep trebuchet)
+    renice -n -1 $(pgrep dialer)
+    renice -n -1 $(pgrep keyboard)
+    renice -n -1 $(pgrep inputmethod)
+    renice -n -9 $(pgrep fluid)
+    renice -n -10 $(pgrep composer)
+    renice -n -1 $(pgrep com.android.phone)
+    renice -n -10 $(pgrep surfaceflinger)
+    renice -n 1 $(pgrep kswapd0)
+    renice -n 1 $(pgrep ksmd)
+    renice -n -6 $(pgrep msm_irqbalance)
+    renice -n -9 $(pgrep kgsl_worker)
+    renice -n 6 $(pgrep android.gms)    
+
+    simple_bar
+    kmsg1 "[*] RENICED PROCESSES. "
+    simple_bar
+    
+    # Disable logd and statsd to reduce overhead.
+    stop logd
+    stop statsd
+
+    simple_bar
+    kmsg1 "[*] DISABLED STATSD AND LOGD. "
+    simple_bar
+    
+    # CPU tweaks
+	cpu="0"
+	while [ $cpu -lt $cpu_cores ]; do
+		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
+		if [ -d "$cpu_dir" ]; then
+			write "${cpu_dir}/cpufreq/scaling_governor" "performance"
+		fi
+		cpu="$((cpu + 1))"
+	done
+    
+    for cpu in /sys/devices/system/cpu/cpu*
+    do
+	    write "$cpu/online" "1"
+    done
+    
+    # CPUStune
+    
+	# CPU Load settings
+	write "/dev/cpuset/foreground/cpus" "0-7"
+	write "/dev/cpuset/background/cpus" "0-3"
+	write "/dev/cpuset/system-background/cpus" "0-3"
+	write "/dev/cpuset/top-app/cpus" "0-7"
+	write "/dev/cpuset/restricted/cpus" "0-7"
+	
+	simple_bar
+    kmsg1 "[*] CPU TWEAKED. "
+    simple_bar
+	
+    # FS Tweaks
+    write "/proc/sys/fs/lease-break-time" "20"
+	write "/proc/sys/fs/leases-enable" "1"
+    write "/proc/sys/fs/aio-max-nr" "131072"
+	
+	simple_bar
+    kmsg1 "[*] FS TWEAKED. "
+    simple_bar
+	
+    # Tweak some kernel settings to improve overall performance.
+    write "/proc/sys/kernel/sched_child_runs_first" "0"
+    write "/proc/sys/kernel/perf_cpu_time_max_percent" "25"
+    write "/proc/sys/kernel/random/write_wakeup_threshold" "1024"
+    write "/proc/sys/kernel/random/urandom_min_reseed_secs" "90"
+    write "/proc/sys/kernel/sched_tunable_scaling" "0"
+    write "/proc/sys/kernel/sched_latency_ns" "$SCHED_PERIOD_BALANCE"
+    write "/proc/sys/kernel/sched_min_granularity_ns" "$((SCHED_PERIOD_BALANCE / SCHED_TASKS_BALANCE))"
+    write "/proc/sys/kernel/sched_wakeup_granularity_ns" "$((SCHED_PERIOD_BALANCE / 2))"
+    write "/proc/sys/kernel/sched_migration_cost_ns" "5000000"
+    write "/proc/sys/kernel/sched_nr_migrate" "128"
+    write "/proc/sys/kernel/printk_devkmsg" "off"
+
+    simple_bar
+    kmsg1 "[*] TWEAKED KERNEL SETTINGS. "
+    simple_bar
+    
+    # Set min and max clocks.
+    for minclk in /sys/devices/system/cpu/cpufreq/policy0/
+    do
+	    if [[ -e "${minclk}scaling_min_freq" ]]; then
+		    write "${minclk}scaling_min_freq" "2002000"
+		    write "${minclk}scaling_max_freq" "2002000"
+	    fi
+    done
+    
+    for minclk in /sys/devices/system/cpu/cpufreq/policy6/
+    do
+	    if [[ -e "${minclk}scaling_min_freq" ]]; then
+		    write "${minclk}scaling_min_freq" "2400000"
+		    write "${minclk}scaling_max_freq" "2400000"
+	    fi
+    done
+
+    for mnclk in /sys/devices/system/cpu/cpu{0..5}/cpufreq/
+    do
+      if [[ -e "${mnclk}scaling_min_freq" ]]; then
+        write "${mnclk}scaling_min_freq" "2002000"
+        write "${mnclk}scaling_max_freq" "2002000"
+      fi
+    done
+
+    for mnclk in /sys/devices/system/cpu/cpu{6..7}/cpufreq/
+    do
+      if [[ -e "${mnclk}scaling_min_freq" ]]; then
+        write "${mnclk}scaling_min_freq" "2400000"
+        write "${mnclk}scaling_max_freq" "2400000"
+      fi
+    done
+
+    simple_bar
+    kmsg1 "[*] SET MIN AND MAX CPU CLOCKS. "
+    simple_bar
+    
+    # VM settings to improve overall user experience and smoothness.
+    write "/proc/sys/vm/drop_caches" "3"
+    write "/proc/sys/vm/dirty_background_ratio" "5"
+    write "/proc/sys/vm/dirty_ratio" "20"
+    write "/proc/sys/vm/dirty_expire_centisecs" "500"
+    write "/proc/sys/vm/dirty_writeback_centisecs" "3000"
+    write "/proc/sys/vm/page-cluster" "0"
+    write "/proc/sys/vm/stat_interval" "60"
+    write "/proc/sys/vm/swappiness" "100"
+    write "/proc/sys/vm/laptop_mode" "0"
+    write "/proc/sys/vm/vfs_cache_pressure" "200"
+
+    simple_bar
+    kmsg1 "[*] APPLIED VM TWEAKS."
+    simple_bar
+    
+    # Disable power efficient workqueue.
+    if [[ -e "/sys/module/workqueue/parameters/power_efficient" ]]; then
+	    write "/sys/module/workqueue/parameters/power_efficient" "N"
+	    simple_bar
+	    kmsg1 "[*] DISABLED POWER EFFICIENT WORKQUEUE. "
+	    simple_bar
+    fi
+    
+    # I/O Scheduler
+    write "/sys/block/sda/queue/scheduler" "mq-deadline"
+    write "/sys/block/sdb/queue/scheduler" "mq-deadline"
+    write "/sys/block/sdc/queue/scheduler" "mq-deadline"
+	write "/sys/block/sdd/queue/scheduler" "mq-deadline"
+    write "/sys/block/sde/queue/scheduler" "mq-deadline"
+	
+    # I/O Scheduler Tweaks.
+    for queue in /sys/block/sd{a,b,c,d,e}/queue/
+    do
+      write "${queue}add_random" "0"
+      write "${queue}iostats" "0"
+      write "${queue}read_ahead_kb" "512"
+      write "${queue}nomerges" "2"
+      write "${queue}rq_affinity" "2"
+      write "${queue}nr_requests" "256"
+    done
+    
+    simple_bar
+    kmsg1 "[*] I/O SCHEDULER TWEAKED. "
+    simple_bar
+    
+    for mali in /sys/devices/platform/*.mali
+    do
+    write "$mali/power_policy" "always_on" # default coarse_demand
+    write "$mali/dvfs_governor" "4" # Booster
+    write "$mali/tmu" "0" # Thermal Management Until for thermal monitoring and control 
+    write "$mali/dvfs" "0" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
+    write "$mali/highspeed_load" "80"
+    write "$mali/highspeed_delay" "3"
+    write "$mali/highspeed_clock" "897000"
+    write "/sys/kernel/gpu/gpu_min_clock" "897000"
+    chmod 0000 > "$mali/dvfs"
+    done
+    
+    simple_bar
+    kmsg1 "[*] GPU TWEAKED. "
+    simple_bar
+    
+    # Thermal zone tweaks (Qualcomm Snapdragon 665 Thermal)
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "95000"
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "115000"
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "145000"
+    
+    simple_bar
+    kmsg1 "[*] THERMAL ZONE TWEAKED. "
+    simple_bar
+    
+    # Enable battery store mode
+    write "/sys/devices/platform/samsung_mobile_device/samsung_mobile_device:battery/power_supply/battery/store_mode" "1"
+    
+    simple_bar
+    kmsg1 "[*] BATTERY STORE MODE ENABLED. "
+    simple_bar
+    
+    simple_bar
+    kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
+    simple_bar
+
+    simple_bar
+    kmsg1 "[*] END OF EXECUTION: $(date)"
+    simple_bar
+    exit=$(date +%s)
+
+    exectime=$((exit - init))
+    simple_bar
+    kmsg1 "[*] EXECUTION DONE IN $exectime SECONDS. "
+    simple_bar
+
+    init=$(date +%s)
+	am start -a android.intent.action.MAIN -e toasttext "Performance profile was successfully applied!" -n bellavita.toast/.MainActivity
+}
+
 mtk_perf() {
 	init=$(date +%s)
 	kmsg1 "----------------------- Info -----------------------"
@@ -2692,7 +2935,6 @@ mtk_perf() {
 	am start -a android.intent.action.MAIN -e toasttext "Performance profile was successfully applied!" -n bellavita.toast/.MainActivity
 }
 
-# Performance Profile
 performance() {
 init=$(date +%s)     
 
@@ -2707,6 +2949,13 @@ if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
     exit
 else
     kmsg1 "[ * ] Device is not Mediatek, continuing script..."
+fi
+
+if [[ $chipset == *s5e8825* ]]; then
+    kmsg1 "[ ! ] Device is Exynos 1280, executing s5e8825_performance..."
+    settings delete global device_idle_constants
+    s5e8825_performance
+    exit
 fi
 
 kmsg1 "----------------------- Info -----------------------"
