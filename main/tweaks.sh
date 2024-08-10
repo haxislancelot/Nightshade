@@ -2613,10 +2613,10 @@ s5e8825_performance() {
     kmsg1 "[*] GPU TWEAKED. "
     simple_bar
     
-    # Thermal zone tweaks (Qualcomm Snapdragon 665 Thermal)
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "95000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "115000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "145000"
+    # Thermal zone tweaks
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "145000"
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "150000"
+    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "160000"
     
     simple_bar
     kmsg1 "[*] THERMAL ZONE TWEAKED. "
