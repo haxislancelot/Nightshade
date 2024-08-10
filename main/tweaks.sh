@@ -513,7 +513,7 @@ s5e8825_battery() {
     write "/proc/sys/vm/dirty_writeback_centisecs" "3000"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60"
-    write "/proc/sys/vm/swappiness" "100"
+    write "/proc/sys/vm/swappiness" "130"
     write "/proc/sys/vm/laptop_mode" "0"
     write "/proc/sys/vm/vfs_cache_pressure" "50"
     
@@ -1540,7 +1540,7 @@ s5e8825_balanced() {
     write "/proc/sys/vm/dirty_writeback_centisecs" "3000"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60"
-    write "/proc/sys/vm/swappiness" "100"
+    write "/proc/sys/vm/swappiness" "130"
     write "/proc/sys/vm/laptop_mode" "0"
     write "/proc/sys/vm/vfs_cache_pressure" "50"
 
@@ -2558,7 +2558,7 @@ s5e8825_performance() {
     write "/proc/sys/vm/dirty_writeback_centisecs" "3000"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60"
-    write "/proc/sys/vm/swappiness" "100"
+    write "/proc/sys/vm/swappiness" "130"
     write "/proc/sys/vm/laptop_mode" "0"
     write "/proc/sys/vm/vfs_cache_pressure" "80"
 
@@ -3595,7 +3595,7 @@ s5e8825_gaming() {
     write "/proc/sys/vm/dirty_writeback_centisecs" "3000"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60"
-    write "/proc/sys/vm/swappiness" "100"
+    write "/proc/sys/vm/swappiness" "130"
     write "/proc/sys/vm/laptop_mode" "0"
     write "/proc/sys/vm/vfs_cache_pressure" "200"
 
@@ -4662,7 +4662,7 @@ s5e8825_thermal() {
     write "/proc/sys/vm/dirty_writeback_centisecs" "3000"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60"
-    write "/proc/sys/vm/swappiness" "100"
+    write "/proc/sys/vm/swappiness" "130"
     write "/proc/sys/vm/laptop_mode" "0"
     write "/proc/sys/vm/vfs_cache_pressure" "50"
 
