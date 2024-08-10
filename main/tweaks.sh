@@ -2599,8 +2599,8 @@ s5e8825_performance() {
     for mali in /sys/devices/platform/*.mali
     do
     write "$mali/power_policy" "always_on" # default coarse_demand
-    write "$mali/dvfs_governor" "3" # default 4 (Booster)
-    write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
+    write "$mali/dvfs_governor" "4" # default 3 (Static)
+    write "$mali/tmu" "0" # Thermal Management Until for thermal monitoring and control 
     write "$mali/dvfs" "0" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
     write "$mali/highspeed_load" "80"
     write "$mali/highspeed_delay" "3"
