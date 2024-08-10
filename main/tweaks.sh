@@ -567,22 +567,6 @@ s5e8825_battery() {
     kmsg1 "[*] GPU TWEAKED. "
     simple_bar
     
-    # Thermal zone tweaks (Qualcomm Snapdragon 665 Thermal)
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "20000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "75000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "85000"
-    
-    simple_bar
-    kmsg1 "[*] THERMAL ZONE TWEAKED. "
-    simple_bar
-    
-    # Disable battery store mode
-    write "/sys/devices/platform/samsung_mobile_device/samsung_mobile_device:battery/power_supply/battery/store_mode" "0"
-    
-    simple_bar
-    kmsg1 "[*] BATTERY STORE MODE DISABLED. "
-    simple_bar
-    
     simple_bar
     kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
     simple_bar
@@ -1594,22 +1578,6 @@ s5e8825_balanced() {
     kmsg1 "[*] GPU TWEAKED. "
     simple_bar
     
-    # Thermal zone tweaks (Qualcomm Snapdragon 665 Thermal)
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "20000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "75000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "85000"
-    
-    simple_bar
-    kmsg1 "[*] THERMAL ZONE TWEAKED. "
-    simple_bar
-    
-    # Disable battery store mode
-    write "/sys/devices/platform/samsung_mobile_device/samsung_mobile_device:battery/power_supply/battery/store_mode" "0"
-    
-    simple_bar
-    kmsg1 "[*] BATTERY STORE MODE DISABLED. "
-    simple_bar
-    
     simple_bar
     kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
     simple_bar
@@ -2613,22 +2581,6 @@ s5e8825_performance() {
     kmsg1 "[*] GPU TWEAKED. "
     simple_bar
     
-    # Thermal zone tweaks
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "145000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "150000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "160000"
-    
-    simple_bar
-    kmsg1 "[*] THERMAL ZONE TWEAKED. "
-    simple_bar
-    
-    # Enable battery store mode
-    write "/sys/devices/platform/samsung_mobile_device/samsung_mobile_device:battery/power_supply/battery/store_mode" "0"
-    
-    simple_bar
-    kmsg1 "[*] BATTERY STORE MODE DISABLED. "
-    simple_bar
-    
     simple_bar
     kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
     simple_bar
@@ -3504,8 +3456,8 @@ s5e8825_gaming() {
 			write "${cpu_dir}/cpufreq/scaling_governor" "userspace"
 		fi
 		cpu="$((cpu + 1))"
-	done
-    
+	done	    
+	
     for cpu in /sys/devices/system/cpu/cpu*
     do
 	    write "$cpu/online" "1"
@@ -3520,6 +3472,27 @@ s5e8825_gaming() {
 	write "/dev/cpuset/top-app/cpus" "0-7" #
 	write "/dev/cpuset/restricted/cpus" "0-7" #
     
+	# CPU Tweaks
+
+    # CPUHP (CPU Hotplug)
+    
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/debug" "0"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/enabled" "1"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/reqs" "0"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/set_online_cpu" "1"
+
+    # CPU Idle
+    write "/sys/devices/system/cpu/cpuidle/current_governor" "menu"
+    write "/sys/devices/system/cpu/cpuidle/current_driver" "psci_idle"
+
+    # CPU Power Management (CPUPM)
+    write "/sys/devices/system/cpu/cpupm/cpupm/sicd" "1" # don't disable
+    write "/sys/devices/system/cpu/cpupm/cpupm/dsupd" "0" # working
+    write "/sys/devices/system/cpu/cpupm/cpupm/cpd_cl1" "1" # don't disable
+    
+    # CPU Hotplug Control
+    write "/sys/devices/system/cpu/hotplug/states" "enabled"
+	
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
     simple_bar
@@ -3650,22 +3623,18 @@ s5e8825_gaming() {
     kmsg1 "[*] GPU TWEAKED. "
     simple_bar
     
-    # Thermal zone tweaks (Qualcomm Snapdragon 665 Thermal)
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "95000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "115000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "145000"
+    # Fix clock
+    sleep 1
+    write "/sys/devices/system/cpu/cpu6" "0"
+	write "/sys/devices/system/cpu/cpu7" "0"
+	sleep 1
+	write "/sys/devices/system/cpu/cpu6" "1"
+	write "/sys/devices/system/cpu/cpu7" "1"
     
+	simple_bar
+    kmsg1 "[*] CPU BIG CLOCK FIXED. "
     simple_bar
-    kmsg1 "[*] THERMAL ZONE TWEAKED. "
-    simple_bar
-    
-    # Enable battery store mode
-    write "/sys/devices/platform/samsung_mobile_device/samsung_mobile_device:battery/power_supply/battery/store_mode" "1"
-    
-    simple_bar
-    kmsg1 "[*] BATTERY STORE MODE ENABLED. "
-    simple_bar
-    
+	
     simple_bar
     kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
     simple_bar
@@ -4714,22 +4683,6 @@ s5e8825_thermal() {
     
     simple_bar
     kmsg1 "[*] GPU TWEAKED. "
-    simple_bar
-    
-    # Thermal zone tweaks.
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "40000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "45000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "50000"
-    
-    simple_bar
-    kmsg1 "[*] THERMAL ZONE TWEAKED. "
-    simple_bar
-    
-    # Disable battery store mode
-    write "/sys/devices/platform/samsung_mobile_device/samsung_mobile_device:battery/power_supply/battery/store_mode" "0"
-    
-    simple_bar
-    kmsg1 "[*] BATTERY STORE MODE DISABLED. "
     simple_bar
     
     simple_bar
