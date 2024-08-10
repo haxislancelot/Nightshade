@@ -2553,14 +2553,14 @@ s5e8825_performance() {
     # VM settings to improve overall user experience and smoothness.
     write "/proc/sys/vm/drop_caches" "3"
     write "/proc/sys/vm/dirty_background_ratio" "5"
-    write "/proc/sys/vm/dirty_ratio" "20"
+    write "/proc/sys/vm/dirty_ratio" "30"
     write "/proc/sys/vm/dirty_expire_centisecs" "500"
     write "/proc/sys/vm/dirty_writeback_centisecs" "3000"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60"
     write "/proc/sys/vm/swappiness" "100"
     write "/proc/sys/vm/laptop_mode" "0"
-    write "/proc/sys/vm/vfs_cache_pressure" "200"
+    write "/proc/sys/vm/vfs_cache_pressure" "80"
 
     simple_bar
     kmsg1 "[*] APPLIED VM TWEAKS."
@@ -2623,10 +2623,10 @@ s5e8825_performance() {
     simple_bar
     
     # Enable battery store mode
-    write "/sys/devices/platform/samsung_mobile_device/samsung_mobile_device:battery/power_supply/battery/store_mode" "1"
+    write "/sys/devices/platform/samsung_mobile_device/samsung_mobile_device:battery/power_supply/battery/store_mode" "0"
     
     simple_bar
-    kmsg1 "[*] BATTERY STORE MODE ENABLED. "
+    kmsg1 "[*] BATTERY STORE MODE DISABLED. "
     simple_bar
     
     simple_bar
