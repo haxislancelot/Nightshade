@@ -3542,7 +3542,7 @@ s5e8825_gaming() {
 	while [ $cpu -lt $cpu_cores ]; do
 		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
 		if [ -d "$cpu_dir" ]; then
-			write "${cpu_dir}/cpufreq/scaling_governor" "userspace"
+			write "${cpu_dir}/cpufreq/scaling_governor" "energy_aware"
 		fi
 		cpu="$((cpu + 1))"
 	done	    
@@ -3554,13 +3554,13 @@ s5e8825_gaming() {
     
     # CPUStune
     
-	# CPU Load settings
-	write "/dev/cpuset/foreground/cpus" "0-4" #
+	# CPU Load settings (From Mediatek)
+	write "/dev/cpuset/foreground/cpus" "0-7" # 0-4 default
 	write "/dev/cpuset/background/cpus" "0-1" # 0-3 default
-	write "/dev/cpuset/system-background/cpus" "0-3"
+	write "/dev/cpuset/system-background/cpus" "0-5" # 0-3 default
 	write "/dev/cpuset/top-app/cpus" "0-7" #
-	write "/dev/cpuset/restricted/cpus" "0-7" #
-    
+	write "/dev/cpuset/restricted/cpus" "0" # default 0-7
+	
 	# CPU Tweaks
 
     # CPUHP (CPU Hotplug)
@@ -3719,14 +3719,24 @@ s5e8825_gaming() {
     
     # Fix clock
     sleep 1
+    write "/sys/devices/system/cpu/cpu1/online" "0"
+    write "/sys/devices/system/cpu/cpu2/online" "0"
+    write "/sys/devices/system/cpu/cpu3/online" "0"
+    write "/sys/devices/system/cpu/cpu4/online" "0"
+    write "/sys/devices/system/cpu/cpu5/online" "0"
     write "/sys/devices/system/cpu/cpu6/online" "0"
 	write "/sys/devices/system/cpu/cpu7/online" "0"
 	sleep 1
-	write "/sys/devices/system/cpu/cpu6/online" "1"
+	write "/sys/devices/system/cpu/cpu1/online" "1"
+    write "/sys/devices/system/cpu/cpu2/online" "1"
+    write "/sys/devices/system/cpu/cpu3/online" "1"
+    write "/sys/devices/system/cpu/cpu4/online" "1"
+    write "/sys/devices/system/cpu/cpu5/online" "1"
+    write "/sys/devices/system/cpu/cpu6/online" "1"
 	write "/sys/devices/system/cpu/cpu7/online" "1"
     
 	simple_bar
-    kmsg1 "[*] CPU BIG CLOCK FIXED. "
+    kmsg1 "[*] CPU CLOCK FIXED. "
     simple_bar
 	
     simple_bar
