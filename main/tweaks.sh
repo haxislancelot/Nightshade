@@ -3702,16 +3702,19 @@ s5e8825_gaming() {
     write "$mali/tmu" "0" # Thermal Management Until for thermal monitoring and control 
     chmod 0644 /sys/devices/platform/10300000.mali/dvfs
     write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
-    write "$mali/highspeed_load" "80"
-    write "$mali/highspeed_delay" "3"
+    write "$mali/highspeed_load" "30" # default 80
+    write "$mali/highspeed_delay" "0" # default 3
     write "$mali/highspeed_clock" "897000"
     write "$mali/dvfs_max_lock" "897000"
-    write "$mali/dvfs_min_lock" "897000"
+    write "$mali/dvfs_min_lock" "507000"
     write "$mali/js_scheduling_period" "100" # Experimental
     write "$mali/js_timeouts" "705 705 4935 4935 1499535 4935 4935 1501650" # Experimental 
     write "$mali/lp_mem_pool_size" "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" # Experimental
     chmod 0644 > "$mali/dvfs"
     done
+    
+    write "/sys/kernel/gpu/gpu_max_clock" "897000"
+    write "/sys/kernel/gpu/gpu_min_clock" "507000"
     
     simple_bar
     kmsg1 "[*] GPU TWEAKED. "
