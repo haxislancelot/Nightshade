@@ -438,6 +438,29 @@ s5e8825_battery() {
 	write "/dev/cpuset/top-app/cpus" "0-7" #
 	write "/dev/cpuset/restricted/cpus" "0-7" #
 	
+	# CPUHP (CPU Hotplug)
+    
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/debug" "0"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/enabled" "1"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/reqs" "0"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/set_online_cpu" "1"
+
+    # CPU Idle
+    write "/sys/devices/system/cpu/cpuidle/current_governor" "menu"
+    write "/sys/devices/system/cpu/cpuidle/current_driver" "psci_idle"
+
+    # CPU Power Management (CPUPM)
+    write "/sys/devices/system/cpu/cpupm/cpupm/sicd" "1" # don't disable
+    write "/sys/devices/system/cpu/cpupm/cpupm/dsupd" "0" # working
+    write "/sys/devices/system/cpu/cpupm/cpupm/cpd_cl1" "1" # don't disable
+    
+    # CPU Hotplug Control
+    write "/sys/devices/system/cpu/hotplug/states" "enabled"
+	
+	simple_bar
+    kmsg1 "[*] CPU TWEAKED. "
+    simple_bar
+	
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
     simple_bar
@@ -555,13 +578,22 @@ s5e8825_battery() {
     write "$mali/power_policy" "coarse_demand"
     write "$mali/dvfs_governor" "3" # Static
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
+    chmod 0644 > "$mali/dvfs"
+    chmod 0644 "$mali/dvfs_max_lock"
+    chmod 0644 "$mali/dvfs_min_lock"
     write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
     write "$mali/highspeed_load" "80"
     write "$mali/highspeed_delay" "3"
     write "$mali/highspeed_clock" "507000"
-    write "/sys/kernel/gpu/gpu_min_clock" "104000"
-    chmod 0644 > "$mali/dvfs"
+    write "$mali/dvfs_max_lock" "507000"
+    write "$mali/dvfs_min_lock" "104000"
+    write "$mali/js_scheduling_period" "100" # Experimental
+    write "$mali/js_timeouts" "705 705 4935 4935 1499535 4935 4935 1501650" # Experimental
+    write "$mali/lp_mem_pool_size" "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" # Experimental
     done
+    
+    write "/sys/kernel/gpu/gpu_max_clock" "507000"
+    write "/sys/kernel/gpu/gpu_min_clock" "104000"
     
     simple_bar
     kmsg1 "[*] GPU TWEAKED. "
@@ -1449,6 +1481,25 @@ s5e8825_balanced() {
 	write "/dev/cpuset/top-app/cpus" "0-7" #
 	write "/dev/cpuset/restricted/cpus" "0-7" #
 	
+    # CPUHP (CPU Hotplug)
+    
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/debug" "0"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/enabled" "1"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/reqs" "0"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/set_online_cpu" "1"
+
+    # CPU Idle
+    write "/sys/devices/system/cpu/cpuidle/current_governor" "menu"
+    write "/sys/devices/system/cpu/cpuidle/current_driver" "psci_idle"
+
+    # CPU Power Management (CPUPM)
+    write "/sys/devices/system/cpu/cpupm/cpupm/sicd" "1" # don't disable
+    write "/sys/devices/system/cpu/cpupm/cpupm/dsupd" "0" # working
+    write "/sys/devices/system/cpu/cpupm/cpupm/cpd_cl1" "1" # don't disable
+    
+    # CPU Hotplug Control
+    write "/sys/devices/system/cpu/hotplug/states" "enabled"
+	
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
     simple_bar
@@ -1564,15 +1615,24 @@ s5e8825_balanced() {
     for mali in /sys/devices/platform/*.mali
     do
     write "$mali/power_policy" "coarse_demand"
-    write "$mali/dvfs_governor" "5" # Dynamic
+    write "$mali/dvfs_governor" "1" # Interactive
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
+    chmod 0644 > "$mali/dvfs"
+    chmod 0644 "$mali/dvfs_max_lock"
+    chmod 0644 "$mali/dvfs_min_lock"
     write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
     write "$mali/highspeed_load" "80"
     write "$mali/highspeed_delay" "3"
-    write "$mali/highspeed_clock" "897000"
-    write "/sys/kernel/gpu/gpu_min_clock" "104000"
-    chmod 0644 > "$mali/dvfs"
+    write "$mali/highspeed_clock" "702000" # default 897000
+    write "$mali/dvfs_max_lock" "702000"
+    write "$mali/dvfs_min_lock" "403000"
+    write "$mali/js_scheduling_period" "100" # Experimental
+    write "$mali/js_timeouts" "705 705 4935 4935 1499535 4935 4935 1501650" # Experimental
+    write "$mali/lp_mem_pool_size" "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" # Experimental
     done
+    
+    write "/sys/kernel/gpu/gpu_max_clock" "702000"
+    write "/sys/kernel/gpu/gpu_min_clock" "403000"
     
     simple_bar
     kmsg1 "[*] GPU TWEAKED. "
@@ -2451,6 +2511,29 @@ s5e8825_performance() {
 	write "/dev/cpuset/top-app/cpus" "0-7"
 	write "/dev/cpuset/restricted/cpus" "0-7"
 	
+	# CPUHP (CPU Hotplug)
+    
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/debug" "0"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/enabled" "1"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/reqs" "0"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/set_online_cpu" "1"
+
+    # CPU Idle
+    write "/sys/devices/system/cpu/cpuidle/current_governor" "menu"
+    write "/sys/devices/system/cpu/cpuidle/current_driver" "psci_idle"
+
+    # CPU Power Management (CPUPM)
+    write "/sys/devices/system/cpu/cpupm/cpupm/sicd" "1" # don't disable
+    write "/sys/devices/system/cpu/cpupm/cpupm/dsupd" "0" # working
+    write "/sys/devices/system/cpu/cpupm/cpupm/cpd_cl1" "1" # don't disable
+    
+    # CPU Hotplug Control
+    write "/sys/devices/system/cpu/hotplug/states" "enabled"
+	
+	simple_bar
+    kmsg1 "[*] CPU TWEAKED. "
+    simple_bar
+	
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
     simple_bar
@@ -2567,15 +2650,21 @@ s5e8825_performance() {
     for mali in /sys/devices/platform/*.mali
     do
     write "$mali/power_policy" "always_on" # default coarse_demand
-    write "$mali/dvfs_governor" "4" # default 3 (Static)
+    write "$mali/dvfs_governor" "3" # default 3 (Static)
     write "$mali/tmu" "0" # Thermal Management Until for thermal monitoring and control 
-    write "$mali/dvfs" "0" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
+    chmod 0000 > "$mali/dvfs"
+    chmod 0000 "$mali/dvfs_max_lock"
+    chmod 0000 "$mali/dvfs_min_lock"
     write "$mali/highspeed_load" "80"
     write "$mali/highspeed_delay" "3"
     write "$mali/highspeed_clock" "897000"
-    write "/sys/kernel/gpu/gpu_min_clock" "897000"
-    chmod 0000 > "$mali/dvfs"
+    write "$mali/js_scheduling_period" "100" # Experimental
+    write "$mali/js_timeouts" "705 705 4935 4935 1499535 4935 4935 1501650" # Experimental
+    write "$mali/lp_mem_pool_size" "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" # Experimental
     done
+    
+    write "/sys/kernel/gpu/gpu_max_clock" "897000"
+    write "/sys/kernel/gpu/gpu_min_clock" "897000"
     
     simple_bar
     kmsg1 "[*] GPU TWEAKED. "
@@ -3561,7 +3650,7 @@ s5e8825_gaming() {
     simple_bar
     
     # VM settings to improve overall user experience and smoothness.
-    write "/proc/sys/vm/drop_caches" "3"
+    #write "/proc/sys/vm/drop_caches" "3"
     write "/proc/sys/vm/dirty_background_ratio" "5"
     write "/proc/sys/vm/dirty_ratio" "20"
     write "/proc/sys/vm/dirty_expire_centisecs" "500"
@@ -3611,12 +3700,17 @@ s5e8825_gaming() {
     write "$mali/power_policy" "always_on" # default coarse_demand
     write "$mali/dvfs_governor" "4" # Booster
     write "$mali/tmu" "0" # Thermal Management Until for thermal monitoring and control 
-    write "$mali/dvfs" "0" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
+    chmod 0644 /sys/devices/platform/10300000.mali/dvfs
+    write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
     write "$mali/highspeed_load" "80"
     write "$mali/highspeed_delay" "3"
     write "$mali/highspeed_clock" "897000"
-    write "/sys/kernel/gpu/gpu_min_clock" "897000"
-    chmod 0000 > "$mali/dvfs"
+    write "$mali/dvfs_max_lock" "897000"
+    write "$mali/dvfs_min_lock" "897000"
+    write "$mali/js_scheduling_period" "100" # Experimental
+    write "$mali/js_timeouts" "705 705 4935 4935 1499535 4935 4935 1501650" # Experimental 
+    write "$mali/lp_mem_pool_size" "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" # Experimental
+    chmod 0644 > "$mali/dvfs"
     done
     
     simple_bar
@@ -3625,11 +3719,11 @@ s5e8825_gaming() {
     
     # Fix clock
     sleep 1
-    write "/sys/devices/system/cpu/cpu6" "0"
-	write "/sys/devices/system/cpu/cpu7" "0"
+    write "/sys/devices/system/cpu/cpu6/online" "0"
+	write "/sys/devices/system/cpu/cpu7/online" "0"
 	sleep 1
-	write "/sys/devices/system/cpu/cpu6" "1"
-	write "/sys/devices/system/cpu/cpu7" "1"
+	write "/sys/devices/system/cpu/cpu6/online" "1"
+	write "/sys/devices/system/cpu/cpu7/online" "1"
     
 	simple_bar
     kmsg1 "[*] CPU BIG CLOCK FIXED. "
@@ -4572,6 +4666,29 @@ s5e8825_thermal() {
 	write "/dev/cpuset/top-app/cpus" "0-1, 4-5"
 	write "/dev/cpuset/restricted/cpus" "0-1"
 	
+	# CPUHP (CPU Hotplug)
+    
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/debug" "0"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/enabled" "1"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/reqs" "0"
+    write "/sys/devices/system/cpu/cpuhp/cpuhp/set_online_cpu" "1"
+
+    # CPU Idle
+    write "/sys/devices/system/cpu/cpuidle/current_governor" "menu"
+    write "/sys/devices/system/cpu/cpuidle/current_driver" "psci_idle"
+
+    # CPU Power Management (CPUPM)
+    write "/sys/devices/system/cpu/cpupm/cpupm/sicd" "1" # don't disable
+    write "/sys/devices/system/cpu/cpupm/cpupm/dsupd" "0" # working
+    write "/sys/devices/system/cpu/cpupm/cpupm/cpd_cl1" "1" # don't disable
+    
+    # CPU Hotplug Control
+    write "/sys/devices/system/cpu/hotplug/states" "enabled"
+	
+	simple_bar
+    kmsg1 "[*] CPU TWEAKED. "
+    simple_bar
+	
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
     simple_bar
@@ -4673,13 +4790,22 @@ s5e8825_thermal() {
     write "$mali/power_policy" "coarse_demand"
     write "$mali/dvfs_governor" "2" # Joint
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
-    write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
-    write "$mali/highspeed_load" "100" # Experimental
-    write "$mali/highspeed_delay" "0" # Experimental
-    write "$mali/highspeed_clock" "897000" # Experimental
-    write "/sys/kernel/gpu/gpu_min_clock" "897000" # Experimental
     chmod 0644 > "$mali/dvfs"
+    chmod 0644 "$mali/dvfs_max_lock"
+    chmod 0644 "$mali/dvfs_min_lock"
+    write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
+    write "$mali/highspeed_load" "100"
+    write "$mali/highspeed_delay" "0"
+    write "$mali/highspeed_clock" "897000"
+    write "$mali/dvfs_max_lock" "897000"
+    write "$mali/dvfs_min_lock" "104000"
+    write "$mali/js_scheduling_period" "100" #Experimental
+    write "$mali/js_timeouts" "705 705 4935 4935 1499535 4935 4935 1501650" # Experimental
+    write "$mali/lp_mem_pool_size" "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" # Experimental
     done
+    
+    write "/sys/kernel/gpu/gpu_max_clock" "897000"
+    write "/sys/kernel/gpu/gpu_min_clock" "104000"
     
     simple_bar
     kmsg1 "[*] GPU TWEAKED. "
