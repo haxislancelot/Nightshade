@@ -3537,12 +3537,21 @@ s5e8825_gaming() {
     kmsg1 "[*] DISABLED STATSD AND LOGD. "
     simple_bar
     
+    sysctl -w kernel.panic=0
+    sysctl -w vm.panic_on_oom=0
+    sysctl -w kernel.panic_on_oops=0
+    sysctl -w kernel.softlockup_panic=0
+
+    simple_bar
+    kmsg1 "[*] DISABLED KERNEL PANIC "
+    simple_bar
+    
     # CPU tweaks
 	cpu="0"
 	while [ $cpu -lt $cpu_cores ]; do
 		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
 		if [ -d "$cpu_dir" ]; then
-			write "${cpu_dir}/cpufreq/scaling_governor" "energy_aware"
+			write "${cpu_dir}/cpufreq/scaling_governor" "schedutil"
 		fi
 		cpu="$((cpu + 1))"
 	done	    
@@ -3552,6 +3561,9 @@ s5e8825_gaming() {
 	    write "$cpu/online" "1"
     done
     
+    write "/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor" "schedutil"
+    write "/sys/devices/system/cpu/cpufreq/policy*/schedutil/rate_limit_us" "10000"
+
     # CPUStune
     
 	# CPU Load settings (From Mediatek)
@@ -3597,53 +3609,69 @@ s5e8825_gaming() {
 	
     # Tweak some kernel settings to improve overall performance.
     write "/proc/sys/kernel/sched_child_runs_first" "0"
-    write "/proc/sys/kernel/perf_cpu_time_max_percent" "25"
     write "/proc/sys/kernel/random/write_wakeup_threshold" "1024"
     write "/proc/sys/kernel/random/urandom_min_reseed_secs" "90"
-    write "/proc/sys/kernel/sched_tunable_scaling" "0"
-    write "/proc/sys/kernel/sched_latency_ns" "$SCHED_PERIOD_BALANCE"
-    write "/proc/sys/kernel/sched_min_granularity_ns" "$((SCHED_PERIOD_BALANCE / SCHED_TASKS_BALANCE))"
-    write "/proc/sys/kernel/sched_wakeup_granularity_ns" "$((SCHED_PERIOD_BALANCE / 2))"
-    write "/proc/sys/kernel/sched_migration_cost_ns" "5000000"
-    write "/proc/sys/kernel/sched_nr_migrate" "128"
-    write "/proc/sys/kernel/printk_devkmsg" "off"
+    
+   # Reduce scheduler latency for power efficiency
+   write "/proc/sys/kernel/sched_wakeup_granularity_ns" "5000000"
+   write "/proc/sys/kernel/sched_latency_ns" "8000000"
+   write "/proc/sys/kernel/sched_min_granularity_ns" "800000"
+   write "/proc/sys/kernel/sched_migration_cost_ns" "500000"
+   write "/proc/sys/kernel/sched_rt_period_us" "1000000"
+   write "/proc/sys/kernel/perf_cpu_time_max_percent" "15"
+   write "/proc/sys/kernel/sched_rr_timeslice_ms" "20"
+   write "/proc/sys/kernel/sched_nr_migrate" "32"
+   write "/proc/irq/default_smp_affinity" "01"
+   write "/sys/bus/workqueue/devices/writeback/cpumask" "f0"
+   write "/sys/devices/virtual/workqueue/cpumask" "f0"
+   write "/dev/cpuset/sched_load_balance" "0"
+   write "/proc/sys/kernel/pid_max" "65536"
+   write "/proc/sys/kernel/printk_devkmsg" "off"
+   write "/proc/sys/kernel/sched_schedstats" "0"
+   write "/proc/sys/kernel/sched_tunable_scaling" "0"
+   write "/proc/sys/kernel/perf_event_max_sample_rate" "100000"
+   write "/proc/sys/kernel/perf_event_mlock_kb" "516"
+
+   if [ -f "/proc/sys/kernel/printk" ]; then
+     write "/proc/sys/kernel/printk" "0 0 0 0"
+   fi
 
     simple_bar
     kmsg1 "[*] TWEAKED KERNEL SETTINGS. "
     simple_bar
     
     # Set min and max clocks.
-    for minclk in /sys/devices/system/cpu/cpufreq/policy0/
-    do
-	    if [[ -e "${minclk}scaling_min_freq" ]]; then
-		    write "${minclk}scaling_min_freq" "2002000"
-		    write "${minclk}scaling_max_freq" "2002000"
-	    fi
-    done
-    
-    for minclk in /sys/devices/system/cpu/cpufreq/policy6/
-    do
-	    if [[ -e "${minclk}scaling_min_freq" ]]; then
-		    write "${minclk}scaling_min_freq" "2400000"
-		    write "${minclk}scaling_max_freq" "2400000"
-	    fi
-    done
+    write "/sys/devices/system/cpu/isolated" "0"
+    write "/sys/devices/system/cpu/offline" "0"
+    write "/sys/devices/system/cpu/cpu0/online" "1"
+    write "/sys/devices/system/cpu/cpu1/online" "1"
+    write "/sys/devices/system/cpu/cpu2/online" "1"
+    write "/sys/devices/system/cpu/cpu3/online" "1"
+    write "/sys/devices/system/cpu/cpu4/online" "1"
+    write "/sys/devices/system/cpu/cpu5/online" "1"
+    write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000"
 
-    for mnclk in /sys/devices/system/cpu/cpu{0..5}/cpufreq/
-    do
-      if [[ -e "${mnclk}scaling_min_freq" ]]; then
-        write "${mnclk}scaling_min_freq" "2002000"
-        write "${mnclk}scaling_max_freq" "2002000"
-      fi
-    done
+    write "/sys/devices/system/cpu/cpu6/online" "1"
+    write "/sys/devices/system/cpu/cpu7/online" "1"
+    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2400000"
 
-    for mnclk in /sys/devices/system/cpu/cpu{6..7}/cpufreq/
-    do
-      if [[ -e "${mnclk}scaling_min_freq" ]]; then
-        write "${mnclk}scaling_min_freq" "2400000"
-        write "${mnclk}scaling_max_freq" "2400000"
-      fi
-    done
+    # Maximum CPU frequency limit to save power
+    chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
+    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2400000"
+    chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
+
+    chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
+    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "66625"
+    chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
+
+
+    chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
+    write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "2002000"
+    chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
+
+    chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
+    write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "66625"
+    chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
 
     simple_bar
     kmsg1 "[*] SET MIN AND MAX CPU CLOCKS. "
@@ -3653,13 +3681,14 @@ s5e8825_gaming() {
     #write "/proc/sys/vm/drop_caches" "3"
     write "/proc/sys/vm/dirty_background_ratio" "5"
     write "/proc/sys/vm/dirty_ratio" "20"
-    write "/proc/sys/vm/dirty_expire_centisecs" "500"
-    write "/proc/sys/vm/dirty_writeback_centisecs" "3000"
+    write "/proc/sys/vm/dirty_expire_centisecs" "1500"
+    write "/proc/sys/vm/dirty_writeback_centisecs" "1500"
+    write "/proc/sys/vm/overcommit_ratio" "40"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60"
-    write "/proc/sys/vm/swappiness" "130"
+    write "/proc/sys/vm/swappiness" "120"
     write "/proc/sys/vm/laptop_mode" "0"
-    write "/proc/sys/vm/vfs_cache_pressure" "200"
+    write "/proc/sys/vm/vfs_cache_pressure" "100"
 
     simple_bar
     kmsg1 "[*] APPLIED VM TWEAKS."
@@ -3674,21 +3703,21 @@ s5e8825_gaming() {
     fi
     
     # I/O Scheduler
-    write "/sys/block/sda/queue/scheduler" "mq-deadline"
-    write "/sys/block/sdb/queue/scheduler" "mq-deadline"
-    write "/sys/block/sdc/queue/scheduler" "mq-deadline"
-	write "/sys/block/sdd/queue/scheduler" "mq-deadline"
-    write "/sys/block/sde/queue/scheduler" "mq-deadline"
+    write "/sys/block/sda/queue/scheduler" "none"
+    write "/sys/block/sdb/queue/scheduler" "none"
+    write "/sys/block/sdc/queue/scheduler" "none"
+	write "/sys/block/sdd/queue/scheduler" "none"
+    write "/sys/block/sde/queue/scheduler" "none"
 	
     # I/O Scheduler Tweaks.
     for queue in /sys/block/sd{a,b,c,d,e}/queue/
     do
       write "${queue}add_random" "0"
       write "${queue}iostats" "0"
-      write "${queue}read_ahead_kb" "512"
+      write "${queue}read_ahead_kb" "128"
       write "${queue}nomerges" "2"
       write "${queue}rq_affinity" "2"
-      write "${queue}nr_requests" "256"
+      write "${queue}nr_requests" "32"
     done
     
     simple_bar
@@ -3697,51 +3726,41 @@ s5e8825_gaming() {
     
     for mali in /sys/devices/platform/*.mali
     do
-    write "$mali/power_policy" "always_on" # default coarse_demand
-    write "$mali/dvfs_governor" "4" # Booster
-    write "$mali/tmu" "0" # Thermal Management Until for thermal monitoring and control 
-    chmod 0644 /sys/devices/platform/10300000.mali/dvfs
-    write "$mali/dvfs" "1" # Dynamic Voltage and Frequency Scaling to control GPU frequency based on workload.
-    write "$mali/highspeed_load" "30" # default 80
-    write "$mali/highspeed_delay" "0" # default 3
-    write "$mali/highspeed_clock" "897000"
-    write "$mali/dvfs_max_lock" "897000"
-    write "$mali/dvfs_min_lock" "507000"
-    write "$mali/js_scheduling_period" "100" # Experimental
-    write "$mali/js_timeouts" "705 705 4935 4935 1499535 4935 4935 1501650" # Experimental 
-    write "$mali/lp_mem_pool_size" "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" # Experimental
-    chmod 0644 > "$mali/dvfs"
+    write "$mali/power_policy" "coarse_demand"
+    write "$mali/dvfs_governor" "1"
+    write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
+    write "$mali/highspeed_load" "80"
+    write "$mali/highspeed_delay" "1"
+    write "$mali/highspeed_clock" "611000"
     done
     
+    chmod -R 000 /sys/devices/platform/*.mali/dvfs
+    chmod -R 000 /sys/devices/platform/*.mali/dvfs_min_lock
+    chmod -R 000 /sys/devices/platform/*.mali/dvfs_max_lock
+    chmod -R 000 /sys/devices/platform/*.mali/dvfs_min_lock_status
+    chmod -R 000 /sys/devices/platform/*.mali/dvfs_max_lock_status
+    
+    chown root /sys/kernel/gpu/gpu_min_clock
+    write "/sys/kernel/gpu/gpu_min_clock" "611000"
+    
+    chown root /sys/kernel/gpu/gpu_min_clock
     write "/sys/kernel/gpu/gpu_max_clock" "897000"
-    write "/sys/kernel/gpu/gpu_min_clock" "507000"
+    
+    write "/sys/kernel/gpu/gpu_cl_boost_disable" "0"
     
     simple_bar
     kmsg1 "[*] GPU TWEAKED. "
     simple_bar
     
-    # Fix clock
-    sleep 1
-    write "/sys/devices/system/cpu/cpu1/online" "0"
-    write "/sys/devices/system/cpu/cpu2/online" "0"
-    write "/sys/devices/system/cpu/cpu3/online" "0"
-    write "/sys/devices/system/cpu/cpu4/online" "0"
-    write "/sys/devices/system/cpu/cpu5/online" "0"
-    write "/sys/devices/system/cpu/cpu6/online" "0"
-	write "/sys/devices/system/cpu/cpu7/online" "0"
-	sleep 1
-	write "/sys/devices/system/cpu/cpu1/online" "1"
-    write "/sys/devices/system/cpu/cpu2/online" "1"
-    write "/sys/devices/system/cpu/cpu3/online" "1"
-    write "/sys/devices/system/cpu/cpu4/online" "1"
-    write "/sys/devices/system/cpu/cpu5/online" "1"
-    write "/sys/devices/system/cpu/cpu6/online" "1"
-	write "/sys/devices/system/cpu/cpu7/online" "1"
-    
-	simple_bar
-    kmsg1 "[*] CPU CLOCK FIXED. "
+	# Net tweaks
+    write "/proc/sys/net/ipv4/tcp_ecn" "1"
+    write "/proc/sys/net/ipv4/tcp_sack" "1"
+    write "/proc/sys/net/ipv4/tcp_fastopen" "3"
+
     simple_bar
-	
+    kmsg1 "[*] NET TWEAKED. "
+    simple_bar
+
     simple_bar
     kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
     simple_bar
