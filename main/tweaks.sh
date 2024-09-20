@@ -1640,8 +1640,8 @@ s5e8825_balanced() {
     write "$mali/dvfs_governor" "1" # Interactive
     write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
     write "$mali/highspeed_load" "80"
-    write "$mali/highspeed_delay" "3"
-    write "$mali/highspeed_clock" "702000"
+    write "$mali/highspeed_delay" "1"
+    write "$mali/highspeed_clock" "897000"
     done
     
     chmod -R 644 /sys/devices/platform/*.mali/dvfs
@@ -1651,13 +1651,12 @@ s5e8825_balanced() {
     chmod -R 644 /sys/devices/platform/*.mali/dvfs_max_lock_status
     
     chown root /sys/kernel/gpu/gpu_min_clock
-    write "/sys/kernel/gpu/gpu_min_clock" "403000"
+    write "/sys/kernel/gpu/gpu_min_clock" "507000"
     
     chown root /sys/kernel/gpu/gpu_min_clock
-    write "/sys/kernel/gpu/gpu_max_clock" "702000"
+    write "/sys/kernel/gpu/gpu_max_clock" "897000"
     
     write "/sys/kernel/gpu/gpu_cl_boost_disable" "0"
-    
     
     simple_bar
     kmsg1 "[*] GPU TWEAKED. "
