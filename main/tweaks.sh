@@ -1585,7 +1585,7 @@ s5e8825_balanced() {
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
 
     simple_bar
-    kmsg1 "[*] SET MIN AND MAX CPU CLOCKS. "
+    kmsg1 "[*] CPU UNDERCLOCKED. "
     simple_bar
     
 # VM settings to improve overall user experience and smoothness.
@@ -3588,7 +3588,7 @@ s5e8825_gaming() {
     write "/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor" "schedutil"
     write "/sys/devices/system/cpu/cpufreq/policy*/schedutil/rate_limit_us" "10000"
 
-    # CPUStune
+    # CPU Tweaks
     
 	# CPU Load settings (From Mediatek)
 	write "/dev/cpuset/foreground/cpus" "0-7" # 0-4 default
@@ -3597,10 +3597,7 @@ s5e8825_gaming() {
 	write "/dev/cpuset/top-app/cpus" "0-7" #
 	write "/dev/cpuset/restricted/cpus" "0" # default 0-7
 	
-	# CPU Tweaks
-
     # CPUHP (CPU Hotplug)
-    
     write "/sys/devices/system/cpu/cpuhp/cpuhp/debug" "0"
     write "/sys/devices/system/cpu/cpuhp/cpuhp/enabled" "1"
     write "/sys/devices/system/cpu/cpuhp/cpuhp/reqs" "0"
@@ -3618,6 +3615,10 @@ s5e8825_gaming() {
     # CPU Hotplug Control
     write "/sys/devices/system/cpu/hotplug/states" "enabled"
 	
+    # Switch to rcu_normal for better CPU efficiency and latency
+    echo "0" > /sys/kernel/rcu_expedited
+    echo "1" > /sys/kernel/rcu_normal
+    
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
     simple_bar
@@ -3633,32 +3634,32 @@ s5e8825_gaming() {
 	
     # Tweak some kernel settings to improve overall performance.
     write "/proc/sys/kernel/sched_child_runs_first" "0"
-    write "/proc/sys/kernel/random/write_wakeup_threshold" "1024"
+    write "/proc/sys/kernel/random/write_wakeup_threshold" "512" # 1024
     write "/proc/sys/kernel/random/urandom_min_reseed_secs" "90"
     
-   # Reduce scheduler latency for power efficiency
-   write "/proc/sys/kernel/sched_wakeup_granularity_ns" "5000000"
-   write "/proc/sys/kernel/sched_latency_ns" "8000000"
-   write "/proc/sys/kernel/sched_min_granularity_ns" "800000"
-   write "/proc/sys/kernel/sched_migration_cost_ns" "500000"
-   write "/proc/sys/kernel/sched_rt_period_us" "1000000"
-   write "/proc/sys/kernel/perf_cpu_time_max_percent" "15"
-   write "/proc/sys/kernel/sched_rr_timeslice_ms" "20"
-   write "/proc/sys/kernel/sched_nr_migrate" "32"
-   write "/proc/irq/default_smp_affinity" "01"
-   write "/sys/bus/workqueue/devices/writeback/cpumask" "f0"
-   write "/sys/devices/virtual/workqueue/cpumask" "f0"
-   write "/dev/cpuset/sched_load_balance" "0"
-   write "/proc/sys/kernel/pid_max" "65536"
-   write "/proc/sys/kernel/printk_devkmsg" "off"
-   write "/proc/sys/kernel/sched_schedstats" "0"
-   write "/proc/sys/kernel/sched_tunable_scaling" "0"
-   write "/proc/sys/kernel/perf_event_max_sample_rate" "100000"
-   write "/proc/sys/kernel/perf_event_mlock_kb" "516"
+    # Reduce scheduler latency for power efficiency
+    write "/proc/sys/kernel/sched_wakeup_granularity_ns" "5000000"
+    write "/proc/sys/kernel/sched_latency_ns" "8000000"
+    write "/proc/sys/kernel/sched_min_granularity_ns" "800000"
+    write "/proc/sys/kernel/sched_migration_cost_ns" "500000"
+    write "/proc/sys/kernel/sched_rt_period_us" "1000000"
+    write "/proc/sys/kernel/perf_cpu_time_max_percent" "15"
+    write "/proc/sys/kernel/sched_rr_timeslice_ms" "20"
+    write "/proc/sys/kernel/sched_nr_migrate" "32"
+    write "/proc/irq/default_smp_affinity" "01"
+    write "/sys/bus/workqueue/devices/writeback/cpumask" "f0"
+    write "/sys/devices/virtual/workqueue/cpumask" "f0"
+    write "/dev/cpuset/sched_load_balance" "0"
+    write "/proc/sys/kernel/pid_max" "65536"
+    write "/proc/sys/kernel/printk_devkmsg" "off"
+    write "/proc/sys/kernel/sched_schedstats" "0"
+    write "/proc/sys/kernel/sched_tunable_scaling" "0"
+    write "/proc/sys/kernel/perf_event_max_sample_rate" "100000"
+    write "/proc/sys/kernel/perf_event_mlock_kb" "516"
 
-   if [ -f "/proc/sys/kernel/printk" ]; then
-     write "/proc/sys/kernel/printk" "0 0 0 0"
-   fi
+    if [ -f "/proc/sys/kernel/printk" ]; then
+      write "/proc/sys/kernel/printk" "0 0 0 0"
+    fi
 
     simple_bar
     kmsg1 "[*] TWEAKED KERNEL SETTINGS. "
@@ -3677,24 +3678,23 @@ s5e8825_gaming() {
 
     write "/sys/devices/system/cpu/cpu6/online" "1"
     write "/sys/devices/system/cpu/cpu7/online" "1"
-    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2400000"
+    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2208000"
 
     # Maximum CPU frequency limit to save power
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2400000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2208000"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "2400000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "66625"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
     write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "2002000"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "2002000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "66625"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
 
     simple_bar
@@ -3702,7 +3702,7 @@ s5e8825_gaming() {
     simple_bar
     
     # VM settings to improve overall user experience and smoothness.
-    #write "/proc/sys/vm/drop_caches" "3"
+    write "/proc/sys/vm/drop_caches" "3"
     write "/proc/sys/vm/dirty_background_ratio" "5"
     write "/proc/sys/vm/dirty_ratio" "20"
     write "/proc/sys/vm/dirty_expire_centisecs" "1500"
@@ -3710,7 +3710,7 @@ s5e8825_gaming() {
     write "/proc/sys/vm/overcommit_ratio" "40"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60"
-    write "/proc/sys/vm/swappiness" "120"
+    write "/proc/sys/vm/swappiness" "80"
     write "/proc/sys/vm/laptop_mode" "0"
     write "/proc/sys/vm/vfs_cache_pressure" "100"
 
@@ -3718,23 +3718,26 @@ s5e8825_gaming() {
     kmsg1 "[*] APPLIED VM TWEAKS."
     simple_bar
     
-    # Disable power efficient workqueue.
-    if [[ -e "/sys/module/workqueue/parameters/power_efficient" ]]; then
-	    write "/sys/module/workqueue/parameters/power_efficient" "N"
-	    simple_bar
-	    kmsg1 "[*] DISABLED POWER EFFICIENT WORKQUEUE. "
-	    simple_bar
-    fi
-    
-    # I/O Scheduler
-    write "/sys/block/sda/queue/scheduler" "none"
-    write "/sys/block/sdb/queue/scheduler" "none"
-    write "/sys/block/sdc/queue/scheduler" "none"
-	write "/sys/block/sdd/queue/scheduler" "none"
-    write "/sys/block/sde/queue/scheduler" "none"
-	
     # I/O Scheduler Tweaks.
-    for queue in /sys/block/sd{a,b,c,d,e}/queue/
+    for sd in /sys/block/sd*/queue/; do
+      echo "none" > ${sd}/scheduler
+    done
+
+    for loop in /sys/block/loop*/queue/; do
+      echo "none" > ${loop}/scheduler
+    done
+    
+    for queue in /sys/block/sd*/queue/
+    do
+      write "${queue}add_random" "0"
+      write "${queue}iostats" "0"
+      write "${queue}read_ahead_kb" "128"
+      write "${queue}nomerges" "2"
+      write "${queue}rq_affinity" "2"
+      write "${queue}nr_requests" "32"
+    done
+    
+    for queue in /sys/block/loop*/queue/
     do
       write "${queue}add_random" "0"
       write "${queue}iostats" "0"
@@ -3785,6 +3788,13 @@ s5e8825_gaming() {
     kmsg1 "[*] NET TWEAKED. "
     simple_bar
 
+    # Force HDR
+    echo '1' > /sys/devices/platform/panel_drv_0/lcd/panel/mdnie/hdr
+
+    simple_bar
+    kmsg1 "[*] HDR TWEAKED. "
+    simple_bar
+    
     simple_bar
     kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
     simple_bar
