@@ -3615,9 +3615,9 @@ s5e8825_gaming() {
     # CPU Hotplug Control
     write "/sys/devices/system/cpu/hotplug/states" "enabled"
 	
-    # Switch to rcu_normal for better CPU efficiency and latency
-    echo "0" > /sys/kernel/rcu_expedited
-    echo "1" > /sys/kernel/rcu_normal
+    # Switch to rcu_normal for better CPU efficiency and latency.
+    write "/sys/kernel/rcu_expedited" "0"
+    write "/sys/kernel/rcu_normal" "1"
     
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
@@ -3789,10 +3789,60 @@ s5e8825_gaming() {
     simple_bar
 
     # Force HDR
-    echo '1' > /sys/devices/platform/panel_drv_0/lcd/panel/mdnie/hdr
+    write "/sys/devices/platform/panel_drv_0/lcd/panel/mdnie/hdr" "1"
 
     simple_bar
     kmsg1 "[*] HDR TWEAKED. "
+    simple_bar
+    
+    # Thermal Tweaks (experimental)
+    
+    # Thermal management for the BIG cluster
+    for i in 0 1 2 3 4 5 6 7; do
+      echo "5000" > /sys/devices/virtual/thermal/thermal_zone0/trip_point_${i}_hyst
+    done
+    echo "30000" > /sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp
+    echo "65000" > /sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp
+    echo "85000" > /sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp
+    echo "90000" > /sys/devices/virtual/thermal/thermal_zone0/trip_point_3_temp
+    echo "95000" > /sys/devices/virtual/thermal/thermal_zone0/trip_point_4_temp
+    echo "100000" > /sys/devices/virtual/thermal/thermal_zone0/trip_point_5_temp
+    echo "105000" > /sys/devices/virtual/thermal/thermal_zone0/trip_point_6_temp
+    echo "110000" > /sys/devices/virtual/thermal/thermal_zone0/trip_point_7_temp
+
+    # Thermal management for the LITTLE cluster
+    for i in 0 1 2 3 4 5 6 7; do
+      echo "5000" > /sys/devices/virtual/thermal/thermal_zone1/trip_point_${i}_hyst
+    done
+    echo "30000" > /sys/devices/virtual/thermal/thermal_zone1/trip_point_0_temp
+    echo "65000" > /sys/devices/virtual/thermal/thermal_zone1/trip_point_1_temp
+    echo "85000" > /sys/devices/virtual/thermal/thermal_zone1/trip_point_2_temp
+    echo "90000" > /sys/devices/virtual/thermal/thermal_zone1/trip_point_3_temp
+    echo "95000" > /sys/devices/virtual/thermal/thermal_zone1/trip_point_4_temp
+    echo "100000" > /sys/devices/virtual/thermal/thermal_zone1/trip_point_5_temp
+    echo "105000" > /sys/devices/virtual/thermal/thermal_zone1/trip_point_6_temp
+    echo "110000" > /sys/devices/virtual/thermal/thermal_zone1/trip_point_7_temp
+    
+    # Thermal management for the GPU
+    for i in 0 1 2 3 4 5 6 7; do
+      echo "5000" > /sys/devices/virtual/thermal/thermal_zone2/trip_point_${i}_hyst
+    done
+    echo "20000" > /sys/devices/virtual/thermal/thermal_zone2/trip_point_0_temp
+    echo "90000" > /sys/devices/virtual/thermal/thermal_zone2/trip_point_1_temp
+    echo "95000" > /sys/devices/virtual/thermal/thermal_zone2/trip_point_2_temp
+    echo "100000" > /sys/devices/virtual/thermal/thermal_zone2/trip_point_3_temp
+    echo "105000" > /sys/devices/virtual/thermal/thermal_zone2/trip_point_4_temp
+    echo "107000" > /sys/devices/virtual/thermal/thermal_zone2/trip_point_5_temp
+    echo "109000" > /sys/devices/virtual/thermal/thermal_zone2/trip_point_6_temp
+    echo "110000" > /sys/devices/virtual/thermal/thermal_zone2/trip_point_7_temp
+    
+    # Power Sustainability for CPU and GPU
+    echo "0" > /sys/devices/virtual/thermal/thermal_zone1/sustainable_power  # LITTLE Cluster
+    echo "1300" > /sys/devices/virtual/thermal/thermal_zone0/sustainable_power  # BIG Cluster
+    echo "1800" > /sys/devices/virtual/thermal/thermal_zone2/sustainable_power  # GPU
+    
+    simple_bar
+    kmsg1 "[*] THERMAL TWEAKED. "
     simple_bar
     
     simple_bar
