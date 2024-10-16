@@ -1573,19 +1573,19 @@ s5e8825_balanced() {
     chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
     write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000"
     
-    write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2288000"
+    write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2400000"
     chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq
-    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2288000"
+    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2400000"
 
     chmod 0444 /sys/devices/system/cpu/cpufreq/policy*/scaling_max_freq
     
     # Maximum CPU frequency limit to save power
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2288000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2400000"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "1536000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "960000"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
@@ -1593,7 +1593,7 @@ s5e8825_balanced() {
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "1536000" # 2002000
+    write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "864000"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
 
     simple_bar
@@ -1725,6 +1725,22 @@ s5e8825_balanced() {
     simple_bar
     kmsg1 "[*] MISC KERNEL SETTINGS TWEAKED. "
     simple_bar
+    
+    if [ "$(cat /sys/block/zram0/disksize)" -ne 4294967296 ]; then
+        chmod 644 /dev/block/zram0
+        echo "lz4" > /sys/block/zram0/comp_algorithm
+        swapoff /dev/block/zram0 > /dev/null 2>&1  
+        echo "1" > /sys/block/zram0/reset
+        echo "0" > /sys/block/zram0/disksize
+        echo "4" > /sys/block/zram0/max_comp_streams
+        echo "4294967296" > /sys/block/zram0/disksize
+        mkswap /dev/block/zram0 > /dev/null 2>&1  
+        swapon /dev/block/zram0 > /dev/null 2>&1
+        
+        simple_bar
+        kmsg1 "[*] ZRAM TWEAKED. "
+        simple_bar
+    fi
     
     simple_bar
     kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
