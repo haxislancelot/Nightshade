@@ -1481,7 +1481,7 @@ s5e8825_balanced() {
 	
     for cpu in /sys/devices/system/cpu/cpu*/cpufreq/
     do
-	write "${cpu}schedutil/rate_limit_us" "5000"
+	write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BATTERY / 1000))" # 5000 default
     done
     
 	# CPU Load settings
@@ -1533,12 +1533,12 @@ s5e8825_balanced() {
     write "/proc/sys/kernel/sched_min_granularity_ns" "950000"
     write "/proc/sys/kernel/sched_migration_cost_ns" "1000000"
     write "/proc/sys/kernel/sched_rt_period_us" "1000000"
-    write "/proc/sys/kernel/perf_cpu_time_max_percent" "5" # 10
+    write "/proc/sys/kernel/perf_cpu_time_max_percent" "15" # default 5
     write "/proc/sys/kernel/sched_rr_timeslice_ms" "30"
     write "/proc/sys/kernel/sched_nr_migrate" "64"
     write "/proc/irq/default_smp_affinity" "ff" # 0f default
-    write "/sys/bus/workqueue/devices/writeback/cpumask" "ff"
-    write "/sys/devices/virtual/workqueue/cpumask" "ff"
+    write "/sys/bus/workqueue/devices/writeback/cpumask" "f0" # default ff
+    write "/sys/devices/virtual/workqueue/cpumask" "f0" # default ff
     write "/dev/cpuset/sched_load_balance" "0"
     write "/proc/sys/kernel/pid_max" "65536"
     write "/proc/sys/kernel/printk_devkmsg" "off"
@@ -1573,19 +1573,19 @@ s5e8825_balanced() {
     chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
     write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000"
     
-    write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2400000"
+    write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2288000"
     chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq
-    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2400000"
+    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2288000"
 
     chmod 0444 /sys/devices/system/cpu/cpufreq/policy*/scaling_max_freq
     
     # Maximum CPU frequency limit to save power
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2400000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2288000"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "960000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "1536000"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
@@ -1593,7 +1593,7 @@ s5e8825_balanced() {
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "864000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "1536000"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
 
     simple_bar
@@ -1648,9 +1648,9 @@ s5e8825_balanced() {
     
     for mali in /sys/devices/platform/*.mali
     do
-    write "$mali/power_policy" "coarse_demand"
+    write "$mali/power_policy" "always_on" # coarse_demand
     write "$mali/dvfs_governor" "1" # Interactive
-    write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
+    write "$mali/tmu" "0" # Thermal Management Until for thermal monitoring and control 
     write "$mali/highspeed_load" "90"
     write "$mali/highspeed_delay" "3"
     write "$mali/highspeed_clock" "507000"
