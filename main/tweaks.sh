@@ -1481,15 +1481,15 @@ s5e8825_balanced() {
 	
     for cpu in /sys/devices/system/cpu/cpu*/cpufreq/
     do
-	write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BALANCE / 1000))" # SCHED_PERIOD_BATTERY default
+        write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BALANCE / 2000))" # SCHED_PERIOD_BATTERY default
     done
     
 	# CPU Load settings
-	write "/dev/cpuset/foreground/cpus" "0-5" # 0-7 default
+	write "/dev/cpuset/foreground/cpus" "0-4" # 0-7 default
 	write "/dev/cpuset/background/cpus" "0-1" # 0-3 default
-	write "/dev/cpuset/system-background/cpus" "0-2"
+	write "/dev/cpuset/system-background/cpus" "0-3"
 	write "/dev/cpuset/top-app/cpus" "0-7"
-	write "/dev/cpuset/restricted/cpus" "0-3"
+	write "/dev/cpuset/restricted/cpus" "0-7"
 	
     # Switch to normal RCU for better CPU efficiency and latency 
     write "/sys/kernel/rcu_expedited" "0"
@@ -1569,13 +1569,13 @@ s5e8825_balanced() {
     write "/sys/devices/system/cpu/cpu6/online" "1"
     write "/sys/devices/system/cpu/cpu7/online" "1"
     
-    write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2002000"
+    write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2002000" # 2002000 default
     chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
-    write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000"
+    write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000" # 2002000 default
     
-    write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2288000"
+    write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2288000" # 2288000 default
     chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq
-    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2288000"
+    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2288000" # 2288000 default
 
     chmod 0444 /sys/devices/system/cpu/cpufreq/policy*/scaling_max_freq
     
@@ -1589,7 +1589,7 @@ s5e8825_balanced() {
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "2002000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "2002000" # 2002000 default
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
@@ -1609,7 +1609,7 @@ s5e8825_balanced() {
     write "/proc/sys/vm/overcommit_ratio" "50"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60"
-    write "/proc/sys/vm/swappiness" "80" # 150 default
+    write "/proc/sys/vm/swappiness" "140" # 150 default
     write "/proc/sys/vm/laptop_mode" "0"
     write "/proc/sys/vm/vfs_cache_pressure" "200" # 150
     write "/proc/sys/vm/oom_kill_allocating_task" "0"
@@ -1656,11 +1656,11 @@ s5e8825_balanced() {
     write "$mali/highspeed_clock" "507000"
     done
     
-    chmod -R 000 /sys/devices/platform/*.mali/dvfs # 644 default
-    chmod -R 000 /sys/devices/platform/*.mali/dvfs_min_lock # 644 default
-    chmod -R 000 /sys/devices/platform/*.mali/dvfs_max_lock # 644 default
-    chmod -R 000 /sys/devices/platform/*.mali/dvfs_min_lock_status # 644 default
-    chmod -R 000 /sys/devices/platform/*.mali/dvfs_max_lock_status # 644 default
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs # 644 default
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs_min_lock # 644 default
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs_max_lock # 644 default
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs_min_lock_status # 644 default
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs_max_lock_status # 644 default
     
     chown root /sys/kernel/gpu/gpu_min_clock
     write "/sys/kernel/gpu/gpu_min_clock" "403000" # 104000 default
