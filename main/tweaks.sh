@@ -1481,15 +1481,15 @@ s5e8825_balanced() {
 	
     for cpu in /sys/devices/system/cpu/cpu*/cpufreq/
     do
-	write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BATTERY / 1000))" # 5000 default
+	write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BALANCE / 1000))" # SCHED_PERIOD_BATTERY default
     done
     
 	# CPU Load settings
-	write "/dev/cpuset/foreground/cpus" "0-4" # 0-7 default
+	write "/dev/cpuset/foreground/cpus" "0-5" # 0-7 default
 	write "/dev/cpuset/background/cpus" "0-1" # 0-3 default
-	write "/dev/cpuset/system-background/cpus" "0-3"
+	write "/dev/cpuset/system-background/cpus" "0-2"
 	write "/dev/cpuset/top-app/cpus" "0-7"
-	write "/dev/cpuset/restricted/cpus" "0-7"
+	write "/dev/cpuset/restricted/cpus" "0-3"
 	
     # Switch to normal RCU for better CPU efficiency and latency 
     write "/sys/kernel/rcu_expedited" "0"
@@ -1533,11 +1533,11 @@ s5e8825_balanced() {
     write "/proc/sys/kernel/sched_min_granularity_ns" "950000"
     write "/proc/sys/kernel/sched_migration_cost_ns" "1000000"
     write "/proc/sys/kernel/sched_rt_period_us" "1000000"
-    write "/proc/sys/kernel/perf_cpu_time_max_percent" "15" # default 5
+    write "/proc/sys/kernel/perf_cpu_time_max_percent" "10" # default 5
     write "/proc/sys/kernel/sched_rr_timeslice_ms" "30"
     write "/proc/sys/kernel/sched_nr_migrate" "64"
-    write "/proc/irq/default_smp_affinity" "ff" # 0f default
-    write "/sys/bus/workqueue/devices/writeback/cpumask" "f0" # default ff
+    write "/proc/irq/default_smp_affinity" "0f" # 0f default
+    write "/sys/bus/workqueue/devices/writeback/cpumask" "0f" # default ff
     write "/sys/devices/virtual/workqueue/cpumask" "f0" # default ff
     write "/dev/cpuset/sched_load_balance" "0"
     write "/proc/sys/kernel/pid_max" "65536"
@@ -1650,7 +1650,7 @@ s5e8825_balanced() {
     do
     write "$mali/power_policy" "always_on" # coarse_demand
     write "$mali/dvfs_governor" "1" # Interactive
-    write "$mali/tmu" "0" # Thermal Management Until for thermal monitoring and control 
+    write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control, default 0.
     write "$mali/highspeed_load" "90"
     write "$mali/highspeed_delay" "3"
     write "$mali/highspeed_clock" "507000"
@@ -1663,7 +1663,7 @@ s5e8825_balanced() {
     chmod -R 000 /sys/devices/platform/*.mali/dvfs_max_lock_status # 644 default
     
     chown root /sys/kernel/gpu/gpu_min_clock
-    write "/sys/kernel/gpu/gpu_min_clock" "104000"
+    write "/sys/kernel/gpu/gpu_min_clock" "403000" # 104000 default
     
     chown root /sys/kernel/gpu/gpu_min_clock
     write "/sys/kernel/gpu/gpu_max_clock" "897000"
