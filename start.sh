@@ -328,12 +328,12 @@ plugins() {
 }
 
 # List the scripts in the /sdcard/.NTSH/labs folder and enumerate them
-list_scripts() {
+list_labs() {
     local counter=1
-    for script in /sdcard/.NTSH/labs/*.sh; do
-        if [ -f "$script" ]; then
-            script_name=$(basename "script" .sh)
-            echo "$script_name [ $counter ]"
+    for plugin in /sdcard/.NTSH/labs/*.sh; do
+        if [ -f "$plugin" ]; then
+            plugin_name=$(basename "$plugin" .sh)
+            echo "$plugin_name [ $counter ]"
             ((counter++))
             sleep 0
         fi
@@ -341,44 +341,45 @@ list_scripts() {
 }
 
 # Function to run a plugin based on the number provided by the user
-execute_scripts() {
-    local script_number=$1
-    local script_path="/sdcard/.NTSH/labs/$script_number.sh"
+execute_labs() {
+    local plugin_number=$1
+    local plugin_path="/sdcard/.NTSH/labs/$plugin_number.sh"
 
-    if [ -f "$script_path" ]; then
-        chmod +x "$script_path"
-        . "$script_path"
+    if [ -f "$plugin_path" ]; then
+        chmod +x "$plugin_path"
+        . "$plugin_path"
     else
         sleep 0
         echo -e "\e[41mInvalid option!\e[0m"
         sleep 1
-        labs
+        plugins
     fi
 }
 
-labs() {
+plugins() {
 	clear
 	sleep 0
 	echo "${G}Welcome to Nightshade's Labs!\033[0;90m"
-	echo "${R}Type 0 to return to main menu\033[0;90m"
+	sleep 0
+	echo "${G}Type 0 to return to main menu\033[0;90m"
 	echo ""
 	sleep 0
-    list_scripts
+    list_plugins
     echo "${F}"
     
     while true; do
         sleep 0
         echo -ne "${G}Enter your choice: ${F}"
-        read selected_script_number
+        read selected_plugin_number
 
-        if [ "$selected_script_number" == "0" ]; then
+        if [ "$selected_plugin_number" == "0" ]; then
             main_menu
             break
-        elif [ "$selected_script_number" == "script" ]; then
-            list_scripts
+        elif [ "$selected_plugin_number" == "plugins" ]; then
+            list_labs
         else
-            selected_script_name=$(list_plugins | grep "\[ $selected_plugin_number \]" | cut -d "[" -f 1 | tr -d '[:space:]')
-            execute_scripts "$selected_script_name"
+            selected_plugin_name=$(list_plugins | grep "\[ $selected_plugin_number \]" | cut -d "[" -f 1 | tr -d '[:space:]')
+            execute_plugin "$selected_plugin_name"
             break
         fi
     done
