@@ -44,7 +44,7 @@ fi
 if [[ -e "/sdcard/.tweaks.sh" ]]; then
 	:
 else
-	curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/main/tweaks.sh" > /dev/null 2>&1 && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/plugins/plugins_list" > /dev/null 2>&1 && sh /sdcard/plugins_list.sh > /dev/null 2>&1 && rm -rf /sdcard/plugins_list.sh > /dev/null 2>&1 && curl -o /sdcard/labs_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/plugins/labs_list" > /dev/null 2>&1 && sh /sdcard/labs_list.sh > /dev/null 2>&1 && rm -rf /sdcard/labs_list.sh > /dev/null 2>&1
+	curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/main/tweaks.sh" > /dev/null 2>&1 && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/plugins/plugins_list" > /dev/null 2>&1 && sh /sdcard/plugins_list.sh > /dev/null 2>&1 && rm -rf /sdcard/plugins_list.sh > /dev/null 2>&1 && curl -o /sdcard/labs_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/labs/labs_list" > /dev/null 2>&1 && sh /sdcard/labs_list.sh > /dev/null 2>&1 && rm -rf /sdcard/labs_list.sh > /dev/null 2>&1
 fi
 
 # Function to ask the user if he wants to update the main script
@@ -57,7 +57,7 @@ ask_update_script() {
         case $answer in
             [Yy]* )
                 echo "\033[0;90mDownloading...${F}"
-                curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/main/tweaks.sh" > /dev/null 2>&1 && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/plugins/plugins_list" > /dev/null 2>&1 && sh /sdcard/plugins_list.sh > /dev/null 2>&1 && rm -rf /sdcard/plugins_list.sh > /dev/null 2>&1 && echo "${G}Main script and plugins updated successfully!${F}"
+                curl -o "/sdcard/.tweaks.sh" "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/main/tweaks.sh" > /dev/null 2>&1 && curl -o /sdcard/plugins_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/plugins/plugins_list" > /dev/null 2>&1 && sh /sdcard/plugins_list.sh > /dev/null 2>&1 && rm -rf /sdcard/plugins_list.sh > /dev/null 2>&1 && curl -o /sdcard/labs_list.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/labs/labs_list" > /dev/null 2>&1 && sh /sdcard/labs_list.sh > /dev/null 2>&1 && rm -rf /sdcard/labs_list.sh > /dev/null 2>&1 && echo "${G}Main script and plugins updated successfully!${F}"
                 echo -n "\033[0;90mClick to continue...${F}"
                 read &&
                 sh start.sh
