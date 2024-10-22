@@ -17,7 +17,7 @@ else
 fi
 
 if [[ $chipset == *mt6877* ]]; then
-    curl -o /sdcard/.NTSH/labs/destroyer.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/labs/s5e8825/destroyer" > /dev/null 2>&1
+    curl -o /sdcard/.NTSH/labs/destroyer.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/labs/mt6877/destroyer" > /dev/null 2>&1
     am start -a android.intent.action.MAIN -e toasttext "Labs scripts updated successfully!" -n bellavita.toast/.MainActivity
 else
     am start -a android.intent.action.MAIN -e toasttext "Labs scripts updated successfully!" -n bellavita.toast/.MainActivity
