@@ -1,0 +1,155 @@
+#!/bin/bash
+# Do not use this in your script or project without asking for my permission.
+# https://t.me/donottellmyname
+
+# Enable All CPUs
+for cpus in /sys/devices/system/cpu; do
+    echo 1 > "$cpus/cpu0/online"
+    echo 1 > "$cpus/cpu1/online"
+    echo 1 > "$cpus/cpu2/online"
+    echo 1 > "$cpus/cpu3/online"
+    echo 1 > "$cpus/cpu4/online"
+    echo 1 > "$cpus/cpu5/online"
+    echo 1 > "$cpus/cpu6/online"
+    echo 1 > "$cpus/cpu7/online"
+done
+    
+# CPU Parameter Enable
+echo "0" > /sys/devices/system/cpu/cpu0/core_ctl/enable
+echo "0" > /sys/devices/system/cpu/cpu4/core_ctl/enable
+echo "0" > /sys/devices/system/cpu/cpu7/core_ctl/enable
+
+# CPU Governor
+chmod 644 /sys/devices/system/cpu/cpufreq/policy0/scaling_governor
+echo "performance" > /sys/devices/system/cpu/cpufreq/policy0/scaling
+echo "performance" > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor
+chmod 644 /sys/devices/system/cpu/cpufreq/policy4/scaling_governor
+echo "performance" > /sys/devices/system/cpu/cpufreq/policy4/scaling_governor
+chmod 644 /sys/devices/system/cpu/cpufreq/policy7/scaling_governor
+echo "performance" > /sys/devices/system/cpu/cpufreq/policy7/scaling_governor
+echo "0" > /sys/devices/system/cpu/cpufreq/policy0/schedutil/rate_limit_us
+echo "0" > /sys/devices/system/cpu/cpufreq/policy4/schedutil/rate_limit_us
+echo "0" > /sys/devices/system/cpu/cpufreq/policy7/schedutil/rate_limit_us
+
+# GPU Configure
+echo "performance" > /sys/class/misc/mali0/device/power_policy
+echo "2" > /sys/class/misc/mali0/device/js_ctx_scheduling_mode
+
+# CPU SET
+chmod 644 /sys/devices/system/cpu/*/cpufreq/scaling_max_freq
+chmod 644 /sys/devices/system/cpu/*/cpufreq/scaling_min_freq
+
+for maf in /sys/devices/system/cpu
+do
+    echo 2000000 > "$maf/cpu0/cpufreq/scaling_max_freq" # Core 0 - Max 2 GHz
+    echo 2000000 > "$maf/cpu1/cpufreq/scaling_max_freq" # Core 1 - Max 2 GHz
+    echo 2000000 > "$maf/cpu2/cpufreq/scaling_max_freq" # Core 2 - Max 2 GHz
+    echo 2000000 > "$maf/cpu3/cpufreq/scaling_max_freq" # Core 3 - Max 2 GHz
+    echo 2000000 > "$maf/cpu4/cpufreq/scaling_max_freq" # Core 4 - Max 2.6 GHz
+    echo 2000000 > "$maf/cpu5/cpufreq/scaling_max_freq" # Core 5 - Max 2.6 GHz
+    echo 2600000 > "$maf/cpu6/cpufreq/scaling_max_freq" # Core 6 - Max 2.6 GHz
+    echo 2600000 > "$maf/cpu7/cpufreq/scaling_max_freq" # Core 7 - Max 3 GHz
+done
+
+for mif in /sys/devices/system/cpu
+do
+    echo 2000000 > "$mif/cpu0/cpufreq/scaling_min_freq" # Core 0 - Min 2 GHz
+    echo 2000000 > "$mif/cpu1/cpufreq/scaling_min_freq" # Core 1 - Min 2 GHz
+    echo 2000000 > "$mif/cpu2/cpufreq/scaling_min_freq" # Core 2 - Min 2 GHz
+    echo 2000000 > "$mif/cpu3/cpufreq/scaling_min_freq" # Core 3 - Min 2 GHz
+    echo 2600000 > "$mif/cpu4/cpufreq/scaling_min_freq" # Core 4 - Min 2.6 GHz
+    echo 2600000 > "$mif/cpu5/cpufreq/scaling_min_freq" # Core 5 - Min 2.6 GHz
+    echo 2600000 > "$mif/cpu6/cpufreq/scaling_min_freq" # Core 6 - Min 2.6 GHz
+    echo 3000000 > "$mif/cpu7/cpufreq/scaling_min_freq" # Core 7 - Min 3 GHz
+done
+
+# Dislowpower
+for dlp in /proc/displowpower; do
+    echo 0 > "$dlp/idlevfp"
+    echo 50 > "$dlp/idletime"
+done
+
+# Scheduler
+echo "1" > /proc/sys/vm/drop_caches
+for sch in /proc/sys/kernel; do
+    echo "500" > "$sch/sched_migration_cost_ns"
+    echo "50" > "$sch/perf_cpu_time_max_percent"
+    echo "200000" > "$sch/sched_latency_ns"
+    echo "1024" > "$sch/sched_util_clamp_max"
+    echo "1" > "$sch/sched_util_clamp_min"
+    echo "1" > "$sch/sched_energy_aware"
+done
+
+# Optimize I/O Scheduler Settings
+for dev in /sys/block/sd{a,b,c}/queue; do
+    echo 0 > "$dev/add_random"
+    echo 0 > "$dev/iostats"
+    echo 1 > "$dev/nomerges"
+    echo 1 > "$dev/rq_affinity"
+    echo 0 > "$dev/rotational"
+    echo 256 > "$dev/nr_requests"
+    echo 2048 > "$dev/read_ahead_kb"
+done
+
+# Power Level
+for pl in /sys/devices/system/cpu/perf; do
+    echo 1 > "$pl/gpu_pmu_enable"
+    echo 50000 > "$pl/gpu_pmu_period"
+    echo 1 > "$pl/fuel_gauge_enable"
+    echo "performance" > "$pl/current_governor"
+    echo 1 > "$pl/enable"
+    echo 1 > "$pl/charger_enable"
+done
+echo "on" > /sys/devices/system/cpu/power/control
+
+# VirtualMemory
+for vm in /proc/sys/vm; do
+    echo 5 > "$vm/dirty_background_ratio"
+    echo 10 > "$vm/dirty_ratio"
+    echo 200 > "$vm/vfs_cache_pressure"
+    echo 500 > "$vm/dirty_expire_centisecs"
+    echo 1000 > "$vm/dirty_writeback_centisecs"
+    echo 0 > "$vm/oom_dump_tasks"
+    echo 2 > "$vm/page-cluster"
+    echo 0 > "$vm/block_dump"
+    echo 5 > "$vm/stat_interval"
+    echo 2 > "$vm/compaction_proactiveness"
+    echo 2 > "$vm/watermark_boost_factor"
+    echo 200 > "$vm/watermark_scale_factor"
+    echo 2 > "$vm/drop_caches"
+done
+
+for sw in /dev/memcg; do
+    echo 20 > "$sw/memory.swappiness"
+done
+
+# CPU Set
+for cs in /dev/cpuset; do
+    echo 0-7 > "$cs/cpus"
+    echo 0-4 > "$cs/background/cpus"
+    echo 0-5 > "$cs/system-background/cpus"
+    echo 0-7 > "$cs/foreground/cpus"
+    echo 0-7 > "$cs/top-app/cpus"
+    echo 0-7 > "$cs/restricted/cpus"
+    echo 0-7 > "$cs/camera-daemon/cpus"
+    echo 0 > "$cs/memory_pressure_enabled"
+    echo 1 > "$cs/sched_load_balance"
+    echo 1 > "$cs/foreground/sched_load_balance"
+    echo 1 > "$cs/foreground-l/sched_load_balance"
+    echo 1 > "$cs/dex2oat/sched_load_balance"
+done
+
+for cc in /dev/cpuctl; do
+    echo 1 > "$cc/rt/cpu.uclamp.latency_sensitive"
+    echo 1 > "$cc/foreground/cpu.uclamp.latency_sensitive"
+    echo 1 > "$cc/nnapi-hal/cpu.uclamp.latency_sensitive"
+    echo 1 > "$cc/pnpmgr_fg/cpu.uclamp.latency_sensitive"
+    echo 1 > "$cc/dex2oat/cpu.uclamp.latency_sensitive"
+    echo 1 > "$cc/top-app/cpu.uclamp.latency_sensitive"
+    echo 100 > "$cc/foreground/cpu.uclamp.max"
+    echo 100 > "$cc/top-app/cpu.uclamp.max"
+    echo 50 > "$cc/cpuctl/top-app/cpu.uclamp.min"
+    echo 50 > "$cc/foreground/cpu.uclamp.min"
+done
+
+labs
