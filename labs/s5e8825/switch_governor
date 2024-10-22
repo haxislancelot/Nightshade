@@ -1,0 +1,36 @@
+#!/bin/bash
+# Do not use this in your script or project without asking for my permission.
+# https://t.me/donottellmyname
+
+case "$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor)" in
+    "energy_aware")
+        echo "conservative" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+        am start -a android.intent.action.MAIN -e toasttext "Governor switched to conservative." -n bellavita.toast/.MainActivity > /dev/null 2>&1
+        ;;
+    "conservative")
+        echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+        am start -a android.intent.action.MAIN -e toasttext "Governor switched to ondemand." -n bellavita.toast/.MainActivity > /dev/null 2>&1
+        ;;
+    "ondemand")
+        echo "userspace" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+        am start -a android.intent.action.MAIN -e toasttext "Governor switched to userspace." -n bellavita.toast/.MainActivity > /dev/null 2>&1
+        ;;
+    "userspace")
+        echo "powersave" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+        am start -a android.intent.action.MAIN -e toasttext "Governor switched to powersave." -n bellavita.toast/.MainActivity > /dev/null 2>&1
+        ;;
+    "powersave")
+        echo "performance" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+        am start -a android.intent.action.MAIN -e toasttext "Governor switched to performance." -n bellavita.toast/.MainActivity > /dev/null 2>&1
+        ;;
+    "performance")
+        echo "schedutil" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+        am start -a android.intent.action.MAIN -e toasttext "Governor switched to schedutil." -n bellavita.toast/.MainActivity > /dev/null 2>&1
+        ;;
+    "schedutil")
+        echo "energy_aware" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+        am start -a android.intent.action.MAIN -e toasttext "Governor switched to energy_aware." -n bellavita.toast/.MainActivity > /dev/null 2>&1
+        ;;
+esac
+
+labs
