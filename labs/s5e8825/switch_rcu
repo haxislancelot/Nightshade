@@ -1,0 +1,15 @@
+#!/bin/bash
+# Do not use this in your script or project without asking for my permission.
+# https://t.me/donottellmyname
+
+if [ "$(cat /sys/kernel/rcu_expedited)" -eq "1" ]; then
+    echo "0" > "/sys/kernel/rcu_expedited"
+    echo "1" > "/sys/kernel/rcu_normal"
+    am start -a android.intent.action.MAIN -e toasttext "RCU switched to normal." -n bellavita.toast/.MainActivity > /dev/null 2>&1
+else
+    echo "1" > "/sys/kernel/rcu_expedited"
+    echo "0" > "/sys/kernel/rcu_normal"
+    am start -a android.intent.action.MAIN -e toasttext "RCU switched to expedited." -n bellavita.toast/.MainActivity > /dev/null 2>&1
+fi
+
+labs
