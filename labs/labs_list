@@ -9,7 +9,15 @@ if [ -z "$chipset" ]; then
 fi
 
 if [[ $chipset == *s5e8825* ]]; then
-    curl -o /sdcard/.NTSH/labs/switch_rcu.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/labs/switch_rcu.sh" > /dev/null 2>&1
+    curl -o /sdcard/.NTSH/labs/switch_rcu.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/labs/s5e8825/switch_rcu" > /dev/null 2>&1
+    curl -o /sdcard/.NTSH/labs/switch_governor.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/labs/s5e8825/switch_governor" > /dev/null 2>&
+    am start -a android.intent.action.MAIN -e toasttext "Labs scripts updated successfully!" -n bellavita.toast/.MainActivity
+else
+    am start -a android.intent.action.MAIN -e toasttext "Labs scripts updated successfully!" -n bellavita.toast/.MainActivity
+fi
+
+if [[ $chipset == *m6877* ]]; then
+    curl -o /sdcard/.NTSH/labs/destroyer.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/labs/s5e8825/destroyer" > /dev/null 2>&1
     am start -a android.intent.action.MAIN -e toasttext "Labs scripts updated successfully!" -n bellavita.toast/.MainActivity
 else
     am start -a android.intent.action.MAIN -e toasttext "Labs scripts updated successfully!" -n bellavita.toast/.MainActivity
