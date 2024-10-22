@@ -352,11 +352,11 @@ execute_labs() {
         sleep 0
         echo -e "\e[41mInvalid option!\e[0m"
         sleep 1
-        plugins
+        labs
     fi
 }
 
-plugins() {
+labs() {
 	clear
 	sleep 0
 	echo "${G}Welcome to Nightshade's Labs!\033[0;90m"
@@ -364,7 +364,7 @@ plugins() {
 	echo "${G}Type 0 to return to main menu\033[0;90m"
 	echo ""
 	sleep 0
-    list_plugins
+    list_labs
     echo "${F}"
     
     while true; do
@@ -378,8 +378,8 @@ plugins() {
         elif [ "$selected_plugin_number" == "plugins" ]; then
             list_labs
         else
-            selected_plugin_name=$(list_plugins | grep "\[ $selected_plugin_number \]" | cut -d "[" -f 1 | tr -d '[:space:]')
-            execute_plugin "$selected_plugin_name"
+            selected_plugin_name=$(list_labs | grep "\[ $selected_plugin_number \]" | cut -d "[" -f 1 | tr -d '[:space:]')
+            execute_labs "$selected_plugin_name"
             break
         fi
     done
