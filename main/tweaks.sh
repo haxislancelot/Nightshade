@@ -3651,85 +3651,78 @@ s5e8825_gaming() {
     kmsg1 "[*] DISABLED KERNEL PANIC "
     simple_bar
     
-    # CPU tweaks
+    # CPU Tweaks
+    
+    # CPU Governor
 	cpu="0"
 	while [ $cpu -lt $cpu_cores ]; do
 		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
 		if [ -d "$cpu_dir" ]; then
-			write "${cpu_dir}/cpufreq/scaling_governor" "performance"
+			write "${cpu_dir}/cpufreq/scaling_governor" "schedutil"
 		fi
 		cpu="$((cpu + 1))"
-	done	    
+	done
 	
-    for cpu in /sys/devices/system/cpu/cpu*
+	for cpu in /sys/devices/system/cpu/cpu*/cpufreq/
     do
-	    write "$cpu/online" "1"
+        write "${cpu}schedutil/rate_limit_us" "20000" # SCHED_PERIOD_BATTERY default
     done
     
-    write "/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor" "performance"
-    #write "/sys/devices/system/cpu/cpufreq/policy*/schedutil/rate_limit_us" "10000"
-
-    # CPU Tweaks
-    
-	# CPU Load settings (From Mediatek)
+	# CPU Load settings
 	write "/dev/cpuset/foreground/cpus" "0-7" # 0-4 default
-	write "/dev/cpuset/background/cpus" "0-1" # 0-3 default
+	write "/dev/cpuset/background/cpus" "0-2" # 0-3 default
 	write "/dev/cpuset/system-background/cpus" "0-5" # 0-3 default
-	write "/dev/cpuset/top-app/cpus" "0-7" #
-	write "/dev/cpuset/restricted/cpus" "0" # default 0-7
+	write "/dev/cpuset/top-app/cpus" "0-7"
+	write "/dev/cpuset/restricted/cpus" "0" # 0-7 default
 	
-    # CPUHP (CPU Hotplug)
-    write "/sys/devices/system/cpu/cpuhp/cpuhp/debug" "0"
-    write "/sys/devices/system/cpu/cpuhp/cpuhp/enabled" "1"
-    write "/sys/devices/system/cpu/cpuhp/cpuhp/reqs" "0"
-    write "/sys/devices/system/cpu/cpuhp/cpuhp/set_online_cpu" "1"
-
-    # CPU Idle
-    write "/sys/devices/system/cpu/cpuidle/current_governor" "menu"
-    write "/sys/devices/system/cpu/cpuidle/current_driver" "psci_idle"
-
-    # CPU Power Management (CPUPM)
-    write "/sys/devices/system/cpu/cpupm/cpupm/sicd" "1" # don't disable
-    write "/sys/devices/system/cpu/cpupm/cpupm/dsupd" "0" # working
-    write "/sys/devices/system/cpu/cpupm/cpupm/cpd_cl1" "1" # don't disable
+    # Switch to normal RCU for better CPU efficiency and latency 
+    write "/sys/kernel/rcu_expedited" "1" # 0 default
+    write "/sys/kernel/rcu_normal" "0" # 1 default
     
-    # CPU Hotplug Control
-    write "/sys/devices/system/cpu/hotplug/states" "enabled"
-	
-    # Switch to normal RCU for better CPU efficiency and latency.
-    write "/sys/kernel/rcu_expedited" "0"
-    write "/sys/kernel/rcu_normal" "1"
+    for cpu2 in /sys/devices/system/cpu/cpu*/
+    do
+    chmod 000 ${cpu2}cpu_capacity
+    done
+
+    chmod 000 /sys/devices/system/cpu/cpu0/topology/physical_package_id
+    chmod 000 /sys/devices/system/cpu/cpu1/topology/physical_package_id
+    chmod 000 /sys/devices/system/cpu/cpu2/topology/physical_package_id
+    chmod 000 /sys/devices/system/cpu/cpu3/topology/physical_package_id
+    chmod 000 /sys/devices/system/cpu/cpu4/topology/physical_package_id
+    chmod 000 /sys/devices/system/cpu/cpu5/topology/physical_package_id
+    chmod 000 /sys/devices/system/cpu/cpu6/topology/physical_package_id
+    chmod 000 /sys/devices/system/cpu/cpu7/topology/physical_package_id
     
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
     simple_bar
-	
-    # FS Tweaks
+    
+    # FileSystem (FS) optimized tweaks & enhancements for a improved userspace experience.
     write "/proc/sys/fs/lease-break-time" "20"
 	write "/proc/sys/fs/leases-enable" "1"
-    write "/proc/sys/fs/aio-max-nr" "131072"
-	
+	write "/proc/sys/fs/aio-max-nr" "131072"
+	write "/proc/sys/fs/inotify/max_queued_events" "131072"
+    write "/proc/sys/fs/inotify/max_user_watches" "131072"
+    write "/proc/sys/fs/inotify/max_user_instances" "1024"
+    
 	simple_bar
     kmsg1 "[*] FS TWEAKED. "
     simple_bar
 	
-    # Tweak some kernel settings to improve overall performance.
-    write "/proc/sys/kernel/sched_child_runs_first" "0"
-    write "/proc/sys/kernel/random/write_wakeup_threshold" "512" # 1024
-    write "/proc/sys/kernel/random/urandom_min_reseed_secs" "90"
+    # Kernel Settings
     
-    # Reduce scheduler latency for power efficiency
+    # CPU scheduling and kernel performance settings.
     write "/proc/sys/kernel/sched_wakeup_granularity_ns" "5000000"
     write "/proc/sys/kernel/sched_latency_ns" "8000000"
     write "/proc/sys/kernel/sched_min_granularity_ns" "800000"
     write "/proc/sys/kernel/sched_migration_cost_ns" "500000"
     write "/proc/sys/kernel/sched_rt_period_us" "1000000"
-    write "/proc/sys/kernel/perf_cpu_time_max_percent" "15"
+    write "/proc/sys/kernel/perf_cpu_time_max_percent" "15" # default 5
     write "/proc/sys/kernel/sched_rr_timeslice_ms" "20"
     write "/proc/sys/kernel/sched_nr_migrate" "32"
-    write "/proc/irq/default_smp_affinity" "01"
-    write "/sys/bus/workqueue/devices/writeback/cpumask" "f0"
-    write "/sys/devices/virtual/workqueue/cpumask" "f0"
+    write "/proc/irq/default_smp_affinity" "0f" # 0f default
+    write "/sys/bus/workqueue/devices/writeback/cpumask" "f0" # default 0f
+    write "/sys/devices/virtual/workqueue/cpumask" "f0" # default ff
     write "/dev/cpuset/sched_load_balance" "0"
     write "/proc/sys/kernel/pid_max" "65536"
     write "/proc/sys/kernel/printk_devkmsg" "off"
@@ -3737,55 +3730,62 @@ s5e8825_gaming() {
     write "/proc/sys/kernel/sched_tunable_scaling" "0"
     write "/proc/sys/kernel/perf_event_max_sample_rate" "100000"
     write "/proc/sys/kernel/perf_event_mlock_kb" "516"
-
+    write "/proc/sys/kernel/sched_child_runs_first" "0"
+    write "/proc/sys/kernel/random/write_wakeup_threshold" "512"
+    write "/proc/sys/kernel/random/urandom_min_reseed_secs" "90"
     if [ -f "/proc/sys/kernel/printk" ]; then
       write "/proc/sys/kernel/printk" "0 0 0 0"
     fi
-
+    
     simple_bar
     kmsg1 "[*] TWEAKED KERNEL SETTINGS. "
     simple_bar
     
-    # Overclock (stock clock)
+    # Underclock
     
     # Set min and max clocks.
-    write "/sys/devices/system/cpu/isolated" "0"
-    write "/sys/devices/system/cpu/offline" "0"
     write "/sys/devices/system/cpu/cpu0/online" "1"
     write "/sys/devices/system/cpu/cpu1/online" "1"
     write "/sys/devices/system/cpu/cpu2/online" "1"
     write "/sys/devices/system/cpu/cpu3/online" "1"
     write "/sys/devices/system/cpu/cpu4/online" "1"
     write "/sys/devices/system/cpu/cpu5/online" "1"
-    write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000"
-
     write "/sys/devices/system/cpu/cpu6/online" "1"
     write "/sys/devices/system/cpu/cpu7/online" "1"
-    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2400000"
+    
+    write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2002000" # 2002000 default
+    chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
+    write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000" # 2002000 default
+    
+    write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2288000" # 2288000 default
+    chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq
+    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2288000" # 2288000 default
 
-    # Maximum CPU frequency for better performance. 
+    chmod 0444 /sys/devices/system/cpu/cpufreq/policy*/scaling_max_freq
+    
+    # Maximum CPU frequency limit to save power
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2400000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2288000"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "2400000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "1536000"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "2002000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "2002000" # 2002000 default
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "2002000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "1536000"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
 
     simple_bar
-    kmsg1 "[*] CPU OVERCLOCKED. "
+    kmsg1 "[*] CPU UNDERCLOCKED. "
     simple_bar
     
     # VM settings to improve overall user experience and smoothness.
-    write "/proc/sys/vm/drop_caches" "3"
+    #write "/proc/sys/vm/drop_caches" "3"
     write "/proc/sys/vm/dirty_background_ratio" "5"
     write "/proc/sys/vm/dirty_ratio" "20"
     write "/proc/sys/vm/dirty_expire_centisecs" "1500"
@@ -3793,10 +3793,12 @@ s5e8825_gaming() {
     write "/proc/sys/vm/overcommit_ratio" "40"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60"
-    write "/proc/sys/vm/swappiness" "80"
+    write "/proc/sys/vm/swappiness" "80" # 150 default
     write "/proc/sys/vm/laptop_mode" "0"
-    write "/proc/sys/vm/vfs_cache_pressure" "100"
-
+    write "/proc/sys/vm/vfs_cache_pressure" "100" # 200 default
+    write "/proc/sys/vm/oom_kill_allocating_task" "0"
+    write "/proc/sys/vm/extfrag_threshold" "750"
+    
     simple_bar
     kmsg1 "[*] APPLIED VM TWEAKS."
     simple_bar
@@ -3805,11 +3807,11 @@ s5e8825_gaming() {
     
     # I/O Scheduler
     for queue in /sys/block/sd*/queue/; do
-      write "${queue}/scheduler" "none"
+      write "${queue}scheduler" "none" 
     done
     
     for loop in /sys/block/loop*/queue/; do
-      echo "${loop}/scheduler" "none"
+      echo "${loop}scheduler" "none"
     done
     
     for io in /sys/block/*/queue/
@@ -3826,28 +3828,26 @@ s5e8825_gaming() {
     kmsg1 "[*] I/O SCHEDULER TWEAKED. "
     simple_bar
     
-    simple_bar
-    kmsg1 "[*] I/O SCHEDULER TWEAKED. "
-    simple_bar
+    # GPU Tweaks
     
     for mali in /sys/devices/platform/*.mali
     do
-    write "$mali/power_policy" "always_on"
-    write "$mali/dvfs_governor" "Booster"
-    write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control 
+    write "$mali/power_policy" "always_on" # coarse_demand
+    write "$mali/dvfs_governor" "4" # Booster
+    write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control, default 0.
     write "$mali/highspeed_load" "30"
     write "$mali/highspeed_delay" "1"
     write "$mali/highspeed_clock" "897000"
     done
     
-    chmod -R 000 /sys/devices/platform/*.mali/dvfs
-    chmod -R 000 /sys/devices/platform/*.mali/dvfs_min_lock
-    chmod -R 000 /sys/devices/platform/*.mali/dvfs_max_lock
-    chmod -R 000 /sys/devices/platform/*.mali/dvfs_min_lock_status
-    chmod -R 000 /sys/devices/platform/*.mali/dvfs_max_lock_status
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs # 644 default
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs_min_lock # 644 default
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs_max_lock # 644 default
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs_min_lock_status # 644 default
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs_max_lock_status # 644 default
     
     chown root /sys/kernel/gpu/gpu_min_clock
-    write "/sys/kernel/gpu/gpu_min_clock" "897000"
+    write "/sys/kernel/gpu/gpu_min_clock" "403000" # 403000 default
     
     chown root /sys/kernel/gpu/gpu_min_clock
     write "/sys/kernel/gpu/gpu_max_clock" "897000"
@@ -3858,76 +3858,78 @@ s5e8825_gaming() {
     kmsg1 "[*] GPU TWEAKED. "
     simple_bar
     
-	# Net tweaks
+    # Turn off a few additional kernel debuggers and what not for gaining a slight boost in both performance and battery life.
+    write "/sys/module/hid_apple/parameters/fnmode" "0"
+    write "/sys/module/hid/parameters/ignore_special_drivers" "0"
+    write "/sys/module/hid_magicmouse/parameters/emulate_3button" "N"
+    write "/sys/module/hid_magicmouse/parameters/emulate_scroll_wheel" "N"
+    write "/sys/module/hid_magicmouse/parameters/scroll_speed" "0"
+    write "/sys/module/ip6_tunnel/parameters/log_ecn_error" "N"
+    write "/sys/module/sit/parameters/log_ecn_error" "N"
+    write "/sys/module/printk/parameters/console_suspend" "Y"
+    write "/sys/module/printk/parameters/cpu" "N"
+    write "/sys/module/printk/parameters/ignore_loglevel" "Y"
+    write "/sys/module/printk/parameters/pid" "N"
+    write "/sys/module/printk/parameters/time" "N"
+    write "/sys/module/battery_saver/parameters/enabled" "Y"
+    write "/sys/module/cpuidle/parameters/off" "1"
+    write "/sys/module/binder/parameters/debug_mask" "0"
+    write "/sys/module/binder_alloc/parameters/debug_mask" "0"
+    
+    simple_bar
+    kmsg1 "[*] KERNEL DEBUGGERS DISABLED. "
+    simple_bar
+    
+    # Network Traffic Tweaks
+    write "/proc/sys/net/ipv4/tcp_tw_recycle" "1"
+    write "/proc/sys/net/ipv4/tcp_fack" "1"
     write "/proc/sys/net/ipv4/tcp_ecn" "1"
+    write "/proc/sys/net/ipv4/tcp_dsack" "1"
+    write "/proc/sys/net/ipv4/conf/default/secure_redirects" "1"
     write "/proc/sys/net/ipv4/tcp_sack" "1"
+    write "/proc/sys/net/ipv4/tcp_rfc1337" "1"
     write "/proc/sys/net/ipv4/tcp_fastopen" "3"
-
-    simple_bar
-    kmsg1 "[*] NET TWEAKED. "
-    simple_bar
-    
-    # Thermal Tweaks
-    	
-    # Thermal management for BIG cluster
-    for i in 0 1 2 3 4 5 6 7; do
-      write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_${i}_hyst" "5000"
-    done
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_0_temp" "30000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_1_temp" "65000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_2_temp" "85000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_3_temp" "90000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_4_temp" "95000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_5_temp" "100000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_6_temp" "105000"
-    write "/sys/devices/virtual/thermal/thermal_zone0/trip_point_7_temp" "110000"
-
-    # Thermal management for LITTLE cluster
-    for i in 0 1 2 3 4 5 6 7; do
-      write "/sys/devices/virtual/thermal/thermal_zone1/trip_point_${i}_hyst" "5000"
-    done
-    write "/sys/devices/virtual/thermal/thermal_zone1/trip_point_0_temp" "30000"
-    write "/sys/devices/virtual/thermal/thermal_zone1/trip_point_1_temp" "65000"
-    write "/sys/devices/virtual/thermal/thermal_zone1/trip_point_2_temp" "85000"
-    write "/sys/devices/virtual/thermal/thermal_zone1/trip_point_3_temp" "90000"
-    write "/sys/devices/virtual/thermal/thermal_zone1/trip_point_4_temp" "95000"
-    write "/sys/devices/virtual/thermal/thermal_zone1/trip_point_5_temp" "100000"
-    write "/sys/devices/virtual/thermal/thermal_zone1/trip_point_6_temp" "105000"
-    write "/sys/devices/virtual/thermal/thermal_zone1/trip_point_7_temp" "110000"
-    
-    # Thermal management for GPU (G3D)
-    for i in 0 1 2 3 4 5 6 7; do
-      write "/sys/devices/virtual/thermal/thermal_zone2/trip_point_${i}_hyst" "5000"
-    done
-    write "/sys/devices/virtual/thermal/thermal_zone2/trip_point_0_temp" "20000"
-    write "/sys/devices/virtual/thermal/thermal_zone2/trip_point_1_temp" "90000"
-    write "/sys/devices/virtual/thermal/thermal_zone2/trip_point_2_temp" "95000"
-    write "/sys/devices/virtual/thermal/thermal_zone2/trip_point_3_temp" "100000"
-    write "/sys/devices/virtual/thermal/thermal_zone2/trip_point_4_temp" "105000"
-    write "/sys/devices/virtual/thermal/thermal_zone2/trip_point_5_temp" "107000"
-    write "/sys/devices/virtual/thermal/thermal_zone2/trip_point_6_temp" "109000"
-    write "/sys/devices/virtual/thermal/thermal_zone2/trip_point_7_temp" "110000"
-
-    # Power Sustainability for CPU and GPU
-    write "/sys/devices/virtual/thermal/thermal_zone1/sustainable_power" "0"  # LITTLE Cluster
-    write "/sys/devices/virtual/thermal/thermal_zone0/sustainable_power" "1300"  # BIG Cluster
-    write "/sys/devices/virtual/thermal/thermal_zone2/sustainable_power" "1800"  # GPU
+    write "/proc/sys/net/ipv4/conf/all/secure_redirects" "1"
     
     simple_bar
-    kmsg1 "[*] THERMAL TWEAKED. "
+    kmsg1 "[*] NETWORK TRAFFIC TWEAKED. "
     simple_bar
     
-    # Force HDR
+    # Misc kernel settings.
     write "/sys/devices/platform/panel_drv_0/lcd/panel/mdnie/hdr" "1"
-
+    write "/sys/power/mem_sleep" "deep"
+    write "/proc/sys/kernel/pty/max" "6144"
+    write "/proc/sys/kernel/keys/gc_delay" "100"
+    write "/proc/sys/kernel/keys/maxbytes" "20000"
+    write "/proc/sys/kernel/keys/maxkeys" "200"
+    write "/sys/power/pm_freeze_timeout" "60000"
+    write "/sys/class/input_booster/*" "0"
+    sysctl -w net.ipv4.tcp_congestion_control=bbr
+    
     simple_bar
-    kmsg1 "[*] HDR TWEAKED. "
+    kmsg1 "[*] MISC KERNEL SETTINGS TWEAKED. "
     simple_bar
+    
+    if [ "$(cat /sys/block/zram0/disksize)" -ne 4294967296 ]; then
+        chmod 644 /dev/block/zram0
+        echo "lz4" > /sys/block/zram0/comp_algorithm
+        swapoff /dev/block/zram0 > /dev/null 2>&1  
+        echo "1" > /sys/block/zram0/reset
+        echo "0" > /sys/block/zram0/disksize
+        echo "4" > /sys/block/zram0/max_comp_streams
+        echo "4294967296" > /sys/block/zram0/disksize
+        mkswap /dev/block/zram0 > /dev/null 2>&1  
+        swapon /dev/block/zram0 > /dev/null 2>&1
+        
+        simple_bar
+        kmsg1 "[*] ZRAM TWEAKED. "
+        simple_bar
+    fi
     
     simple_bar
     kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
     simple_bar
-
+    
     simple_bar
     kmsg1 "[*] END OF EXECUTION: $(date)"
     simple_bar
@@ -3939,6 +3941,7 @@ s5e8825_gaming() {
     simple_bar
 
     init=$(date +%s)
+	
 	am start -a android.intent.action.MAIN -e toasttext "Gaming profile was successfully applied!" -n bellavita.toast/.MainActivity
 }
 
