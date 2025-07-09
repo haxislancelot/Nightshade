@@ -5,7 +5,7 @@
 # Download all scripts and then allocate them
 chipset=$(grep "Hardware" /proc/cpuinfo | uniq | cut -d ':' -f 2 | sed 's/^[ \t]*//')
 if [ -z "$chipset" ]; then
-    chipset=$(getprop "ro.hardware")
+    chipset=$(getprop "ro.product.board")
 fi
 
 if [[ $chipset == *s5e8825* ]]; then
