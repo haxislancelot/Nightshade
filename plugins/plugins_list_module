@@ -5,6 +5,8 @@ curl -o /sdcard/.NTSH/plugins/gapp.sh "https://raw.githubusercontent.com/haxisla
 curl -o /sdcard/.NTSH/plugins/swap.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/plugins/swap.sh" > /dev/null 2>&1
 curl -o /sdcard/.NTSH/plugins/cache.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/plugins/cache.sh" > /dev/null 2>&1
 curl -o /sdcard/.NTSH/plugins/analytics.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/plugins/analytics.sh" > /dev/null 2>&1
+curl -o /sdcard/.NTSH/plugins/gms.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/plugins/gms.sh" > /dev/null 2>&1
+curl -o start.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/beta/start.sh" > /dev/null 2>&1
 
 chipset=$(grep "Hardware" /proc/cpuinfo | uniq | cut -d ':' -f 2 | sed 's/^[ \t]*//')
 if [ -z "$chipset" ]; then
