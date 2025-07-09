@@ -11,7 +11,10 @@ swap_menu() {
     echo ""
     echo "\033[0;90mCustom Swap Size [ 1 ]"
     sleep 0
-    echo "Delete Swap [ 2 ]"
+    echo "Recommended Swap [ 2 ]"
+    sleep 0
+    echo "Delete Swap [ 3 ]"
+    sleep 0
     sleep 0
     echo "Return to plugins menu [ 0 ]"
     echo ""
@@ -29,12 +32,23 @@ swap_menu() {
                 echo ""
                 dd if=/dev/zero of=/data/local/tmp/swap bs=1048576 count=$swap_size
                 mkswap /data/local/tmp/swap
+                swapon /data/local/tmp/swap
                 free
                 else
                 echo ""
                 fi
                 ;;
             2)
+                rm -f /data/local/tmp/swap
+                dd if=/dev/zero of=/data/local/tmp/swap bs=1M count=4096
+                mkswap /data/local/tmp/swap
+                swapon /data/local/tmp/swap
+                sleep 0
+                echo "${G}Swap created successfully!${F}"
+                sleep 1
+                swap_menu
+                ;;
+            3)
                 rm -f /data/local/tmp/swap
                 echo "${G}Swap deleted successfully!${F}"
                 sleep 1
