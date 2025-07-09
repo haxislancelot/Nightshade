@@ -51,7 +51,7 @@ fi
 ask_update_script() {
 	clear
     while true; do
-        echo "\033[0;90mDo you want to update the main script and plugins? (yes/no)"
+        echo "\033[0;90mDo you want to update? (yes/no)"
         echo -n "> ${F}"
         read answer
         case $answer in
@@ -63,7 +63,7 @@ ask_update_script() {
                 sh start.sh
                 break;;
             [Nn]* )
-                echo "Not updating the main script."
+                echo "Not updating."
                 break;;
             * ) echo "Please answer yes or no.";;
         esac
