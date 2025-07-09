@@ -1,0 +1,249 @@
+#!/system/bin/sh
+# Do not use this in your script or project without asking for my permission.
+# https://t.me/donottellmyname
+clear
+
+set_val() {
+    if [ -f "$1" ]; then
+        chmod 644 "$1"
+        echo "$2" > "$1"
+        chmod 444 "$1"
+    else
+        log "Skipped: $1 not found"
+    fi
+}
+
+log() {
+    echo -e "\033[1;36m➤ $1\033[0m"
+    sleep 0
+}
+
+# CPU - BIG Cluster
+log "Configuring BIG CPU cluster..."
+BIG_FREQ_SYS=/sys/devices/system/cpu/cpu6/cpufreq/scaling_max_freq
+BIG_FREQ_QOS=/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq
+
+set_val "$BIG_FREQ_QOS" "2400000"
+if [ -f "$BIG_FREQ_SYS" ] && [ "$(cat $BIG_FREQ_SYS)" = "2496000" ]; then
+    set_val "$BIG_FREQ_QOS" "2496000"
+fi
+
+# CPU - LITTLE Cluster
+log "Configuring LITTLE CPU cluster..."
+LITTLE_FREQ_SYS=/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+LITTLE_FREQ_QOS=/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq
+
+set_val "$LITTLE_FREQ_QOS" "2002000"
+if [ -f "$LITTLE_FREQ_SYS" ] && [ "$(cat $LITTLE_FREQ_SYS)" = "2210000" ]; then
+    set_val "$LITTLE_FREQ_QOS" "2210000"
+fi
+
+# Workqueue power efficiency
+log "Enabling workqueue power efficiency..."
+set_val /sys/module/workqueue/parameters/power_efficient "Y"
+
+# CPU Hotplug
+log "Enabling CPU hotplug..."
+if [ -f /sys/power/cpuhotplug/enabled ]; then
+    echo '1' > /sys/power/cpuhotplug/enabled
+else
+    log "/sys/power/cpuhotplug/enabled not found, skipping"
+fi
+
+# Input Booster
+log "Enabling input booster debug..."
+if [ -f /sys/class/input_booster/debug_level ]; then
+    echo '3' > /sys/class/input_booster/debug_level
+else
+    log "/sys/class/input_booster/debug_level not found, skipping"
+fi
+
+# GPU - Clocks & Policy
+log "Applying GPU clock settings..."
+GPU=/sys/kernel/gpu
+GPU_HS=/sys/devices/platform/10300000.mali/highspeed_clock
+
+if [ -f $GPU/gpu_max_clock ]; then
+    set_val "$GPU/gpu_max_clock" "897000"
+    sleep 0
+    if [ "$(cat $GPU/gpu_max_clock)" = "1209000" ]; then
+        log "GPU max clock: 1209000"
+        set_val "$GPU/gpu_max_clock" "1209000"
+        set_val "$GPU/gpu_min_clock" "312000"
+        set_val "$GPU_HS" "1209000"
+    else
+        log "GPU max clock: 897000"
+        set_val "$GPU/gpu_max_clock" "897000"
+        set_val "$GPU/gpu_min_clock" "312000"
+        set_val "$GPU_HS" "897000"
+    fi
+else
+    log "GPU max clock path not found, skipping GPU tuning"
+fi
+
+log "Setting GPU policy parameters..."
+if [ -f /sys/devices/platform/10300000.mali/highspeed_load ]; then
+    echo '75' > /sys/devices/platform/10300000.mali/highspeed_load
+else
+    log "highspeed_load not found, skipping"
+fi
+if [ -f /sys/devices/platform/10300000.mali/tmu ]; then
+    echo '0' > /sys/devices/platform/10300000.mali/tmu
+else
+    log "tmu not found, skipping"
+fi
+if [ -f /sys/devices/platform/10300000.mali/power_policy ]; then
+    echo 'coarse_demand' > /sys/devices/platform/10300000.mali/power_policy
+else
+    log "power_policy not found, skipping"
+fi
+
+# Battery
+log "Enabling fast charging (AFC)..."
+if [ -f /sys/class/sec/switch/afc_disable ]; then
+    echo '0' > /sys/class/sec/switch/afc_disable
+else
+    log "AFC disable path not found, skipping"
+fi
+
+# I/O Scheduler
+log "Optimizing I/O scheduler..."
+for blk in mmcblk0 mmcblk1; do
+    blkpath="/sys/block/$blk"
+    if [ -d "$blkpath" ]; then
+        echo 'cfq' > $blkpath/queue/scheduler
+        echo '0' > $blkpath/queue/iostats
+        echo '0' > $blkpath/queue/add_random
+        echo '2' > $blkpath/queue/nomerges
+        echo '4' > $blkpath/queue/nr_requests
+        echo '1' > $blkpath/queue/rq_affinity
+        sleep 0
+    else
+        log "I/O block device $blk not found, skipping"
+    fi
+done
+
+# UKSM / KSM
+log "Disabling UKSM and KSM..."
+if [ -f /sys/kernel/mm/uksm/run ]; then
+    echo '0' > /sys/kernel/mm/uksm/run
+else
+    log "UKSM not found, skipping"
+fi
+if [ -f /sys/kernel/mm/ksm/run ]; then
+    echo '0' > /sys/kernel/mm/ksm/run
+else
+    log "KSM not found, skipping"
+fi
+
+# Low Memory Killer
+log "Tuning Low Memory Killer..."
+if [ -f /sys/module/lowmemorykiller/parameters/minfree ]; then
+    chmod 666 /sys/module/lowmemorykiller/parameters/minfree
+    chown root /sys/module/lowmemorykiller/parameters/minfree
+    echo '256,7680,21760,21760,21760,21760' > /sys/module/lowmemorykiller/parameters/minfree
+    echo '0,1,2,4,8,16' > /sys/module/lowmemorykiller/parameters/adj
+else
+    log "Low Memory Killer parameters not found, skipping"
+fi
+
+# Wakelocks
+log "Disabling wakelocks (Wi-Fi & Bluetooth)..."
+if [ -f /sys/module/wakeup/parameters/enable_wlan_wake_wl ]; then
+    echo 'N' > /sys/module/wakeup/parameters/enable_wlan_wake_wl
+else
+    log "Wakelock WLAN not found, skipping"
+fi
+if [ -f /sys/module/wakeup/parameters/enable_bluedroid_timer_wl ]; then
+    echo 'N' > /sys/module/wakeup/parameters/enable_bluedroid_timer_wl
+else
+    log "Wakelock Bluetooth not found, skipping"
+fi
+
+# Entropy
+log "Adjusting entropy values..."
+ENTR=/proc/sys/kernel/random
+if [ -f $ENTR/read_wakeup_threshold ]; then
+    echo 64 > $ENTR/read_wakeup_threshold
+else
+    log "Entropy read_wakeup_threshold not found, skipping"
+fi
+if [ -f $ENTR/write_wakeup_threshold ]; then
+    echo 896 > $ENTR/write_wakeup_threshold
+else
+    log "Entropy write_wakeup_threshold not found, skipping"
+fi
+
+setprop debug.performance.tuning 0
+sleep 0
+
+log "Blocking specific wakelocks via boeffla..."
+if set_val "/sys/class/misc/boeffla_wakelock_blocker/wakelock_blocker" "wlan_wake;wlan_rx_wake;wlan_ctrl_wake;wlan_txfl_wake;bluetooth_timer;BT_bt_wake;BT_host_wake;bbd_wake_lock;ssp_sensorhub_wake_lock;14860000.decon_f;ssp_wake_lock;ssp_comm_wake_lock;abox;umts_ipc0;umts_ipc1;mmc0_detect"; then
+    log "Boeffla wakelock blocker enabled."
+else
+    log "Skipped: /sys/class/misc/boeffla_wakelock_blocker/wakelock_blocker not found"
+fi
+
+WK=0
+
+for param in \
+    /sys/module/bcmdhd/parameters/wlrx_divide:8 \
+    /sys/module/bcmdhd/parameters/wlctrl_divide:8 \
+    /sys/module/wakeup/parameters/enable_bluetooth_timer:Y \
+    /sys/module/wakeup/parameters/enable_wlan_ipa_ws:N \
+    /sys/module/wakeup/parameters/enable_wlan_pno_wl_ws:N \
+    /sys/module/wakeup/parameters/enable_wcnss_filter_lock_ws:N \
+    /sys/module/wakeup/parameters/wlan_wake:N \
+    /sys/module/wakeup/parameters/wlan_ctrl_wake:N \
+    /sys/module/wakeup/parameters/wlan_rx_wake:N \
+    /sys/module/wakeup/parameters/enable_msm_hsic_ws:N \
+    /sys/module/wakeup/parameters/enable_si_ws:N \
+    /sys/module/wakeup/parameters/enable_bluedroid_timer_ws:N \
+    /sys/module/wakeup/parameters/enable_ipa_ws:N \
+    /sys/module/wakeup/parameters/enable_netlink_ws:N \
+    /sys/module/wakeup/parameters/enable_netmgr_wl_ws:N \
+    /sys/module/wakeup/parameters/enable_qcom_rx_wakelock_ws:N \
+    /sys/module/wakeup/parameters/enable_timerfd_ws:N \
+    /sys/module/wakeup/parameters/enable_wlan_extscan_wl_ws:N \
+    /sys/module/wakeup/parameters/enable_wlan_rx_wake_ws:N \
+    /sys/module/wakeup/parameters/enable_wlan_wake_ws:N \
+    /sys/module/wakeup/parameters/enable_wlan_wow_wl_ws:N \
+    /sys/module/wakeup/parameters/enable_wlan_ws:N \
+    /sys/module/wakeup/parameters/enable_wlan_ctrl_wake_ws:N \
+    /sys/module/smb135x_charger/parameters/use_wlock:N \
+    /sys/module/wakeup/parameters/enable_smb135x_wake_ws:N \
+    /sys/module/wakeup/parameters/enable_si_ws:N \
+    /sys/module/wakeup/parameters/enable_bluesleep_ws:N \
+    /sys/module/bcmdhd/parameters/wlrx_divide:N \
+    /sys/module/bcmdhd/parameters/wlctrl_divide:N \
+    /sys/module/xhci_hcd/parameters/wl_divide:N \
+    /sys/module/smb135x_charger/parameters/use_wlock:N
+do
+    file="${param%%:*}"
+    val="${param#*:}"
+    if set_val "$file" "$val"; then
+        WK=$((WK + 1))
+        log "Blocked wakelock param: $file set to $val"
+    else
+        log "Skipped: $file not found"
+    fi
+done
+
+if [ $WK -gt 0 ]; then
+    log "Blocked $WK wakelock parameters."
+else
+    log "No wakelock parameters were blocked."
+fi
+
+log "Enabling additional boeffla wakelock blocker..."
+if set_val "/sys/class/misc/boeffla_wakelock_blocker/wakelock_blocker" "wlan_pno_wl;wlan_ipa;wcnss_filter_lock;[timerfd];hal_bluetooth_lock;IPA_WS;sensor_ind;wlan;netmgr_wl;qcom_rx_wakelock;wlan_wow_wl;wlan_extscan_wl;NETLINK"; then
+    log "Additional boeffla wakelock blocker enabled."
+else
+    log "Skipped: /sys/class/misc/boeffla_wakelock_blocker/wakelock_blocker not found"
+fi
+
+# Final message
+echo -e "\033[1;33m➤ All optimizations applied successfully!\033[0m"
+echo
+echo -ne "${G}Press ENTER to open labs...${F}"; read
+labs
