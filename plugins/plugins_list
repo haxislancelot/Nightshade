@@ -7,7 +7,7 @@ curl -o start.sh "https://raw.githubusercontent.com/haxislancelot/Nightshade/bet
 
 chipset=$(grep "Hardware" /proc/cpuinfo | uniq | cut -d ':' -f 2 | sed 's/^[ \t]*//')
 if [ -z "$chipset" ]; then
-    chipset=$(getprop "ro.hardware")
+    chipset=$(getprop "ro.product.board")
 fi
 
 if [[ $chipset == *MT* ]] || [[ $chipset == *mt* ]]; then
