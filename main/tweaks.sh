@@ -1570,10 +1570,12 @@ s5e8825_balanced() {
     write "/sys/devices/system/cpu/cpu7/online" "1"
     
     write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2002000" # 2002000 default
+    chmod 000 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq
     chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
     write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000" # 2002000 default
     
     write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2288000" # 2288000 default
+    chmod 000 /sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq
     chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq
     write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2288000" # 2288000 default
 
@@ -1582,19 +1584,19 @@ s5e8825_balanced() {
     # Maximum CPU frequency limit to save power
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
     write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2288000"
-    chmod 000 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
+    chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
     write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "533000"
-    chmod 000 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
+    chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
     write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "2002000"
-    chmod 000 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
+    chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
     write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "533000"
-    chmod 000 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
+    chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
 
     simple_bar
     kmsg1 "[*] CPU UNDERCLOCKED. "
