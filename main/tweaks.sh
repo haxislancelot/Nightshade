@@ -1474,17 +1474,12 @@ s5e8825_balanced() {
 	while [ $cpu -lt $cpu_cores ]; do
 		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
 		if [ -d "$cpu_dir" ]; then
-			write "${cpu_dir}/cpufreq/scaling_governor" "schedutil"
+			write "${cpu_dir}/cpufreq/scaling_governor" "energy_aware"
 		fi
 		cpu="$((cpu + 1))"
 	done
 	
-    for cpu in /sys/devices/system/cpu/cpu*/cpufreq/
-    do
-        write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BALANCE / 2000))" # SCHED_PERIOD_BATTERY default
-    done
-    
-	# CPU Load settings
+    # CPU Load settings
 	write "/dev/cpuset/foreground/cpus" "0-4" # 0-7 default
 	write "/dev/cpuset/background/cpus" "0-1" # 0-3 default
 	write "/dev/cpuset/system-background/cpus" "0-3"
@@ -1492,34 +1487,34 @@ s5e8825_balanced() {
 	write "/dev/cpuset/restricted/cpus" "0-7"
 	
     # Switch to normal RCU for better CPU efficiency and latency 
-    write "/sys/kernel/rcu_expedited" "0"
-    write "/sys/kernel/rcu_normal" "1"
+    write "/sys/kernel/rcu_expedited" "1"
+    write "/sys/kernel/rcu_normal" "0"
     
     for cpu2 in /sys/devices/system/cpu/cpu*/
     do
-    chmod 000 ${cpu2}cpu_capacity
+    chmod 444 ${cpu2}cpu_capacity
     done
 
-    chmod 000 /sys/devices/system/cpu/cpu0/topology/physical_package_id
-    chmod 000 /sys/devices/system/cpu/cpu1/topology/physical_package_id
-    chmod 000 /sys/devices/system/cpu/cpu2/topology/physical_package_id
-    chmod 000 /sys/devices/system/cpu/cpu3/topology/physical_package_id
-    chmod 000 /sys/devices/system/cpu/cpu4/topology/physical_package_id
-    chmod 000 /sys/devices/system/cpu/cpu5/topology/physical_package_id
-    chmod 000 /sys/devices/system/cpu/cpu6/topology/physical_package_id
-    chmod 000 /sys/devices/system/cpu/cpu7/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu0/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu1/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu2/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu3/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu4/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu5/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu6/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu7/topology/physical_package_id
     
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
     simple_bar
     
     # FileSystem (FS) optimized tweaks & enhancements for a improved userspace experience.
-    write "/proc/sys/fs/lease-break-time" "10"
-	write "/proc/sys/fs/leases-enable" "0"
-	write "/proc/sys/fs/aio-max-nr" "327680"
-	write "/proc/sys/fs/inotify/max_queued_events" "131072"
+    write "/proc/sys/fs/lease-break-time" "45"
+	write "/proc/sys/fs/leases-enable" "1"
+	write "/proc/sys/fs/aio-max-nr" "65536"
+	write "/proc/sys/fs/inotify/max_queued_events" "16384"
     write "/proc/sys/fs/inotify/max_user_watches" "131072"
-    write "/proc/sys/fs/inotify/max_user_instances" "1024"
+    write "/proc/sys/fs/inotify/max_user_instances" "128"
     
 	simple_bar
     kmsg1 "[*] FS TWEAKED. "
@@ -1528,36 +1523,34 @@ s5e8825_balanced() {
     # Kernel Settings
     
     # CPU scheduling and kernel performance settings.
-    write "/proc/sys/kernel/sched_wakeup_granularity_ns" "3000000"
-    write "/proc/sys/kernel/sched_latency_ns" "10000000"
-    write "/proc/sys/kernel/sched_min_granularity_ns" "950000"
-    write "/proc/sys/kernel/sched_migration_cost_ns" "1000000"
+    write "/proc/sys/kernel/sched_wakeup_granularity_ns" "2000000"
+    write "/proc/sys/kernel/sched_latency_ns" "4000000"
+    write "/proc/sys/kernel/sched_min_granularity_ns" "500000"
+    write "/proc/sys/kernel/sched_migration_cost_ns" "5000000"
     write "/proc/sys/kernel/sched_rt_period_us" "1000000"
-    write "/proc/sys/kernel/perf_cpu_time_max_percent" "10" # default 5
-    write "/proc/sys/kernel/sched_rr_timeslice_ms" "30"
-    write "/proc/sys/kernel/sched_nr_migrate" "64"
-    write "/proc/irq/default_smp_affinity" "0f" # 0f default
-    write "/sys/bus/workqueue/devices/writeback/cpumask" "0f" # default ff
-    write "/sys/devices/virtual/workqueue/cpumask" "f0" # default ff
-    write "/dev/cpuset/sched_load_balance" "0"
-    write "/proc/sys/kernel/pid_max" "65536"
+    write "/proc/sys/kernel/perf_cpu_time_max_percent" "25"
+    write "/proc/sys/kernel/sched_rr_timeslice_ms" "100"
+    write "/proc/sys/kernel/sched_nr_migrate" "32"
+    write "/proc/irq/default_smp_affinity" "01" # 0f default
+    write "/sys/bus/workqueue/devices/writeback/cpumask" "ff" # default ff
+    write "/sys/devices/virtual/workqueue/cpumask" "ff" # default ff
+    write "/dev/cpuset/sched_load_balance" "1"
+    write "/proc/sys/kernel/pid_max" "32768"
     write "/proc/sys/kernel/printk_devkmsg" "off"
     write "/proc/sys/kernel/sched_schedstats" "0"
     write "/proc/sys/kernel/sched_tunable_scaling" "0"
     write "/proc/sys/kernel/perf_event_max_sample_rate" "100000"
     write "/proc/sys/kernel/perf_event_mlock_kb" "516"
-    write "/proc/sys/kernel/sched_child_runs_first" "0"
-    write "/proc/sys/kernel/random/write_wakeup_threshold" "512"
-    write "/proc/sys/kernel/random/urandom_min_reseed_secs" "90"
+    write "/proc/sys/kernel/sched_child_runs_first" "1"
+    write "/proc/sys/kernel/random/write_wakeup_threshold" "256"
+    write "/proc/sys/kernel/random/urandom_min_reseed_secs" "60"
     if [ -f "/proc/sys/kernel/printk" ]; then
-      write "/proc/sys/kernel/printk" "0 0 0 0"
+      write "/proc/sys/kernel/printk" "7 4 1 7"
     fi
     
     simple_bar
     kmsg1 "[*] TWEAKED KERNEL SETTINGS. "
     simple_bar
-    
-    # Underclock
     
     # Set min and max clocks.
     write "/sys/devices/system/cpu/cpu0/online" "1"
@@ -1569,33 +1562,33 @@ s5e8825_balanced() {
     write "/sys/devices/system/cpu/cpu6/online" "1"
     write "/sys/devices/system/cpu/cpu7/online" "1"
     
-    write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2002000" # 2002000 default
+    write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2002000"
     chmod 000 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq
     chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
-    write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000" # 2002000 default
+    write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000"
     
-    write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2288000" # 2288000 default
+    write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2340000"
     chmod 000 /sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq
     chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq
-    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2288000" # 2288000 default
+    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2400000"
 
     chmod 0444 /sys/devices/system/cpu/cpufreq/policy*/scaling_max_freq
     
     # Maximum CPU frequency limit to save power
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2288000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "-1"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "533000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "0"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "2002000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "-1"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
 
     chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "533000"
+    write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "-1"
     chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
 
     simple_bar
@@ -1606,14 +1599,14 @@ s5e8825_balanced() {
     #write "/proc/sys/vm/drop_caches" "3"
     write "/proc/sys/vm/dirty_background_ratio" "10"
     write "/proc/sys/vm/dirty_ratio" "25"
-    write "/proc/sys/vm/dirty_expire_centisecs" "2000"
-    write "/proc/sys/vm/dirty_writeback_centisecs" "2000"
+    write "/proc/sys/vm/dirty_expire_centisecs" "3000"
+    write "/proc/sys/vm/dirty_writeback_centisecs" "3000"
     write "/proc/sys/vm/overcommit_ratio" "50"
     write "/proc/sys/vm/page-cluster" "0"
-    write "/proc/sys/vm/stat_interval" "60"
-    write "/proc/sys/vm/swappiness" "140" # 150 default
+    write "/proc/sys/vm/stat_interval" "10"
+    write "/proc/sys/vm/swappiness" "100"
     write "/proc/sys/vm/laptop_mode" "0"
-    write "/proc/sys/vm/vfs_cache_pressure" "200" # 150
+    write "/proc/sys/vm/vfs_cache_pressure" "200"
     write "/proc/sys/vm/oom_kill_allocating_task" "0"
     write "/proc/sys/vm/extfrag_threshold" "750"
     
@@ -1625,20 +1618,20 @@ s5e8825_balanced() {
     
     # I/O Scheduler
     for queue in /sys/block/sd*/queue/; do
-      write "${queue}scheduler" "none" 
+      write "${queue}scheduler" "ssg" 
     done
     
     for loop in /sys/block/loop*/queue/; do
-      echo "${loop}scheduler" "none"
+      echo "${loop}scheduler" "ssg"
     done
     
     for io in /sys/block/*/queue/
     do
       write "${io}add_random" "0"
       write "${io}iostats" "0"
-      write "${io}read_ahead_kb" "128"
-      write "${io}nomerges" "2"
-      write "${io}rq_affinity" "1"
+      write "${io}read_ahead_kb" "1024"
+      write "${io}nomerges" "0"
+      write "${io}rq_affinity" "0"
       write "${io}nr_requests" "32"
     done
     
@@ -1650,22 +1643,22 @@ s5e8825_balanced() {
     
     for mali in /sys/devices/platform/*.mali
     do
-    write "$mali/power_policy" "always_on" # coarse_demand
-    write "$mali/dvfs_governor" "1" # Interactive
-    write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control, default 0.
-    write "$mali/highspeed_load" "90"
-    write "$mali/highspeed_delay" "3"
+    write "$mali/power_policy" "coarse_demand"
+    write "$mali/dvfs_governor" "1"
+    write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control.
+    write "$mali/highspeed_load" "80"
+    write "$mali/highspeed_delay" "0"
     write "$mali/highspeed_clock" "507000"
     done
     
-    chmod -R 644 /sys/devices/platform/*.mali/dvfs # 644 default
-    chmod -R 644 /sys/devices/platform/*.mali/dvfs_min_lock # 644 default
-    chmod -R 644 /sys/devices/platform/*.mali/dvfs_max_lock # 644 default
-    chmod -R 644 /sys/devices/platform/*.mali/dvfs_min_lock_status # 644 default
-    chmod -R 644 /sys/devices/platform/*.mali/dvfs_max_lock_status # 644 default
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs_min_lock
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs_max_lock
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs_min_lock_status
+    chmod -R 644 /sys/devices/platform/*.mali/dvfs_max_lock_status
     
     chown root /sys/kernel/gpu/gpu_min_clock
-    write "/sys/kernel/gpu/gpu_min_clock" "403000" # 104000 default
+    write "/sys/kernel/gpu/gpu_min_clock" "104000"
     
     chown root /sys/kernel/gpu/gpu_min_clock
     write "/sys/kernel/gpu/gpu_max_clock" "897000"
@@ -1677,19 +1670,16 @@ s5e8825_balanced() {
     simple_bar
     
     # Turn off a few additional kernel debuggers and what not for gaining a slight boost in both performance and battery life.
-    write "/sys/module/hid_apple/parameters/fnmode" "0"
+    write "/sys/module/hid_apple/parameters/fnmode" "1"
     write "/sys/module/hid/parameters/ignore_special_drivers" "0"
-    write "/sys/module/hid_magicmouse/parameters/emulate_3button" "N"
-    write "/sys/module/hid_magicmouse/parameters/emulate_scroll_wheel" "N"
-    write "/sys/module/hid_magicmouse/parameters/scroll_speed" "0"
-    write "/sys/module/ip6_tunnel/parameters/log_ecn_error" "N"
-    write "/sys/module/sit/parameters/log_ecn_error" "N"
-    write "/sys/module/printk/parameters/console_suspend" "Y"
-    write "/sys/module/printk/parameters/cpu" "N"
-    write "/sys/module/printk/parameters/ignore_loglevel" "Y"
-    write "/sys/module/printk/parameters/pid" "N"
-    write "/sys/module/printk/parameters/time" "N"
-    write "/sys/module/battery_saver/parameters/enabled" "Y"
+    write "/sys/module/hid_magicmouse/parameters/emulate_3button" "Y"
+    write "/sys/module/hid_magicmouse/parameters/emulate_scroll_wheel" "Y"
+    write "/sys/module/hid_magicmouse/parameters/scroll_speed" "32"
+    write "/sys/module/ip6_tunnel/parameters/log_ecn_error" "Y"
+    write "/sys/module/sit/parameters/log_ecn_error" "Y"
+    write "/sys/module/printk/parameters/console_suspend" "N"
+    write "/sys/module/printk/parameters/ignore_loglevel" "N"
+    write "/sys/module/printk/parameters/time" "Y"
     write "/sys/module/cpuidle/parameters/off" "1"
     write "/sys/module/binder/parameters/debug_mask" "0"
     write "/sys/module/binder_alloc/parameters/debug_mask" "0"
@@ -1699,14 +1689,14 @@ s5e8825_balanced() {
     simple_bar
     
     # Network Traffic Tweaks
-    write "/proc/sys/net/ipv4/tcp_tw_recycle" "1"
-    write "/proc/sys/net/ipv4/tcp_fack" "1"
-    write "/proc/sys/net/ipv4/tcp_ecn" "1"
+    write "/proc/sys/net/ipv4/tcp_fack" "0"
+    
+    write "/proc/sys/net/ipv4/tcp_ecn" "0"
     write "/proc/sys/net/ipv4/tcp_dsack" "1"
     write "/proc/sys/net/ipv4/conf/default/secure_redirects" "1"
     write "/proc/sys/net/ipv4/tcp_sack" "1"
-    write "/proc/sys/net/ipv4/tcp_rfc1337" "1"
-    write "/proc/sys/net/ipv4/tcp_fastopen" "3"
+    write "/proc/sys/net/ipv4/tcp_rfc1337" "0"
+    write "/proc/sys/net/ipv4/tcp_fastopen" "1"
     write "/proc/sys/net/ipv4/conf/all/secure_redirects" "1"
     
     simple_bar
@@ -1714,14 +1704,13 @@ s5e8825_balanced() {
     simple_bar
     
     # Misc kernel settings.
-    write "/sys/devices/platform/panel_drv_0/lcd/panel/mdnie/hdr" "1"
+    write "/sys/devices/platform/panel_drv_0/lcd/panel/mdnie/hdr" "0"
     write "/sys/power/mem_sleep" "deep"
-    write "/proc/sys/kernel/pty/max" "6144"
-    write "/proc/sys/kernel/keys/gc_delay" "100"
+    write "/proc/sys/kernel/pty/max" "4096"
+    write "/proc/sys/kernel/keys/gc_delay" "300"
     write "/proc/sys/kernel/keys/maxbytes" "20000"
     write "/proc/sys/kernel/keys/maxkeys" "200"
-    write "/sys/power/pm_freeze_timeout" "60000"
-    write "/sys/class/input_booster/*" "0"
+    write "/sys/power/pm_freeze_timeout" "100"
     sysctl -w net.ipv4.tcp_congestion_control=bbr
     
     simple_bar
