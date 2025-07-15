@@ -1444,7 +1444,7 @@ s5e8825_balanced() {
     renice -n -6 $(pgrep msm_irqbalance)
     renice -n -9 $(pgrep kgsl_worker)
     renice -n 6 $(pgrep android.gms)    
-
+    
     simple_bar
     kmsg1 "[*] RENICED PROCESSES. "
     simple_bar
@@ -1562,35 +1562,67 @@ s5e8825_balanced() {
     write "/sys/devices/system/cpu/cpu6/online" "1"
     write "/sys/devices/system/cpu/cpu7/online" "1"
     
-    write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2002000"
-    chmod 000 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq
-    chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
-    write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000"
-    
-    write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2340000"
-    chmod 000 /sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq
-    chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq
-    write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2400000"
-
-    chmod 0444 /sys/devices/system/cpu/cpufreq/policy*/scaling_max_freq
+    if uname -a | grep -q "KN+U"; then
+       write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2210000"
+       chmod 444 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq
+       chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
+       write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2210000"
+       #
+       write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2496000"
+       chmod 444 /sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq
+       chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq
+       write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2496000"
+       #
+       chmod 0444 /sys/devices/system/cpu/cpufreq/policy*/scaling_max_freq
+    else
+       write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2002000"
+       chmod 444 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq
+       chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
+       write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000"
+       #
+       write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2400000"
+       chmod 444 /sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq
+       chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq
+       write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2400000"
+       #
+       chmod 0444 /sys/devices/system/cpu/cpufreq/policy*/scaling_max_freq
+    fi
     
     # Maximum CPU frequency limit to save power
-    chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "-1"
-    chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-
-    chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "0"
-    chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-
-    chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "-1"
-    chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-
-    chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-    write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "-1"
-    chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-
+    if uname -a | grep -q "KN+U"; then
+       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
+       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "-1"
+       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
+       #
+       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
+       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "0"
+       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
+       # 
+       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
+       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "-1"
+       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
+       #
+       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
+       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "-1"
+       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
+    else
+       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
+       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "-1"
+       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
+       #
+       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
+       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "0"
+       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
+       # 
+       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
+       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "-1"
+       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
+       #
+       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
+       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "-1"
+       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
+    fi
+    
     simple_bar
     kmsg1 "[*] CPU UNDERCLOCKED. "
     simple_bar
@@ -1660,10 +1692,15 @@ s5e8825_balanced() {
     chown root /sys/kernel/gpu/gpu_min_clock
     write "/sys/kernel/gpu/gpu_min_clock" "104000"
     
-    chown root /sys/kernel/gpu/gpu_min_clock
-    write "/sys/kernel/gpu/gpu_max_clock" "897000"
+    if uname -a | grep -q "KN+U"; then
+       chown root /sys/kernel/gpu/gpu_min_clock
+       write "/sys/kernel/gpu/gpu_max_clock" "1209000"
+    else
+       chown root /sys/kernel/gpu/gpu_min_clock
+       write "/sys/kernel/gpu/gpu_max_clock" "897000"
+    fi
     
-    write "/sys/kernel/gpu/gpu_cl_boost_disable" "0"
+    write "/sys/kernel/gpu/gpu_cl_boost_disable" "0"   
     
     simple_bar
     kmsg1 "[*] GPU TWEAKED. "
@@ -1690,7 +1727,6 @@ s5e8825_balanced() {
     
     # Network Traffic Tweaks
     write "/proc/sys/net/ipv4/tcp_fack" "0"
-    
     write "/proc/sys/net/ipv4/tcp_ecn" "0"
     write "/proc/sys/net/ipv4/tcp_dsack" "1"
     write "/proc/sys/net/ipv4/conf/default/secure_redirects" "1"
