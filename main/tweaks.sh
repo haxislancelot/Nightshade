@@ -3713,15 +3713,10 @@ s5e8825_gaming() {
 	while [ $cpu -lt $cpu_cores ]; do
 		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
 		if [ -d "$cpu_dir" ]; then
-			write "${cpu_dir}/cpufreq/scaling_governor" "schedutil"
+			write "${cpu_dir}/cpufreq/scaling_governor" "energy_aware"
 		fi
 		cpu="$((cpu + 1))"
 	done
-	
-	for cpu in /sys/devices/system/cpu/cpu*/cpufreq/
-    do
-	write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_LATENCY / 1000))"
-    done
 	
     # CPU Load settings
 	write "/dev/cpuset/foreground/cpus" "0-5"
