@@ -1480,8 +1480,8 @@ s5e8825_balanced() {
 	done
 	
     # CPU Load settings
-	write "/dev/cpuset/foreground/cpus" "0-4" # 0-7 default
-	write "/dev/cpuset/background/cpus" "0-1" # 0-3 default
+	write "/dev/cpuset/foreground/cpus" "0-4,6-7" # 0-7 default
+	write "/dev/cpuset/background/cpus" "0-3" # 0-3 default
 	write "/dev/cpuset/system-background/cpus" "0-3"
 	write "/dev/cpuset/top-app/cpus" "0-7"
 	write "/dev/cpuset/restricted/cpus" "0-7"
@@ -1562,7 +1562,7 @@ s5e8825_balanced() {
     write "/sys/devices/system/cpu/cpu6/online" "1"
     write "/sys/devices/system/cpu/cpu7/online" "1"
     
-    write "/sys/devices/platform/exynos-migov/migov/disable" "1"
+    write "/sys/devices/platform/exynos-migov/migov/disable" "0"
     if uname -a | grep -q "KN+U"; then
        write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2002000"
        chmod 444 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq
@@ -1612,40 +1612,46 @@ s5e8825_balanced() {
     # Maximum CPU frequency limit
     if uname -a | grep -q "KN+U"; then
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2496000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "-1" # 2496000
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
        #
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "533000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "-1"
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
        # 
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "2210000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "-1" # 2210000
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
        #
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "533000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "-1"
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
     else
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2400000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "-1" # 2400000
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
        #
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "533000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "-1"
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
        # 
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "2002000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "-1" # 2002000
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
        #
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "533000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "-1"
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
     fi
     
-    write "/sys/devices/platform/10080000.BIG/thermal_mode" "2"
-    write "/sys/devices/platform/10080000.BIG/emergency_frequency" "2016000"
+    write "/sys/devices/platform/10080000.BIG/thermal_mode" "1"
+    #write "/sys/devices/platform/10080000.BIG/emergency_frequency" "2016000"
+    
+    # Limitar little a 2.0 GHz (em vez de 2.21 GHz)
+    write "/sys/devices/platform/exynos-acme/freq_qos_max" "0 2002000"
+
+    # Limitar big a 2.4 GHz (em vez de 2.496 GHz)
+    write "/sys/devices/platform/exynos-acme/freq_qos_max" "6 2288000"
     
     simple_bar
     kmsg1 "[*] CPU UNDERCLOCKED + EXYNOS MIGOV DISABLED + THERMAL CONFIGURED. "
@@ -3851,40 +3857,45 @@ s5e8825_gaming() {
     # Maximum CPU frequency limit
     if uname -a | grep -q "KN+U"; then
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2496000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "-1" # 2496000
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
        #
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "533000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "-1"
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
        # 
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "2210000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "-1" # 2210000
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
        #
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "533000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "-1"
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
     else
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "2400000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "-1" # 2002000
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
        #
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "533000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "-1"
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
        # 
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "2002000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "-1" # 2002000
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
        #
        chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "533000"
+       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "-1"
        chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
     fi
     
     write "/sys/devices/platform/10080000.BIG/thermal_mode" "2"
     write "/sys/devices/platform/10080000.BIG/emergency_frequency" "2288000"
+    
+    write "/sys/devices/platform/exynos-migov/migov/inc_perf_temp_thr" "65" # 65
+    write "/sys/devices/platform/exynos-migov/migov/min_sensitivity" "10" # 10
+    write "/sys/devices/platform/exynos-migov/migov/gpu_freq_thr" "403000" # 403000
+    write "/sys/devices/platform/exynos-migov/migov/heavy_gpu_ms_thr" "50" # 50
     
     simple_bar
     kmsg1 "[*] CPU UNDERCLOCKED + EXYNOS MIGOV DISABLED + THERMAL CONFIGURED. "
