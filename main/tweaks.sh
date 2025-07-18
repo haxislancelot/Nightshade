@@ -1480,15 +1480,15 @@ s5e8825_balanced() {
 	done
 	
     # CPU Load settings
-	write "/dev/cpuset/foreground/cpus" "0-4,6-7" # 0-7 default
-	write "/dev/cpuset/background/cpus" "0-3" # 0-3 default
+	write "/dev/cpuset/foreground/cpus" "0-6" # 0-4,6-7 is default
+	write "/dev/cpuset/background/cpus" "0-2" # 0-3 default
 	write "/dev/cpuset/system-background/cpus" "0-3"
-	write "/dev/cpuset/top-app/cpus" "0-7"
-	write "/dev/cpuset/restricted/cpus" "0-7"
+	write "/dev/cpuset/top-app/cpus" "0-5,6-7" # 0-7 is default
+	write "/dev/cpuset/restricted/cpus" "0-1"
 	
     # Switch to normal RCU for better CPU efficiency and latency 
-    write "/sys/kernel/rcu_expedited" "1"
-    write "/sys/kernel/rcu_normal" "0"
+    write "/sys/kernel/rcu_expedited" "1" # default is 1
+    write "/sys/kernel/rcu_normal" "0" # default is 0
     
     for cpu2 in /sys/devices/system/cpu/cpu*/
     do
@@ -1569,7 +1569,7 @@ s5e8825_balanced() {
     
     # Set thermal mode.
     write "/sys/devices/platform/10080000.BIG/thermal_mode" "2" # default is 1
-    write "/sys/devices/platform/10080000.BIG/emergency_frequency" "228800"
+    write "/sys/devices/platform/10080000.BIG/emergency_frequency" "2288000"
     
     simple_bar
     kmsg1 "[*] CPU UNDERCLOCKED. "
