@@ -1509,7 +1509,7 @@ s5e8825_balanced() {
     simple_bar
     
     # FileSystem (FS) optimized tweaks & enhancements for a improved userspace experience.
-    write "/proc/sys/fs/lease-break-time" "45"
+    write "/proc/sys/fs/lease-break-time" "20" # 45 is default
 	write "/proc/sys/fs/leases-enable" "1"
 	write "/proc/sys/fs/aio-max-nr" "65536"
 	write "/proc/sys/fs/inotify/max_queued_events" "16384"
@@ -1523,12 +1523,12 @@ s5e8825_balanced() {
     # Kernel Settings
     
     # CPU scheduling and kernel performance settings.
-    write "/proc/sys/kernel/sched_wakeup_granularity_ns" "2000000"
-    write "/proc/sys/kernel/sched_latency_ns" "4000000"
-    write "/proc/sys/kernel/sched_min_granularity_ns" "500000"
+    write "/proc/sys/kernel/sched_wakeup_granularity_ns" "$((SCHED_PERIOD_BALANCE / 2))" # 2000000 is default
+    write "/proc/sys/kernel/sched_latency_ns" "$SCHED_PERIOD_BALANCE" # 4000000 is deafult
+    write "/proc/sys/kernel/sched_min_granularity_ns" "$((SCHED_PERIOD_BALANCE / SCHED_TASKS_BALANCE))" # 500000 is deafult
     write "/proc/sys/kernel/sched_migration_cost_ns" "5000000"
     write "/proc/sys/kernel/sched_rt_period_us" "1000000"
-    write "/proc/sys/kernel/perf_cpu_time_max_percent" "25"
+    write "/proc/sys/kernel/perf_cpu_time_max_percent" "15" # 25 is default
     write "/proc/sys/kernel/sched_rr_timeslice_ms" "100"
     write "/proc/sys/kernel/sched_nr_migrate" "32"
     write "/proc/irq/default_smp_affinity" "01" # 0f default
@@ -1552,6 +1552,8 @@ s5e8825_balanced() {
     kmsg1 "[*] TWEAKED KERNEL SETTINGS. "
     simple_bar
     
+    # Underclock Settings
+    
     # Set min and max clocks.
     write "/sys/devices/system/cpu/cpu0/online" "1"
     write "/sys/devices/system/cpu/cpu1/online" "1"
@@ -1562,113 +1564,29 @@ s5e8825_balanced() {
     write "/sys/devices/system/cpu/cpu6/online" "1"
     write "/sys/devices/system/cpu/cpu7/online" "1"
     
-    write "/sys/devices/platform/exynos-migov/migov/disable" "0"
-    if uname -a | grep -q "KN+U"; then
-       write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2002000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
-       write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000"
-       #
-       write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_min_freq" "533000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_min_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq
-       write "/sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq" "533000"
-       #
-       write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2288000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq
-       write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2288000"
-       #
-       write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_min_freq" "533000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_min_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_min_freq
-       write "/sys/devices/system/cpu/cpufreq/policy6/scaling_min_freq" "533000"
-       #
-       chmod 0444 /sys/devices/system/cpu/cpufreq/policy*/scaling_max_freq
-    else
-       write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2002000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
-       write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000"
-       #
-       write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_min_freq" "533000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_min_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq
-       write "/sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq" "533000"
-       #
-       write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2288000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq
-       write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2288000"
-       #
-       write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_min_freq" "533000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_min_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_min_freq
-       write "/sys/devices/system/cpu/cpufreq/policy6/scaling_min_freq" "533000"
-       #
-       chmod 0444 /sys/devices/system/cpu/cpufreq/policy*/scaling_max_freq
-    fi
-    
-    # Maximum CPU frequency limit
-    if uname -a | grep -q "KN+U"; then
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "-1" # 2496000
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-       #
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "-1"
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-       # 
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "-1" # 2210000
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-       #
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "-1"
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-    else
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "-1" # 2400000
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-       #
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "-1"
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-       # 
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "-1" # 2002000
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-       #
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "-1"
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-    fi
-    
-    write "/sys/devices/platform/10080000.BIG/thermal_mode" "1"
-    #write "/sys/devices/platform/10080000.BIG/emergency_frequency" "2016000"
-    
-    # Limitar little a 2.0 GHz (em vez de 2.21 GHz)
     write "/sys/devices/platform/exynos-acme/freq_qos_max" "0 2002000"
-
-    # Limitar big a 2.4 GHz (em vez de 2.496 GHz)
     write "/sys/devices/platform/exynos-acme/freq_qos_max" "6 2288000"
     
+    # Set thermal mode.
+    write "/sys/devices/platform/10080000.BIG/thermal_mode" "1"
+    write "/sys/devices/platform/10080000.BIG/emergency_frequency" "2399999"
+    
     simple_bar
-    kmsg1 "[*] CPU UNDERCLOCKED + EXYNOS MIGOV DISABLED + THERMAL CONFIGURED. "
+    kmsg1 "[*] CPU UNDERCLOCKED. "
     simple_bar
     
     # VM settings to improve overall user experience and smoothness.
-    #write "/proc/sys/vm/drop_caches" "3"
+    write "/proc/sys/vm/drop_caches" "3"
     write "/proc/sys/vm/dirty_background_ratio" "10"
-    write "/proc/sys/vm/dirty_ratio" "25"
-    write "/proc/sys/vm/dirty_expire_centisecs" "3000"
+    write "/proc/sys/vm/dirty_ratio" "30" # 25 is default
+    write "/proc/sys/vm/dirty_expire_centisecs" "1000" # 3000 is default 
     write "/proc/sys/vm/dirty_writeback_centisecs" "3000"
     write "/proc/sys/vm/overcommit_ratio" "50"
     write "/proc/sys/vm/page-cluster" "0"
-    write "/proc/sys/vm/stat_interval" "10"
+    write "/proc/sys/vm/stat_interval" "60" # 10 is default
     write "/proc/sys/vm/swappiness" "100"
     write "/proc/sys/vm/laptop_mode" "0"
-    write "/proc/sys/vm/vfs_cache_pressure" "200"
+    write "/proc/sys/vm/vfs_cache_pressure" "50" # 200 is default
     write "/proc/sys/vm/oom_kill_allocating_task" "0"
     write "/proc/sys/vm/extfrag_threshold" "750"
     
@@ -1691,10 +1609,10 @@ s5e8825_balanced() {
     do
       write "${io}add_random" "0"
       write "${io}iostats" "0"
-      write "${io}read_ahead_kb" "1024"
-      write "${io}nomerges" "0"
-      write "${io}rq_affinity" "0"
-      write "${io}nr_requests" "32"
+      write "${io}read_ahead_kb" "128" # 1024 is default
+      write "${io}nomerges" "2" # 0 is default
+      write "${io}rq_affinity" "1" # 0 is default
+      write "${io}nr_requests" "64" # 32 is default
     done
     
     simple_bar
@@ -1741,16 +1659,16 @@ s5e8825_balanced() {
     simple_bar
     
     # Turn off a few additional kernel debuggers and what not for gaining a slight boost in both performance and battery life.
-    write "/sys/module/hid_apple/parameters/fnmode" "1"
+    write "/sys/module/hid_apple/parameters/fnmode" "0" # default is 1
     write "/sys/module/hid/parameters/ignore_special_drivers" "0"
-    write "/sys/module/hid_magicmouse/parameters/emulate_3button" "Y"
-    write "/sys/module/hid_magicmouse/parameters/emulate_scroll_wheel" "Y"
-    write "/sys/module/hid_magicmouse/parameters/scroll_speed" "32"
-    write "/sys/module/ip6_tunnel/parameters/log_ecn_error" "Y"
-    write "/sys/module/sit/parameters/log_ecn_error" "Y"
-    write "/sys/module/printk/parameters/console_suspend" "N"
-    write "/sys/module/printk/parameters/ignore_loglevel" "N"
-    write "/sys/module/printk/parameters/time" "Y"
+    write "/sys/module/hid_magicmouse/parameters/emulate_3button" "N" # default is Y
+    write "/sys/module/hid_magicmouse/parameters/emulate_scroll_wheel" "N" # default is Y
+    write "/sys/module/hid_magicmouse/parameters/scroll_speed" "0" # default is 32
+    write "/sys/module/ip6_tunnel/parameters/log_ecn_error" "N" # default is Y
+    write "/sys/module/sit/parameters/log_ecn_error" "N" # default is Y
+    write "/sys/module/printk/parameters/console_suspend" "Y" # default is N
+    write "/sys/module/printk/parameters/ignore_loglevel" "Y" # default is N
+    write "/sys/module/printk/parameters/time" "N" # default is Y
     write "/sys/module/cpuidle/parameters/off" "1"
     write "/sys/module/binder/parameters/debug_mask" "0"
     write "/sys/module/binder_alloc/parameters/debug_mask" "0"
@@ -1760,13 +1678,13 @@ s5e8825_balanced() {
     simple_bar
     
     # Network Traffic Tweaks
-    write "/proc/sys/net/ipv4/tcp_fack" "0"
-    write "/proc/sys/net/ipv4/tcp_ecn" "0"
+    write "/proc/sys/net/ipv4/tcp_fack" "1" # default is 0
+    write "/proc/sys/net/ipv4/tcp_ecn" "1" # default is 0
     write "/proc/sys/net/ipv4/tcp_dsack" "1"
     write "/proc/sys/net/ipv4/conf/default/secure_redirects" "1"
     write "/proc/sys/net/ipv4/tcp_sack" "1"
-    write "/proc/sys/net/ipv4/tcp_rfc1337" "0"
-    write "/proc/sys/net/ipv4/tcp_fastopen" "1"
+    write "/proc/sys/net/ipv4/tcp_rfc1337" "1" # default is 0
+    write "/proc/sys/net/ipv4/tcp_fastopen" "3" # default is 1
     write "/proc/sys/net/ipv4/conf/all/secure_redirects" "1"
     
     simple_bar
@@ -1774,13 +1692,16 @@ s5e8825_balanced() {
     simple_bar
     
     # Misc kernel settings.
-    write "/sys/devices/platform/panel_drv_0/lcd/panel/mdnie/hdr" "0"
+    write "/sys/devices/platform/panel_drv_0/lcd/panel/mdnie/hdr" "1" # default is 0
     write "/sys/power/mem_sleep" "deep"
-    write "/proc/sys/kernel/pty/max" "4096"
-    write "/proc/sys/kernel/keys/gc_delay" "300"
+    write "/proc/sys/kernel/pty/max" "6144" # default is 4096
+    write "/proc/sys/kernel/keys/gc_delay" "100" # default is 300
     write "/proc/sys/kernel/keys/maxbytes" "20000"
     write "/proc/sys/kernel/keys/maxkeys" "200"
-    write "/sys/power/pm_freeze_timeout" "100"
+    write "/sys/power/pm_freeze_timeout" "60000" # default is 100
+    write "/sys/class/input_booster/debug_level" "1" # default is 0
+    write "/sys/class/input_booster/enable_event" "1" # default is 0
+    write "/sys/class/input_booster/send_event" "1" # default is 0
     sysctl -w net.ipv4.tcp_congestion_control=bbr
     
     simple_bar
