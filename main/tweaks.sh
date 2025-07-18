@@ -1568,8 +1568,8 @@ s5e8825_balanced() {
     write "/sys/devices/platform/exynos-acme/freq_qos_max" "6 2288000"
     
     # Set thermal mode.
-    write "/sys/devices/platform/10080000.BIG/thermal_mode" "1"
-    write "/sys/devices/platform/10080000.BIG/emergency_frequency" "2399999"
+    write "/sys/devices/platform/10080000.BIG/thermal_mode" "2" # default is 1
+    write "/sys/devices/platform/10080000.BIG/emergency_frequency" "228800"
     
     simple_bar
     kmsg1 "[*] CPU UNDERCLOCKED. "
