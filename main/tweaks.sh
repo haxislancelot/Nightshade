@@ -1584,7 +1584,7 @@ s5e8825_balanced() {
     write "/proc/sys/vm/overcommit_ratio" "50"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60" # 10 is default
-    write "/proc/sys/vm/swappiness" "45" # 100 is default
+    write "/proc/sys/vm/swappiness" "40" # 100 is default
     write "/proc/sys/vm/laptop_mode" "0"
     write "/proc/sys/vm/vfs_cache_pressure" "50" # 200 is default
     write "/proc/sys/vm/oom_kill_allocating_task" "0"
@@ -3755,7 +3755,7 @@ s5e8825_gaming() {
     write "/proc/sys/vm/overcommit_ratio" "50"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60" # 10 is default
-    write "/proc/sys/vm/swappiness" "100"
+    write "/proc/sys/vm/swappiness" "20" # 100 is default
     write "/proc/sys/vm/laptop_mode" "0"
     write "/proc/sys/vm/vfs_cache_pressure" "200"
     write "/proc/sys/vm/oom_kill_allocating_task" "0"
