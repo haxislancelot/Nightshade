@@ -3569,7 +3569,6 @@ s5e8825_gaming() {
     done <<< "$(pm list packages -e -3 | grep package | cut -f 2 -d ":")" && kmsg1 "[ * ] Cleaned background apps. "
 
     ram_usage
-	init=$(date +%s)
 	kmsg1 "----------------------- Info -----------------------"
     kmsg1 "[ * ] Date of execution: $(date) "
     kmsg1 "[ * ] Nightshade's version: $nightshade "
@@ -3646,15 +3645,15 @@ s5e8825_gaming() {
 	done
 	
     # CPU Load settings
-	write "/dev/cpuset/foreground/cpus" "0-5"
-	write "/dev/cpuset/background/cpus" "0-1"
-	write "/dev/cpuset/system-background/cpus" "0-3"
-	write "/dev/cpuset/top-app/cpus" "0-7"
-	write "/dev/cpuset/restricted/cpus" "0-7"
+	write "/dev/cpuset/foreground/cpus" "0-7" # 0-4,6-7 is default
+	write "/dev/cpuset/background/cpus" "0-2" # 0-3 default
+	write "/dev/cpuset/system-background/cpus" "0-5"
+	write "/dev/cpuset/top-app/cpus" "0-7" # 0-7 is default
+	write "/dev/cpuset/restricted/cpus" "0"
 	
-    # Switch to normal RCU for better CPU efficiency and latency 
-    write "/sys/kernel/rcu_expedited" "1"
-    write "/sys/kernel/rcu_normal" "0"
+	# Switch to normal RCU for better CPU efficiency and latency 
+    write "/sys/kernel/rcu_expedited" "1" # default is 1
+    write "/sys/kernel/rcu_normal" "0" # default is 0
     
     for cpu2 in /sys/devices/system/cpu/cpu*/
     do
@@ -3675,7 +3674,7 @@ s5e8825_gaming() {
     simple_bar
     
     # FileSystem (FS) optimized tweaks & enhancements for a improved userspace experience.
-    write "/proc/sys/fs/lease-break-time" "45"
+    write "/proc/sys/fs/lease-break-time" "20" # 45 is default
 	write "/proc/sys/fs/leases-enable" "1"
 	write "/proc/sys/fs/aio-max-nr" "65536"
 	write "/proc/sys/fs/inotify/max_queued_events" "16384"
@@ -3689,14 +3688,14 @@ s5e8825_gaming() {
     # Kernel Settings
     
     # CPU scheduling and kernel performance settings.
-    write "/proc/sys/kernel/sched_wakeup_granularity_ns" "1000000"
-    write "/proc/sys/kernel/sched_latency_ns" "3000000"
-    write "/proc/sys/kernel/sched_min_granularity_ns" "300000"
-    write "/proc/sys/kernel/sched_migration_cost_ns" "2500000"
+    write "/proc/sys/kernel/sched_wakeup_granularity_ns" "$((SCHED_PERIOD_THROUGHPUT / 2))" # 2000000 is default
+    write "/proc/sys/kernel/sched_latency_ns" "$SCHED_PERIOD_THROUGHPUT" # 4000000 is deafult
+    write "/proc/sys/kernel/sched_min_granularity_ns" "$((SCHED_PERIOD_THROUGHPUT / SCHED_TASKS_THROUGHPUT))" # 500000 is deafult
+    write "/proc/sys/kernel/sched_migration_cost_ns" "5000000"
     write "/proc/sys/kernel/sched_rt_period_us" "1000000"
     write "/proc/sys/kernel/perf_cpu_time_max_percent" "25"
     write "/proc/sys/kernel/sched_rr_timeslice_ms" "100"
-    write "/proc/sys/kernel/sched_nr_migrate" "32"
+    write "/proc/sys/kernel/sched_nr_migrate" "128" # 32 is default
     write "/proc/irq/default_smp_affinity" "01" # 0f default
     write "/sys/bus/workqueue/devices/writeback/cpumask" "ff" # default ff
     write "/sys/devices/virtual/workqueue/cpumask" "ff" # default ff
@@ -3707,9 +3706,9 @@ s5e8825_gaming() {
     write "/proc/sys/kernel/sched_tunable_scaling" "0"
     write "/proc/sys/kernel/perf_event_max_sample_rate" "100000"
     write "/proc/sys/kernel/perf_event_mlock_kb" "516"
-    write "/proc/sys/kernel/sched_child_runs_first" "1"
-    write "/proc/sys/kernel/random/write_wakeup_threshold" "256"
-    write "/proc/sys/kernel/random/urandom_min_reseed_secs" "60"
+    write "/proc/sys/kernel/sched_child_runs_first" "0" # 1 is default
+    write "/proc/sys/kernel/random/write_wakeup_threshold" "1024" # 256 is default
+    write "/proc/sys/kernel/random/urandom_min_reseed_secs" "90" # 60 is default
     if [ -f "/proc/sys/kernel/printk" ]; then
       write "/proc/sys/kernel/printk" "7 4 1 7"
     fi
@@ -3717,6 +3716,8 @@ s5e8825_gaming() {
     simple_bar
     kmsg1 "[*] TWEAKED KERNEL SETTINGS. "
     simple_bar
+    
+    # CPU Frequency Settings
     
     # Set min and max clocks.
     write "/sys/devices/system/cpu/cpu0/online" "1"
@@ -3728,112 +3729,34 @@ s5e8825_gaming() {
     write "/sys/devices/system/cpu/cpu6/online" "1"
     write "/sys/devices/system/cpu/cpu7/online" "1"
     
-    write "/sys/devices/platform/exynos-migov/migov/disable" "1"
     if uname -a | grep -q "KN+U"; then
-       write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2210000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
-       write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2210000"
-       #
-       write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_min_freq" "533000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_min_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq
-       write "/sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq" "533000"
-       #
-       write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2496000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq
-       write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2496000"
-       #
-       write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_min_freq" "533000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_min_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_min_freq
-       write "/sys/devices/system/cpu/cpufreq/policy6/scaling_min_freq" "533000"
-       #
-       chmod 0444 /sys/devices/system/cpu/cpufreq/policy*/scaling_max_freq
+       write "/sys/devices/platform/exynos-acme/freq_qos_max" "0 2210000"
+       write "/sys/devices/platform/exynos-acme/freq_qos_max" "6 2496000"
     else
-       write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq" "2002000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_max_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
-       write "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq" "2002000"
-       #
-       write "/sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_min_freq" "533000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl0/cl0_pm_qos_min_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq
-       write "/sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq" "533000"
-       #
-       write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq" "2288000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_max_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq
-       write "/sys/devices/system/cpu/cpufreq/policy6/scaling_max_freq" "2288000"
-       #
-       write "/sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_min_freq" "533000"
-       chmod 444 /sys/devices/platform/exynos-migov/cl1/cl1_pm_qos_min_freq
-       chown root /sys/devices/system/cpu/cpufreq/policy6/scaling_min_freq
-       write "/sys/devices/system/cpu/cpufreq/policy6/scaling_min_freq" "533000"
-       #
-       chmod 0444 /sys/devices/system/cpu/cpufreq/policy*/scaling_max_freq
+       write "/sys/devices/platform/exynos-acme/freq_qos_max" "0 2002000"
+       write "/sys/devices/platform/exynos-acme/freq_qos_max" "6 2400000"
     fi
     
-    # Maximum CPU frequency limit
-    if uname -a | grep -q "KN+U"; then
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "-1" # 2496000
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-       #
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "-1"
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-       # 
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "-1" # 2210000
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-       #
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "-1"
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-    else
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit" "-1" # 2002000
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_max_limit
-       #
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit" "-1"
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/cpufreq_min_limit
-       # 
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_max_limit" "-1" # 2002000
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_max_limit
-       #
-       chmod 644 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-       write "/sys/devices/platform/exynos-ufcc/ufc/little_min_limit" "-1"
-       chmod 444 /sys/devices/platform/exynos-ufcc/ufc/little_min_limit
-    fi
-    
-    write "/sys/devices/platform/10080000.BIG/thermal_mode" "2"
+    # Set thermal mode.
+    write "/sys/devices/platform/10080000.BIG/thermal_mode" "2" # default is 1
     write "/sys/devices/platform/10080000.BIG/emergency_frequency" "2288000"
     
-    write "/sys/devices/platform/exynos-migov/migov/inc_perf_temp_thr" "65" # 65
-    write "/sys/devices/platform/exynos-migov/migov/min_sensitivity" "10" # 10
-    write "/sys/devices/platform/exynos-migov/migov/gpu_freq_thr" "403000" # 403000
-    write "/sys/devices/platform/exynos-migov/migov/heavy_gpu_ms_thr" "50" # 50
-    
     simple_bar
-    kmsg1 "[*] CPU UNDERCLOCKED + EXYNOS MIGOV DISABLED + THERMAL CONFIGURED. "
+    kmsg1 "[*] CPU OVERCLOCKED. "
     simple_bar
     
     # VM settings to improve overall user experience and smoothness.
-    #write "/proc/sys/vm/drop_caches" "3"
-    write "/proc/sys/vm/dirty_background_ratio" "5"
-    write "/proc/sys/vm/dirty_ratio" "20"
-    write "/proc/sys/vm/dirty_expire_centisecs" "3000"
+    write "/proc/sys/vm/drop_caches" "3"
+    write "/proc/sys/vm/dirty_background_ratio" "5" # 10 is default
+    write "/proc/sys/vm/dirty_ratio" "30" # 25 is default
+    write "/proc/sys/vm/dirty_expire_centisecs" "500" # 3000 is default 
     write "/proc/sys/vm/dirty_writeback_centisecs" "3000"
     write "/proc/sys/vm/overcommit_ratio" "50"
     write "/proc/sys/vm/page-cluster" "0"
-    write "/proc/sys/vm/stat_interval" "10"
-    write "/proc/sys/vm/swappiness" "60"
+    write "/proc/sys/vm/stat_interval" "60" # 10 is default
+    write "/proc/sys/vm/swappiness" "100"
     write "/proc/sys/vm/laptop_mode" "0"
-    write "/proc/sys/vm/vfs_cache_pressure" "100"
+    write "/proc/sys/vm/vfs_cache_pressure" "200"
     write "/proc/sys/vm/oom_kill_allocating_task" "0"
     write "/proc/sys/vm/extfrag_threshold" "750"
     
@@ -3856,10 +3779,10 @@ s5e8825_gaming() {
     do
       write "${io}add_random" "0"
       write "${io}iostats" "0"
-      write "${io}read_ahead_kb" "2048"
-      write "${io}nomerges" "0"
-      write "${io}rq_affinity" "0"
-      write "${io}nr_requests" "64"
+      write "${io}read_ahead_kb" "512" # 1024 is default
+      write "${io}nomerges" "2" # 0 is default
+      write "${io}rq_affinity" "2" # 0 is default
+      write "${io}nr_requests" "256" # 32 is default
     done
     
     simple_bar
@@ -3870,20 +3793,20 @@ s5e8825_gaming() {
     
     if uname -a | grep -q "KN+U"; then
        write "/sys/kernel/gpu/gpu_unlock" "1"
-    fi   
+    fi
     
     for mali in /sys/devices/platform/*.mali
     do
     write "$mali/power_policy" "coarse_demand"
     write "$mali/dvfs_governor" "1"
-    write "$mali/tmu" "1" # Thermal Management Until for thermal monitoring and control.
-    write "$mali/highspeed_load" "60"
+    write "$mali/tmu" "0" # Thermal Management Until for thermal monitoring and control (1 is default).
+    write "$mali/highspeed_load" "80"
     write "$mali/highspeed_delay" "0"
     if uname -a | grep -q "KN+U"; then
        write "$mali/highspeed_clock" "1209000"
     else
        write "$mali/highspeed_clock" "897000"
-    fi   
+    fi
     done
     
     chmod -R 644 /sys/devices/platform/*.mali/dvfs
@@ -3893,13 +3816,13 @@ s5e8825_gaming() {
     chmod -R 644 /sys/devices/platform/*.mali/dvfs_max_lock_status
     
     chown root /sys/kernel/gpu/gpu_min_clock
-    write "/sys/kernel/gpu/gpu_min_clock" "507000"
+    write "/sys/kernel/gpu/gpu_min_clock" "104000"
     
     if uname -a | grep -q "KN+U"; then
-       chown root /sys/kernel/gpu/gpu_min_clock
+       chown root /sys/kernel/gpu/gpu_max_clock
        write "/sys/kernel/gpu/gpu_max_clock" "1209000"
     else
-       chown root /sys/kernel/gpu/gpu_min_clock
+       chown root /sys/kernel/gpu/gpu_max_clock
        write "/sys/kernel/gpu/gpu_max_clock" "897000"
     fi
     
@@ -3910,16 +3833,16 @@ s5e8825_gaming() {
     simple_bar
     
     # Turn off a few additional kernel debuggers and what not for gaining a slight boost in both performance and battery life.
-    write "/sys/module/hid_apple/parameters/fnmode" "1"
+    write "/sys/module/hid_apple/parameters/fnmode" "0" # default is 1
     write "/sys/module/hid/parameters/ignore_special_drivers" "0"
-    write "/sys/module/hid_magicmouse/parameters/emulate_3button" "Y"
-    write "/sys/module/hid_magicmouse/parameters/emulate_scroll_wheel" "Y"
-    write "/sys/module/hid_magicmouse/parameters/scroll_speed" "32"
-    write "/sys/module/ip6_tunnel/parameters/log_ecn_error" "Y"
-    write "/sys/module/sit/parameters/log_ecn_error" "Y"
-    write "/sys/module/printk/parameters/console_suspend" "N"
-    write "/sys/module/printk/parameters/ignore_loglevel" "N"
-    write "/sys/module/printk/parameters/time" "Y"
+    write "/sys/module/hid_magicmouse/parameters/emulate_3button" "N" # default is Y
+    write "/sys/module/hid_magicmouse/parameters/emulate_scroll_wheel" "N" # default is Y
+    write "/sys/module/hid_magicmouse/parameters/scroll_speed" "0" # default is 32
+    write "/sys/module/ip6_tunnel/parameters/log_ecn_error" "N" # default is Y
+    write "/sys/module/sit/parameters/log_ecn_error" "N" # default is Y
+    write "/sys/module/printk/parameters/console_suspend" "Y" # default is N
+    write "/sys/module/printk/parameters/ignore_loglevel" "Y" # default is N
+    write "/sys/module/printk/parameters/time" "N" # default is Y
     write "/sys/module/cpuidle/parameters/off" "1"
     write "/sys/module/binder/parameters/debug_mask" "0"
     write "/sys/module/binder_alloc/parameters/debug_mask" "0"
@@ -3929,13 +3852,13 @@ s5e8825_gaming() {
     simple_bar
     
     # Network Traffic Tweaks
-    write "/proc/sys/net/ipv4/tcp_fack" "0"
-    write "/proc/sys/net/ipv4/tcp_ecn" "0"
+    write "/proc/sys/net/ipv4/tcp_fack" "1" # default is 0
+    write "/proc/sys/net/ipv4/tcp_ecn" "1" # default is 0
     write "/proc/sys/net/ipv4/tcp_dsack" "1"
     write "/proc/sys/net/ipv4/conf/default/secure_redirects" "1"
     write "/proc/sys/net/ipv4/tcp_sack" "1"
-    write "/proc/sys/net/ipv4/tcp_rfc1337" "0"
-    write "/proc/sys/net/ipv4/tcp_fastopen" "1"
+    write "/proc/sys/net/ipv4/tcp_rfc1337" "1" # default is 0
+    write "/proc/sys/net/ipv4/tcp_fastopen" "3" # default is 1
     write "/proc/sys/net/ipv4/conf/all/secure_redirects" "1"
     
     simple_bar
@@ -3943,13 +3866,16 @@ s5e8825_gaming() {
     simple_bar
     
     # Misc kernel settings.
-    write "/sys/devices/platform/panel_drv_0/lcd/panel/mdnie/hdr" "0"
+    write "/sys/devices/platform/panel_drv_0/lcd/panel/mdnie/hdr" "1" # default is 0
     write "/sys/power/mem_sleep" "deep"
-    write "/proc/sys/kernel/pty/max" "4096"
-    write "/proc/sys/kernel/keys/gc_delay" "300"
+    write "/proc/sys/kernel/pty/max" "6144" # default is 4096
+    write "/proc/sys/kernel/keys/gc_delay" "100" # default is 300
     write "/proc/sys/kernel/keys/maxbytes" "20000"
     write "/proc/sys/kernel/keys/maxkeys" "200"
-    write "/sys/power/pm_freeze_timeout" "100"
+    write "/sys/power/pm_freeze_timeout" "60000" # default is 100
+    write "/sys/class/input_booster/debug_level" "1" # default is 0
+    write "/sys/class/input_booster/enable_event" "1" # default is 0
+    write "/sys/class/input_booster/send_event" "1" # default is 0
     sysctl -w net.ipv4.tcp_congestion_control=bbr
     
     simple_bar
@@ -3958,7 +3884,7 @@ s5e8825_gaming() {
     
     if [ "$(cat /sys/block/zram0/disksize)" -ne 4294967296 ]; then
         chmod 644 /dev/block/zram0
-        echo "zstd" > /sys/block/zram0/comp_algorithm
+        echo "lz4" > /sys/block/zram0/comp_algorithm
         swapoff /dev/block/zram0 > /dev/null 2>&1  
         echo "1" > /sys/block/zram0/reset
         echo "0" > /sys/block/zram0/disksize
@@ -3988,7 +3914,7 @@ s5e8825_gaming() {
 
     init=$(date +%s)
 	
-	am start -a android.intent.action.MAIN -e toasttext "Gaming+ profile was successfully applied!" -n bellavita.toast/.MainActivity
+	am start -a android.intent.action.MAIN -e toasttext "Gaming profile was successfully applied!" -n bellavita.toast/.MainActivity
 }
 
 mtk_gaming() {
