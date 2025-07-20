@@ -1703,7 +1703,7 @@ s5e8825_balanced() {
     write "/sys/class/input_booster/enable_event" "1" # default is 0
     write "/sys/class/input_booster/send_event" "1" # default is 0
     sysctl -w net.ipv4.tcp_congestion_control=bbr
-    pid=$(pgrep '^kswapd0$') && taskset -p f0 "$pid"
+    pid=$(pgrep '^kswapd0$') && taskset -p ff "$pid"
     
     simple_bar
     kmsg1 "[*] MISC KERNEL SETTINGS TWEAKED. "
@@ -3878,7 +3878,7 @@ s5e8825_gaming() {
     write "/sys/class/input_booster/enable_event" "1" # default is 0
     write "/sys/class/input_booster/send_event" "1" # default is 0
     sysctl -w net.ipv4.tcp_congestion_control=bbr
-    pid=$(pgrep '^kswapd0$') && taskset -p f0 "$pid"
+    pid=$(pgrep '^kswapd0$') && taskset -p ff "$pid"
     
     simple_bar
     kmsg1 "[*] MISC KERNEL SETTINGS TWEAKED. "
