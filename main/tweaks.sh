@@ -1584,7 +1584,7 @@ s5e8825_balanced() {
     write "/proc/sys/vm/overcommit_ratio" "50"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60" # 10 is default
-    write "/proc/sys/vm/swappiness" "100"
+    write "/proc/sys/vm/swappiness" "80" # 100 is default
     write "/proc/sys/vm/laptop_mode" "0"
     write "/proc/sys/vm/vfs_cache_pressure" "50" # 200 is default
     write "/proc/sys/vm/oom_kill_allocating_task" "0"
@@ -1703,6 +1703,7 @@ s5e8825_balanced() {
     write "/sys/class/input_booster/enable_event" "1" # default is 0
     write "/sys/class/input_booster/send_event" "1" # default is 0
     sysctl -w net.ipv4.tcp_congestion_control=bbr
+    pid=$(pgrep '^kswapd0$') && taskset -p f0 "$pid"
     
     simple_bar
     kmsg1 "[*] MISC KERNEL SETTINGS TWEAKED. "
@@ -3877,6 +3878,7 @@ s5e8825_gaming() {
     write "/sys/class/input_booster/enable_event" "1" # default is 0
     write "/sys/class/input_booster/send_event" "1" # default is 0
     sysctl -w net.ipv4.tcp_congestion_control=bbr
+    pid=$(pgrep '^kswapd0$') && taskset -p f0 "$pid"
     
     simple_bar
     kmsg1 "[*] MISC KERNEL SETTINGS TWEAKED. "
