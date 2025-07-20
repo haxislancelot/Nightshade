@@ -1569,7 +1569,7 @@ s5e8825_balanced() {
     
     # Set thermal mode.
     write "/sys/devices/platform/10080000.BIG/thermal_mode" "2" # default is 1
-    write "/sys/devices/platform/10080000.BIG/emergency_frequency" "2288000"
+    write "/sys/devices/platform/10080000.BIG/emergency_frequency" "2400000"
     
     simple_bar
     kmsg1 "[*] CPU UNDERCLOCKED. "
@@ -1584,7 +1584,7 @@ s5e8825_balanced() {
     write "/proc/sys/vm/overcommit_ratio" "50"
     write "/proc/sys/vm/page-cluster" "0"
     write "/proc/sys/vm/stat_interval" "60" # 10 is default
-    write "/proc/sys/vm/swappiness" "80" # 100 is default
+    write "/proc/sys/vm/swappiness" "45" # 100 is default
     write "/proc/sys/vm/laptop_mode" "0"
     write "/proc/sys/vm/vfs_cache_pressure" "50" # 200 is default
     write "/proc/sys/vm/oom_kill_allocating_task" "0"
