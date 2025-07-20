@@ -1565,7 +1565,7 @@ s5e8825_balanced() {
     write "/sys/devices/system/cpu/cpu7/online" "1"
     
     write "/sys/devices/platform/exynos-acme/freq_qos_max" "0 2002000"
-    write "/sys/devices/platform/exynos-acme/freq_qos_max" "6 2288000"
+    write "/sys/devices/platform/exynos-acme/freq_qos_max" "6 2400000"
     
     # Set thermal mode.
     write "/sys/devices/platform/10080000.BIG/thermal_mode" "2" # default is 1
