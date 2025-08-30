@@ -2143,7 +2143,7 @@ kona_balanced() {
     
     write "/sys/devices/system/cpu/cpu0/cpufreq/schedutil/hispeed_freq" "1804000"
     write "/sys/devices/system/cpu/cpu5/cpufreq/schedutil/hispeed_freq" "2342000"
-    write "/sys/devices/system/cpu/cpu7/cpufreq/schedutil/hispeed_freq" "2649000"
+    write "/sys/devices/system/cpu/cpu7/cpufreq/schedutil/hispeed_freq" "2745000"
 	
     write "/sys/devices/system/cpu/cpu0/cpufreq/schedutil/rtg_boost_freq" "0"
     
