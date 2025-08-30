@@ -2052,6 +2052,314 @@ mtk_normal() {
 	am start -a android.intent.action.MAIN -e toasttext "Balanced profile was successfully applied!" -n bellavita.toast/.MainActivity
 }
 
+kona_balanced() {
+	init=$(date +%s)
+	kmsg1 "----------------------- Info -----------------------"
+    kmsg1 "[ * ] Date of execution: $(date) "
+    kmsg1 "[ * ] Nightshade's version: $nightshade "
+    kmsg1 "[ * ] Kernel: $(uname -a) "
+    kmsg1 "[ * ] SOC: $mf, $soc "
+    kmsg1 "[ * ] SDK: $sdk "
+    kmsg1 "[ * ] CPU governor: $CPU_GOVERNOR "
+    kmsg1 "[ * ] CPU aarch: $aarch "
+    kmsg1 "[ * ] GPU governor: $GPU_GOVERNOR "
+    kmsg1 "[ * ] GPU model: $GPU_MODEL "
+    kmsg1 "[ * ] Android version: $arv "
+    kmsg1 "[ * ] Device: $dm  "
+    kmsg1 "[ * ] Battery charge level: $percentage% "
+    kmsg1 "[ * ] Battery temperature: $temperature°C "
+    kmsg1 "[ * ] Device total RAM: $totalram MB "
+    kmsg1 "[ * ] RAM usage: $used_percentage% "
+    kmsg1 "-------------------------------------------------------"
+    simple_bar
+    kmsg1 "[*] ENABLING $ntsh_profile PROFILE... "
+    simple_bar
+    
+    renice -n -5 $(pgrep system_server)
+    renice -n -5 $(pgrep com.miui.home)
+    renice -n -5 $(pgrep launcher)
+    renice -n -5 $(pgrep lawnchair)
+    renice -n -5 $(pgrep home)
+    renice -n -5 $(pgrep watchapp)
+    renice -n -5 $(pgrep trebuchet)
+    renice -n -1 $(pgrep dialer)
+    renice -n -1 $(pgrep keyboard)
+    renice -n -1 $(pgrep inputmethod)
+    renice -n -9 $(pgrep fluid)
+    renice -n -10 $(pgrep composer)
+    renice -n -1 $(pgrep com.android.phone)
+    renice -n -10 $(pgrep surfaceflinger)
+    renice -n 1 $(pgrep kswapd0)
+    renice -n 1 $(pgrep ksmd)
+    renice -n -6 $(pgrep msm_irqbalance)
+    renice -n -9 $(pgrep kgsl_worker)
+    renice -n 6 $(pgrep android.gms)    
+    
+    simple_bar
+    kmsg1 "[*] RENICED PROCESSES. "
+    simple_bar
+    
+    # Disable logd and statsd to reduce overhead.
+    stop logd
+    stop statsd
+
+    simple_bar
+    kmsg1 "[*] DISABLED STATSD AND LOGD. "
+    simple_bar
+    
+    # Disable kernel panic
+    sysctl -w kernel.panic=0
+    sysctl -w vm.panic_on_oom=0
+    sysctl -w kernel.panic_on_oops=0
+    sysctl -w kernel.softlockup_panic=0
+
+    simple_bar
+    kmsg1 "[*] DISABLED KERNEL PANIC "
+    simple_bar
+    
+    # CPU Tweaks
+    
+    # CPU Governor
+	cpu="0"
+	while [ $cpu -lt $cpu_cores ]; do
+		cpu_dir="/sys/devices/system/cpu/cpu${cpu}"
+		if [ -d "$cpu_dir" ]; then
+			write "${cpu_dir}/cpufreq/scaling_governor" "schedutil"
+		fi
+		cpu="$((cpu + 1))"
+	done
+	
+	# CPU Tweaks
+    for cpu in /sys/devices/system/cpu/cpu*/cpufreq/
+    do
+        write "${cpu}scaling_governor" schedutil
+        write "${cpu}schedutil/up_rate_limit_us" "$((SCHED_PERIOD_BALANCE / 1000))"
+        write "${cpu}schedutil/down_rate_limit_us" "$((4 * SCHED_PERIOD_BALANCE / 1000))"
+        write "${cpu}schedutil/pl" "0"
+        write "${cpu}schedutil/iowait_boost_enable" "0"
+        write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BALANCE / 1000))"
+        write "${cpu}schedutil/hispeed_load" "89"
+    done
+    
+    write "/sys/devices/system/cpu/cpu0/cpufreq/schedutil/hispeed_freq" "1804000"
+    write "/sys/devices/system/cpu/cpu5/cpufreq/schedutil/hispeed_freq" "2342000"
+    write "/sys/devices/system/cpu/cpu7/cpufreq/schedutil/hispeed_freq" "2649000"
+	
+    write "/sys/devices/system/cpu/cpu0/cpufreq/schedutil/rtg_boost_freq" "0"
+    
+	# CPU Load settings
+	write "/dev/cpuset/foreground/cpus" "0-2,4-7" # 0-2,4-7 is default
+	write "/dev/cpuset/background/cpus" "0-3" # 0-2 default
+	write "/dev/cpuset/system-background/cpus" "0-3"
+	write "/dev/cpuset/top-app/cpus" "0-7" # 0-5,6-7 is default
+	write "/dev/cpuset/restricted/cpus" "0-1" # 0-2 is default
+	
+	
+    for cpu2 in /sys/devices/system/cpu/cpu*/
+    do
+    chmod 444 ${cpu2}cpu_capacity
+    done
+
+    chmod 444 /sys/devices/system/cpu/cpu0/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu1/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu2/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu3/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu4/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu5/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu6/topology/physical_package_id
+    chmod 444 /sys/devices/system/cpu/cpu7/topology/physical_package_id
+    
+	simple_bar
+    kmsg1 "[*] CPU TWEAKED. "
+    simple_bar
+    
+    # Schedtune Tweaks
+    if [[ -d "/dev/stune/" ]]; then
+        write "/dev/stune/background/schedtune.boost" "0"
+        write "/dev/stune/background/schedtune.prefer_idle" "0"
+        write "/dev/stune/foreground/schedtune.boost" "0"
+        write "/dev/stune/foreground/schedtune.prefer_idle" "1"
+        write "/dev/stune/rt/schedtune.boost" "0"
+        write "/dev/stune/rt/schedtune.prefer_idle" "0"
+        write "/dev/stune/top-app/schedtune.boost" "10"
+        write "/dev/stune/top-app/schedtune.prefer_idle" "1"
+        write "/dev/stune/schedtune.boost" "0"
+        write "/dev/stune/schedtune.prefer_idle" "0"
+        simple_bar
+        kmsg1 "[*] APPLIED SCHEDTUNE TWEAKS. "
+        simple_bar
+    fi
+    
+    if [[ -e "/sys/module/cpu_boost/parameters/dynamic_stune_boost" ]]; then
+	    write "/sys/module/cpu_boost/parameters/dynamic_stune_boost" "10"
+	    simple_bar
+	    kmsg1 "[*] TWEAKED STUNE BOOST."
+	    simple_bar
+    fi
+
+    for corectl in /sys/devices/system/cpu/cpu*/core_ctl
+    do
+	    if [[ -e "${corectl}/enable" ]]; then
+		    write "${corectl}/enable" "1"
+        elif [[ -e "${corectl}/disable" ]]; then
+	    write "${corectl}/disable" "0"
+	    fi
+    done
+
+    simple_bar
+    kmsg1 "[*] ENABLED CORE CONTROL. "
+    simple_bar
+    
+    # Underclock Settings
+    
+    # Set max clock.
+    for cpu in /sys/devices/system/cpu/cpu*
+    do
+	    write "$cpu/online" "1"
+    done
+    
+    write "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq" "1804000"
+    write "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq" "2342000"
+    write "/sys/devices/system/cpu/cpu7/cpufreq/scaling_max_freq" "2649000"
+    
+    simple_bar
+    kmsg1 "[*] CPU UNDERCLOCKED. "
+    simple_bar
+    
+    # VM settings to improve overall user experience and smoothness.
+    write "/proc/sys/vm/drop_caches" "3"
+    write "/proc/sys/vm/dirty_background_ratio" "10"
+    write "/proc/sys/vm/dirty_ratio" "30"
+    write "/proc/sys/vm/dirty_expire_centisecs" "1000"
+    write "/proc/sys/vm/dirty_writeback_centisecs" "3000"
+    write "/proc/sys/vm/page-cluster" "0"
+    write "/proc/sys/vm/stat_interval" "60"
+    write "/proc/sys/vm/swappiness" "100"
+    write "/proc/sys/vm/laptop_mode" "0"
+    write "/proc/sys/vm/vfs_cache_pressure" "50"
+
+    simple_bar
+    kmsg1 "[*] APPLIED VM TWEAKS."
+    simple_bar
+    
+    # Enable power efficient workqueue.
+    if [[ -e "/sys/module/workqueue/parameters/power_efficient" ]]; then
+	    write "/sys/module/workqueue/parameters/power_efficient" "Y"
+	    simple_bar
+	    kmsg1 "[*] ENABLED POWER EFFICIENT WORKQUEUE. "
+	    simple_bar
+    fi
+    
+    # I/O Tweaks
+    
+    # I/O Scheduler
+    for queue in /sys/block/sd*/queue/; do
+      write "${queue}scheduler" "cfq" 
+    done
+    
+    for loop in /sys/block/loop*/queue/; do
+      echo "${loop}scheduler" "cfq"
+    done
+    
+    for io in /sys/block/*/queue/
+    do
+      write "${io}add_random" "0"
+      write "${io}iostats" "0"
+      write "${io}read_ahead_kb" "128" # 1024 is default
+      write "${io}nomerges" "2" # 0 is default
+      write "${io}rq_affinity" "1" # 0 is default
+      write "${io}nr_requests" "64" # 32 is default
+    done
+    
+    simple_bar
+    kmsg1 "[*] I/O SCHEDULER TWEAKED. "
+    simple_bar
+    
+    # GPU Tweaks
+    gpu="/sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/"
+    write "$gpu/default_pwrlevel" "4"
+    write "$gpu/throttling" "1"
+    write "$gpu/thermal_pwrlevel" "0"
+    write "$gpu/force_no_nap" "0"
+    write "$gpu/bus_split" "1"
+    write "$gpu/devfreq/max_freq" $(cat "$gpu"/max_gpuclk)
+    write "$gpu/devfreq/min_freq" "100000000"
+    write "$gpu/force_bus_on" "0"
+    write "$gpu/force_clk_on" "0"
+    write "$gpu/force_rail_on" "0"
+    write "$gpu/idle_timer" "96"
+    
+    simple_bar
+    kmsg1 "[*] GPU TWEAKED. "
+    simple_bar
+    
+    # FS tweaks.
+    if [[ -d "/proc/sys/fs" ]]; then
+	    write "/proc/sys/fs/dir-notify-enable" "0"
+	    write "/proc/sys/fs/lease-break-time" "20"
+	    write "/proc/sys/fs/leases-enable" "1"
+	    simple_bar
+	    kmsg1 "[*] APPLIED FS TWEAKS "
+	    simple_bar
+    fi
+    
+    # Network Traffic Tweaks
+    write "/proc/sys/net/ipv4/tcp_fack" "1" # default is 0
+    write "/proc/sys/net/ipv4/tcp_ecn" "1" # default is 0
+    write "/proc/sys/net/ipv4/tcp_dsack" "1"
+    write "/proc/sys/net/ipv4/conf/default/secure_redirects" "1"
+    write "/proc/sys/net/ipv4/tcp_sack" "1"
+    write "/proc/sys/net/ipv4/tcp_rfc1337" "1" # default is 0
+    write "/proc/sys/net/ipv4/tcp_fastopen" "3" # default is 1
+    write "/proc/sys/net/ipv4/conf/all/secure_redirects" "1"
+    
+    simple_bar
+    kmsg1 "[*] NETWORK TRAFFIC TWEAKED. "
+    simple_bar
+    
+    # Tweak some kernel settings to improve overall performance.
+    write "/proc/sys/kernel/sched_child_runs_first" "0"
+    write "/proc/sys/kernel/sched_boost" "0"
+    write "/proc/sys/kernel/perf_cpu_time_max_percent" "15"
+    write "/proc/sys/kernel/sched_autogroup_enabled" "1"
+    write "/proc/sys/kernel/random/read_wakeup_threshold" "64"
+    write "/proc/sys/kernel/random/write_wakeup_threshold" "256"
+    write "/proc/sys/kernel/random/urandom_min_reseed_secs" "90"
+    write "/proc/sys/kernel/sched_tunable_scaling" "0"
+    write "/proc/sys/kernel/sched_latency_ns" "$SCHED_PERIOD_BALANCE"
+    write "/proc/sys/kernel/sched_min_granularity_ns" "$((SCHED_PERIOD_BALANCE / SCHED_TASKS_BALANCE))"
+    write "/proc/sys/kernel/sched_wakeup_granularity_ns" "$((SCHED_PERIOD_BALANCE / 2))"
+    write "/proc/sys/kernel/sched_migration_cost_ns" "5000000"
+    write "/proc/sys/kernel/sched_min_task_util_for_colocation" "0"
+    write "/proc/sys/kernel/sched_nr_migrate" "32"
+    write "/proc/sys/kernel/sched_schedstats" "0"
+    write "/proc/sys/kernel/sched_sync_hint_enable" "0"
+    write "/proc/sys/kernel/sched_user_hint" "0"
+    write "/proc/sys/kernel/printk_devkmsg" "off"
+
+    simple_bar
+    kmsg1 "[*] TWEAKED KERNEL SETTINGS. "
+    simple_bar
+    
+    simple_bar
+    kmsg1 "[*] $ntsh_profile PROFILE APPLIED WITH SUCCESS. "
+    simple_bar
+    
+    simple_bar
+    kmsg1 "[*] END OF EXECUTION: $(date)"
+    simple_bar
+    exit=$(date +%s)
+
+    exectime=$((exit - init))
+    simple_bar
+    kmsg1 "[*] EXECUTION DONE IN $exectime SECONDS. "
+    simple_bar
+
+    init=$(date +%s)
+	
+	am start -a android.intent.action.MAIN -e toasttext "Balanced profile was successfully applied!" -n bellavita.toast/.MainActivity
+}
+
 balanced() {
 init=$(date +%s)     
 
@@ -2070,6 +2378,13 @@ if [[ $chipset == *s5e8825* ]]; then
     kmsg1 "[ ! ] Device is Exynos 1280, executing s5e8825_balanced..."
     settings delete global device_idle_constants
     s5e8825_balanced
+    exit
+fi
+
+if [[ $chipset == *KONA* ]]; then
+    kmsg1 "[ ! ] Device is Kona, executing kona_balanced..."
+    settings delete global device_idle_constants
+    kona_balanced
     exit
 fi
 
