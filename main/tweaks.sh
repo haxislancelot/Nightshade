@@ -2136,24 +2136,22 @@ kona_balanced() {
         write "${cpu}schedutil/up_rate_limit_us" "$((SCHED_PERIOD_BALANCE / 1000))"
         write "${cpu}schedutil/down_rate_limit_us" "$((4 * SCHED_PERIOD_BALANCE / 1000))"
         write "${cpu}schedutil/pl" "0"
-        write "${cpu}schedutil/iowait_boost_enable" "0"
-        write "${cpu}schedutil/rate_limit_us" "$((4 * SCHED_PERIOD_BALANCE / 1000))"
         write "${cpu}schedutil/hispeed_load" "89"
     done
     
+    # Underclocking Settings
     write "/sys/devices/system/cpu/cpu0/cpufreq/schedutil/hispeed_freq" "1804000"
     write "/sys/devices/system/cpu/cpu5/cpufreq/schedutil/hispeed_freq" "2342000"
     write "/sys/devices/system/cpu/cpu7/cpufreq/schedutil/hispeed_freq" "2745000"
-	
+    
     write "/sys/devices/system/cpu/cpu0/cpufreq/schedutil/rtg_boost_freq" "0"
     
-	# CPU Load settings
+	# CPU Load Settings
 	write "/dev/cpuset/foreground/cpus" "0-2,4-7" # 0-2,4-7 is default
-	write "/dev/cpuset/background/cpus" "0-3" # 0-2 default
+	write "/dev/cpuset/background/cpus" "0-2" # 0-2 default
 	write "/dev/cpuset/system-background/cpus" "0-3"
-	write "/dev/cpuset/top-app/cpus" "0-7" # 0-5,6-7 is default
-	write "/dev/cpuset/restricted/cpus" "0-1" # 0-2 is default
-	
+	write "/dev/cpuset/top-app/cpus" "0-5,6-7" # 0-5,6-7 is default
+	write "/dev/cpuset/restricted/cpus" "0-2" # 0-2 is default
 	
     for cpu2 in /sys/devices/system/cpu/cpu*/
     do
@@ -2227,7 +2225,7 @@ kona_balanced() {
     simple_bar
     
     # VM settings to improve overall user experience and smoothness.
-    write "/proc/sys/vm/drop_caches" "3"
+    #write "/proc/sys/vm/drop_caches" "3"
     write "/proc/sys/vm/dirty_background_ratio" "10"
     write "/proc/sys/vm/dirty_ratio" "30"
     write "/proc/sys/vm/dirty_expire_centisecs" "1000"
@@ -2241,14 +2239,6 @@ kona_balanced() {
     simple_bar
     kmsg1 "[*] APPLIED VM TWEAKS."
     simple_bar
-    
-    # Enable power efficient workqueue.
-    if [[ -e "/sys/module/workqueue/parameters/power_efficient" ]]; then
-	    write "/sys/module/workqueue/parameters/power_efficient" "Y"
-	    simple_bar
-	    kmsg1 "[*] ENABLED POWER EFFICIENT WORKQUEUE. "
-	    simple_bar
-    fi
     
     # I/O Tweaks
     
@@ -2277,7 +2267,15 @@ kona_balanced() {
     
     # GPU Tweaks
     gpu="/sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/"
-    write "$gpu/default_pwrlevel" "4"
+    max_gpuclk=$(cat /sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/max_gpuclk)
+    if [[ $max_gpuclk = "870000000" ]]; then
+        kmsg1 "[*] GPU is overclocked, setting default_pwrlevel..."
+        write "$gpu/default_pwrlevel" "8" # default is 5, but we'll use 8 for better battery draining. 
+    else
+        kmsg1 "[*] GPU is non-overclocked, setting default_pwrlevel..."
+        write "$gpu/default_pwrlevel" "5"
+    fi
+    
     write "$gpu/throttling" "1"
     write "$gpu/thermal_pwrlevel" "0"
     write "$gpu/force_no_nap" "0"
@@ -2321,8 +2319,6 @@ kona_balanced() {
     write "/proc/sys/kernel/sched_child_runs_first" "0"
     write "/proc/sys/kernel/sched_boost" "0"
     write "/proc/sys/kernel/perf_cpu_time_max_percent" "15"
-    write "/proc/sys/kernel/sched_autogroup_enabled" "1"
-    write "/proc/sys/kernel/random/read_wakeup_threshold" "64"
     write "/proc/sys/kernel/random/write_wakeup_threshold" "256"
     write "/proc/sys/kernel/random/urandom_min_reseed_secs" "90"
     write "/proc/sys/kernel/sched_tunable_scaling" "0"
