@@ -2107,7 +2107,7 @@ kona_balanced() {
     kmsg1 "[*] DISABLED STATSD AND LOGD. "
     simple_bar
     
-    # Disable kernel panic
+    # Disable Kernel Panic
     sysctl -w kernel.panic=0
     sysctl -w vm.panic_on_oom=0
     sysctl -w kernel.panic_on_oops=0
@@ -2137,14 +2137,13 @@ kona_balanced() {
         write "${cpu}schedutil/down_rate_limit_us" "$((4 * SCHED_PERIOD_BALANCE / 1000))"
         write "${cpu}schedutil/pl" "0"
         write "${cpu}schedutil/hispeed_load" "89"
+        write "/sys/devices/system/cpu/cpu0/cpufreq/schedutil/rtg_boost_freq" "0"
     done
     
     # Underclocking Settings
     write "/sys/devices/system/cpu/cpu0/cpufreq/schedutil/hispeed_freq" "1804000"
     write "/sys/devices/system/cpu/cpu5/cpufreq/schedutil/hispeed_freq" "2342000"
     write "/sys/devices/system/cpu/cpu7/cpufreq/schedutil/hispeed_freq" "2745000"
-    
-    write "/sys/devices/system/cpu/cpu0/cpufreq/schedutil/rtg_boost_freq" "0"
     
 	# CPU Load Settings
 	write "/dev/cpuset/foreground/cpus" "0-2,4-7" # 0-2,4-7 is default
@@ -2153,6 +2152,11 @@ kona_balanced() {
 	write "/dev/cpuset/top-app/cpus" "0-5,6-7" # 0-5,6-7 is default
 	write "/dev/cpuset/restricted/cpus" "0-2" # 0-2 is default
 	
+	simple_bar
+    kmsg1 "[*] CPU TWEAKED. "
+    simple_bar
+    
+    # Schedtune and general cpu settings.
     for cpu2 in /sys/devices/system/cpu/cpu*/
     do
     chmod 444 ${cpu2}cpu_capacity
@@ -2167,11 +2171,6 @@ kona_balanced() {
     chmod 444 /sys/devices/system/cpu/cpu6/topology/physical_package_id
     chmod 444 /sys/devices/system/cpu/cpu7/topology/physical_package_id
     
-	simple_bar
-    kmsg1 "[*] CPU TWEAKED. "
-    simple_bar
-    
-    # Schedtune Tweaks
     if [[ -d "/dev/stune/" ]]; then
         write "/dev/stune/background/schedtune.boost" "0"
         write "/dev/stune/background/schedtune.prefer_idle" "0"
@@ -2300,6 +2299,25 @@ kona_balanced() {
 	    kmsg1 "[*] APPLIED FS TWEAKS "
 	    simple_bar
     fi
+    
+    # Turn off a few additional kernel debuggers and what not for gaining a slight boost in both performance and battery life.
+    write "/sys/module/hid_apple/parameters/fnmode" "0" # default is 1
+    write "/sys/module/hid/parameters/ignore_special_drivers" "0"
+    write "/sys/module/hid_magicmouse/parameters/emulate_3button" "N" # default is Y
+    write "/sys/module/hid_magicmouse/parameters/emulate_scroll_wheel" "N" # default is Y
+    write "/sys/module/hid_magicmouse/parameters/scroll_speed" "0" # default is 32
+    write "/sys/module/ip6_tunnel/parameters/log_ecn_error" "N" # default is Y
+    write "/sys/module/sit/parameters/log_ecn_error" "N" # default is Y
+    write "/sys/module/printk/parameters/console_suspend" "Y" # default is N
+    write "/sys/module/printk/parameters/ignore_loglevel" "Y" # default is N
+    write "/sys/module/printk/parameters/time" "N" # default is Y
+    write "/sys/module/cpuidle/parameters/off" "1"
+    write "/sys/module/binder/parameters/debug_mask" "0"
+    write "/sys/module/binder_alloc/parameters/debug_mask" "0"
+    
+    simple_bar
+    kmsg1 "[*] KERNEL DEBUGGERS DISABLED. "
+    simple_bar
     
     # Network Traffic Tweaks
     write "/proc/sys/net/ipv4/tcp_fack" "1" # default is 0
