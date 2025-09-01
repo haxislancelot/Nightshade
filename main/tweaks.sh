@@ -2217,7 +2217,7 @@ kona_balanced() {
     
     write "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq" "1804000"
     write "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq" "2342000"
-    write "/sys/devices/system/cpu/cpu7/cpufreq/scaling_max_freq" "2649000"
+    write "/sys/devices/system/cpu/cpu7/cpufreq/scaling_max_freq" "2745000"
     
     simple_bar
     kmsg1 "[*] CPU UNDERCLOCKED. "
