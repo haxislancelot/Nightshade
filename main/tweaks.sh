@@ -2142,8 +2142,8 @@ kona_balanced() {
     
     # Underclocking Settings
     write "/sys/devices/system/cpu/cpu0/cpufreq/schedutil/hispeed_freq" "1804000"
-    write "/sys/devices/system/cpu/cpu5/cpufreq/schedutil/hispeed_freq" "2342000"
-    write "/sys/devices/system/cpu/cpu7/cpufreq/schedutil/hispeed_freq" "2745000"
+    write "/sys/devices/system/cpu/cpu5/cpufreq/schedutil/hispeed_freq" "2419000"
+    write "/sys/devices/system/cpu/cpu7/cpufreq/schedutil/hispeed_freq" "2841000"
     
 	# CPU Load Settings
 	write "/dev/cpuset/foreground/cpus" "0-2,4-7" # 0-2,4-7 is default
@@ -2151,6 +2151,11 @@ kona_balanced() {
 	write "/dev/cpuset/system-background/cpus" "0-3"
 	write "/dev/cpuset/top-app/cpus" "0-5,6-7" # 0-5,6-7 is default
 	write "/dev/cpuset/restricted/cpus" "0-2" # 0-2 is default
+	
+	# CPU Hotplug Settings
+	write "/sys/devices/system/cpu/cpu7/core_ctl/busy_down_thres" "50" # 30 is default
+    write "/sys/devices/system/cpu/cpu7/core_ctl/busy_up_thres" "80" # 60 is default
+    write "/sys/devices/system/cpu/cpu7/core_ctl/offline_delay_ms" "500" # 100 is default
 	
 	simple_bar
     kmsg1 "[*] CPU TWEAKED. "
@@ -2216,8 +2221,11 @@ kona_balanced() {
     done
     
     write "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq" "1804000"
-    write "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq" "2342000"
-    write "/sys/devices/system/cpu/cpu7/cpufreq/scaling_max_freq" "2745000"
+    write "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq" "2419000"
+    write "/sys/devices/system/cpu/cpu7/cpufreq/scaling_max_freq" "2841000"
+    
+    # Experimental Battery Thermal Configs
+    write "/sys/class/thermal/thermal_zone84/policy" "low_limits_cap" # default is "step_wise"
     
     simple_bar
     kmsg1 "[*] CPU UNDERCLOCKED. "
@@ -2265,13 +2273,13 @@ kona_balanced() {
     simple_bar
     
     # GPU Tweaks
-    gpu="/sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/"
+    gpu="/sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/kgsl/kgsl-3d0"
     max_gpuclk=$(cat /sys/devices/platform/soc/3d00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/max_gpuclk)
     if [[ $max_gpuclk = "870000000" ]]; then
-        kmsg1 "[*] GPU is overclocked, setting default_pwrlevel..."
+        kmsg1 "[*] GPU is konabess, setting default_pwrlevel..."
         write "$gpu/default_pwrlevel" "8" # default is 5, but we'll use 8 for better battery draining. 
     else
-        kmsg1 "[*] GPU is non-overclocked, setting default_pwrlevel..."
+        kmsg1 "[*] GPU is non-konabess, setting default_pwrlevel..."
         write "$gpu/default_pwrlevel" "5"
     fi
     
